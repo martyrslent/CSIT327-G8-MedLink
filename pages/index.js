@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
   const [count, setCount] = useState(0);
@@ -15,6 +16,13 @@ export default function Home() {
         Increment Count: {count}
       </button>
 
+      <button className="mt-4 px-5 py-2 bg-blue-500 text-white font-medium rounded-lg shadow hover:bg-blue-600 transition">
+        <Link href="/login">login page</Link>
+      </button>
+
+      <button className="mt-4 px-5 py-2 bg-purple-500 text-white font-medium rounded-lg shadow hover:bg-purple-600 transition">
+        <Link href="/register">register page</Link>
+      </button>
     </div>
   );
 }
