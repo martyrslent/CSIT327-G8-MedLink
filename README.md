@@ -1,40 +1,218 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# MedLink
 
-## Getting Started
+Welcome to **MedLink** — a web application for managing health services and appointments.
+This README is written for **new developers** joining the project.
 
-First, run the development server:
+---
+
+## 🚀 Tech stack
+
+* **Next.js** (Page Router) — React framework for frontend + backend API routes
+* **React** — frontend UI library
+* **Tailwind CSS** — styling
+* **MongoDB** + **Mongoose** — database + ORM
+* **ESLint** — linting & code style
+
+---
+
+## 📂 Project structure
+
+```
+/pages
+  index.js            # Home page
+  appointments.js     # Appointments page
+  api/
+    test-db.js        # Test DB connection
+/lib
+  mongodb.js          # DB connection helper
+/models
+  Appointment.js      # Example Mongoose model
+/public
+/styles
+package.json
+tailwind.config.js
+README.md
+.env.example
+```
+
+---
+
+## 🛠️ Setup instructions
+
+### 1. Prerequisites
+
+* Install **Node.js v20+**
+* Install **npm** (comes with Node)
+
+### 2. Clone repo
+
+```bash
+git clone git@github.com:Kintoyyy/MedLink.git
+cd MedLink
+```
+
+### 3. Configure environment
+
+Copy the example env file:
+
+```bash
+cp .env.example .env.local
+```
+
+Update `.env.local` with your MongoDB URI and any required secrets.
+
+Example:
+
+```env
+MONGODB_URI=mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/medlink
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+⚠️ Never commit `.env.local`.
+
+### 4. Install dependencies
+
+```bash
+npm ci
+```
+
+---
+
+## ▶️ Running the app
+
+### Development mode
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open: [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+### Production build
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+```bash
+npm run build
+npm start
+```
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✅ Testing DB connection
 
-## Learn More
+Visit the test API route:
 
-To learn more about Next.js, take a look at the following resources:
+```
+http://localhost:3000/api/test-db
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+If the DB is connected, you’ll see a list of collections.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 👩‍💻 Contribution workflow (branch-based, step by step)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+⚠️ **Never commit directly to `main`. Always work on your own branch.**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+### 1. Sync `main` branch
+
+```bash
+git checkout main
+git pull origin main
+```
+
+### 2. Switch to your own branch
+
+If you already have a branch:
+
+```bash
+git checkout feature/add-appointments
+```
+
+If you need to create a new one:
+
+```bash
+git checkout -b feature/<short-description>
+```
+
+### 3. Update your branch with main
+
+```bash
+git checkout feature/add-appointments
+git pull origin main
+```
+
+### 4. Do your work
+
+* Run `npm run dev` while coding
+* Run `npm run lint` to check style
+
+### 5. Commit your changes
+
+Use clear commit messages (Conventional Commit style):
+
+Examples:
+
+```bash
+git add .
+git commit -m "feat(appointments): add booking button"
+git commit -m "fix(api): handle missing appointment date"
+git commit -m "docs(readme): update branch workflow"
+```
+
+### 6. Push your branch
+
+```bash
+git push origin feature/add-appointments
+```
+
+### 7. Open a Pull Request (PR)
+
+* PR target: `main`
+* Title: short & descriptive (`feat: add appointments page`)
+* Description: explain
+
+  * What you changed
+  * How to test
+  * Screenshots if UI changed
+
+### 8. Review & merge
+
+* Reviewer checks code & functionality
+* Fix issues if asked → commit & push again:
+
+  ```bash
+  git add .
+  git commit -m "fix(appointments): update button color"
+  git push origin feature/add-appointments
+  ```
+* After approval, PR is merged into `main` via GitHub/GitLab
+
+### 9. Update your local main
+
+After merge:
+
+```bash
+git checkout main
+git pull origin main
+```
+
+---
+
+## 🔍 Checklist before opening PR
+
+* [ ] App builds without errors: `npm run build`
+* [ ] Lint passes: `npm run lint`
+* [ ] `.env.local` not committed
+* [ ] PR description explains changes
+
+---
+
+## 🆘 Need help?
+
+If you get stuck:
+
+1. Share your branch name
+2. Include error logs or screenshots
+3. Describe the steps you tried
+
+Post this info in Teams or tag your reviewer.

@@ -1,3 +1,6 @@
+// Example: Access via
+// http://localhost:3000/api/test-db
+
 import mongoose from "mongoose";
 import { connectDB } from "../../lib/mongodb";
 
