@@ -29,7 +29,7 @@ ALLOWED_HOSTS = [
     "10.15.0.165",
     "localhost",
     "127.0.0.1",
-    "*.kintoyyy.com"
+    "medlink.kintoyyy.com"
 ]
 
 
