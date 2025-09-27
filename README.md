@@ -25,7 +25,7 @@ This step-by-step guide will help you:
    Expected output:
 
    ```
-   Python 3.13.7
+   Python 3.x.x
    ```
 
 ---
@@ -46,7 +46,7 @@ This step-by-step guide will help you:
    Example:
 
    ```
-   git version 2.46.0
+   git version 2.x.x.windows.1
    ```
 
 ---
