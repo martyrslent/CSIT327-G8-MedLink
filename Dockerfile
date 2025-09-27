@@ -40,9 +40,9 @@ COPY . .
 # =========================
 # Development (Django runserver)
 # =========================
-# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8002"]
 
 # =========================
 # Production (Gunicorn)
 # =========================
-CMD ["gunicorn", "medlink.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "medlink.wsgi:application", "--bind", "0.0.0.0:8002"]
