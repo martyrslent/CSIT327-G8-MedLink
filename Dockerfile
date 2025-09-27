@@ -21,13 +21,10 @@ RUN pip install --no-cache-dir pipenv
 # Copy Pipfile (always required)
 COPY Pipfile ./
 
-# Copy Pipfile.lock if it exists
-# (ignore missing file so build won’t fail)
+# Copy Pipfile.lock if it exists (ignore if missing)
 COPY Pipfile.lock* ./
 
 # Install dependencies
-# - If lockfile exists → deterministic install
-# - If not → install directly from Pipfile (skip lock)
 RUN if [ -f Pipfile.lock ]; then \
         pipenv install --system --deploy --ignore-pipfile; \
     else \
@@ -37,12 +34,15 @@ RUN if [ -f Pipfile.lock ]; then \
 # Copy project files
 COPY . .
 
+# Collect static files at build time
+RUN python manage.py collectstatic --noinput
+
 # =========================
 # Development (Django runserver)
 # =========================
-# CMD ["python", "manage.py", "runserver", "0.0.0.0:8002"]
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8001"]
 
 # =========================
-# Production (Gunicorn)
+# Production (Gunicorn + WhiteNoise)
 # =========================
-CMD ["gunicorn", "medlink.wsgi:application", "--bind", "0.0.0.0:8002"]
+CMD ["gunicorn", "medlink.wsgi:application", "--bind", "0.0.0.0:8001"]
