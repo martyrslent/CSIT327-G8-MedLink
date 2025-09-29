@@ -1,11 +1,13 @@
 # 🪟 MedLink Setup & Contribution Guide (Windows)
 
 This step-by-step guide will help you:
-- ✔ Install **Python** & **Git**
-- ✔ Clone the **MedLink repo**
-- ✔ Open the project in **VS Code**
-- ✔ Run the **Django app** locally
-- ✔ Create a branch & contribute on **GitHub**
+* ✔ Install **Python** & **Git**
+* ✔ Clone the **MedLink repo**
+* ✔ Open the project in **VS Code**
+* ✔ Run the **Django app** locally
+* ✔ Keep your repo updated (pull, requirements, migrations)
+* ✔ Create a branch & contribute on **GitHub**
+
 
 ---
 
@@ -175,11 +177,35 @@ Quit the server with CTRL+C.
 👉 Open your browser: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 🎉 You should see the MedLink app running locally.
 
+## 8. Keep Your Local Repo Updated 🔄
+
+Before working on new features, always sync your repo with the latest changes from GitHub.
+
+1. Pull the latest changes:
+
+   ```bash
+   git pull origin main
+   ```
+
+2. Update dependencies:
+
+   ```bash
+   pipenv install -r requirements.txt
+   ```
+
+   *(This makes sure you have the same libraries as the repo.)*
+
+3. Run migrations (in case new database changes were added):
+
+   ```bash
+   python manage.py migrate
+   ```
+
+👉 Do this every time before you start coding to avoid errors.
+
 ---
 
-## 8. Create a New Branch 🌱
-
-Before making changes, create a feature branch:
+## 9. Create a New Branch 🌱
 
 ```bash
 git checkout -b your-feature-name
@@ -193,41 +219,28 @@ git checkout -b add-login-page
 
 ---
 
-## 9. Save & Commit Changes ✅
+## 10. Save & Commit Changes ✅
 
-1. Edit files inside **VS Code**.
-2. In terminal, stage and commit changes:
-
-   ```bash
-   git add .
-   git commit -m "Added login page feature"
-   ```
+```bash
+git add .
+git commit -m "Added login page feature"
+```
 
 ---
 
-## 10. Push Your Branch to GitHub ☁️
-
-Upload your branch:
+## 11. Push Your Branch to GitHub ☁️
 
 ```bash
 git push origin your-feature-name
 ```
 
-Example:
-
-```bash
-git push origin add-login-page
-```
-
 ---
 
-## 11. Open a Pull Request (PR) 🔄
+## 12. Open a Pull Request (PR) 🔄
 
 1. Go to the [MedLink GitHub Repo](https://github.com/Kintoyyy/MedLink).
-2. You’ll see a banner: **“Compare & Pull Request”**.
-3. Click → describe your changes → **Create Pull Request**.
-
-Done ✅ You’ve contributed to MedLink!
+2. Click **Compare & Pull Request**.
+3. Describe your changes → **Create Pull Request**.
 
 ---
 
@@ -241,12 +254,7 @@ Done ✅ You’ve contributed to MedLink!
 6. Install Pipenv → `pip install pipenv`
 7. Enter env → `pipenv shell`
 8. Run server → `python manage.py runserver`
-9. Branch → `git checkout -b feature-name`
-10. Commit → `git commit -m "msg"`
-11. Push & PR 🚀
-
----
-
-## ⚠️ Having Trouble?
-
-Check the [Troubleshooting Guide](/TROUBLESHOOTING_WINDOWS.md).
+9. **Update repo** → `git pull`, `pipenv install -r requirements.txt`, `python manage.py migrate`
+10. Branch → `git checkout -b feature-name`
+11. Commit → `git commit -m "msg"`
+12. Push & PR 🚀

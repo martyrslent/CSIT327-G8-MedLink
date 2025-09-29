@@ -6,6 +6,10 @@ filelock==3.19.1
 packaging==25.0
 pipenv==2025.0.4
 platformdirs==4.4.0
+<<<<<<< Updated upstream
+=======
+python-decouple==3.8
+>>>>>>> Stashed changes
 setuptools==80.9.0
 sqlparse==0.5.3
 tzdata==2025.2
