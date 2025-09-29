@@ -1,0 +1,82 @@
+body.auth-body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f7 url('/static/accounts/images/bg-placeholder.jpg') no-repeat center center;
+    background-size: cover;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.auth-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+    width: 350px;
+    text-align: center;
+}
+
+.auth-logo {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #e60023;
+}
+
+.highlight {
+    color: #111;
+}
+
+.auth-container h2 {
+    margin-bottom: 0.5rem;
+}
+
+.auth-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.auth-container input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    width: 100%;
+}
+
+.auth-container .name-row {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn {
+    background: #e60023;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #c1001d;
+}
+
+.auth-links, .switch-page {
+    font-size: 0.9rem;
+    margin-top: 0.8rem;
+}
+
+.auth-links a, .switch-page a {
+    color: #e60023;
+    text-decoration: none;
+}
+
+.auth-links a:hover, .switch-page a:hover {
+    text-decoration: underline;
+}
