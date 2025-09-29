@@ -99,27 +99,61 @@ Inside VS Code, install these extensions for a smoother workflow:
 
 ---
 
-## 6. Install Pipenv & Django 💻
+## 6. Set Up Virtual Environment (`venv`) 💻
 
-We’ll use **Pipenv** to manage dependencies.
+We’ll use Python’s built-in `venv` to manage dependencies.
 
-1. Install Pipenv:
+### ➤ Step 1: Create a Virtual Environment
 
-   ```bash
-   pip install pipenv
-   ```
-2. Install Django in the environment:
+In the project folder (`IMDC-Management-System`):
 
-   ```bash
-   pipenv install django
-   ```
-3. Activate the environment:
+```bash
+python -m venv venv
+```
 
-   ```bash
-   pipenv shell
-   ```
+This creates a `venv/` folder with your isolated environment.
 
-   👉 You should see `(MedLink)` at the start of your terminal prompt, meaning you’re inside the virtual environment.
+---
+
+### ➤ Step 2: Activate the Virtual Environment
+
+#### ✅ If using **Command Prompt**:
+
+```cmd
+venv\Scripts\activate.bat
+```
+
+#### ✅ If using **PowerShell**:
+
+```powershell
+.\venv\Scripts\Activate.ps1
+```
+
+#### ✅ If using **Linux**:
+
+```bash
+. venv/bin/activate
+```
+
+> ⚠️ If you see an error about script execution policy, use **Command Prompt** instead of PowerShell — it works without changing security settings.
+
+---
+
+### ➤ Step 3: Install Django
+
+Once the environment is activated:
+
+```bash
+pip install django
+```
+
+---
+
+### ➤ Step 4: Freeze Dependencies (for sharing with others)
+
+```bash
+pip freeze > requirements.txt
+```
 
 ---
 

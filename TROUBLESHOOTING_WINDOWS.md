@@ -9,9 +9,9 @@ Common issues when setting up **MedLink** on Windows.
 **Cause:** Windows doesn’t recognize Python properly.
 **Fix:**
 
-1. Uninstall the Microsoft Store **“App Installer” Python**.
+1. Uninstall the Microsoft Store **“App Installer” Python** app if installed.
 2. Download and install Python 👉 [python.org/downloads/windows](https://www.python.org/downloads/windows/)
-3. During installation, check **“Add Python to PATH”**.
+3. During installation, make sure to check **“Add Python to PATH”**.
 
 ---
 
@@ -44,21 +44,41 @@ Common issues when setting up **MedLink** on Windows.
 
 ---
 
-## ❌ Pipenv errors (`command not found`)
+## ❌ Virtual environment won’t activate (PowerShell script execution restricted)
 
-**Cause:** Pipenv not installed globally.
+**Cause:** Windows restricts running scripts due to Execution Policy, and you **do not have admin rights** to change it.
 **Fix:**
 
-```bash
-pip install pipenv
-```
+* Use **Command Prompt** instead of PowerShell, then activate with:
+
+  ```cmd
+  venv\Scripts\activate.bat
+  ```
+
+* Alternatively, in PowerShell, you can run the Python interpreter inside the virtual environment without activating it:
+
+  ```powershell
+  .\venv\Scripts\python.exe manage.py runserver
+  ```
+
+* If you *do* have admin rights on another machine, you can open PowerShell **as Administrator** and run:
+
+  ```powershell
+  Set-ExecutionPolicy RemoteSigned
+  ```
+
+  Then activate with:
+
+  ```powershell
+  .\venv\Scripts\Activate.ps1
+  ```
 
 ---
 
 ## ❌ Port already in use (when running server)
 
-**Cause:** Port **8000** is already being used.
-**Fix:** Run the server on a different port:
+**Cause:** Port **8000** is already in use.
+**Fix:** Run the Django development server on a different port:
 
 ```bash
 python manage.py runserver 8080
@@ -68,20 +88,20 @@ Then open 👉 [http://127.0.0.1:8080/](http://127.0.0.1:8080/)
 
 ---
 
-## ❌ Virtual environment won’t activate
+## ❌ Pipenv errors (`command not found`)
 
-**Cause:** Windows restricts script execution.
-**Fix:** Open PowerShell as **Administrator** and run:
+**Cause:** Pipenv is not installed or unavailable on your system.
+**Fix:**
 
-```powershell
-Set-ExecutionPolicy RemoteSigned
-```
+* We recommend switching to the built-in `venv` for virtual environments (see setup guide).
 
-Then activate again:
+* If you still want to use pipenv, install it with:
 
-```bash
-pipenv shell
-```
+  ```bash
+  pip install --user pipenv
+  ```
+
+* Make sure your user-level `Scripts` directory is added to PATH.
 
 ---
 
