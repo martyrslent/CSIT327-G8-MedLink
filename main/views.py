@@ -1,5 +1,8 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password
+from .supabase_client import supabase  # Make sure supabase_client.py sets up your Supabase client
 
 def hello_page(request):
     return HttpResponse("Hello, Django Page!")
@@ -8,33 +11,48 @@ def login_page(request):
     return render(request, "login-student.html")
 
 def register_page(request):
-    from django.contrib.auth.models import User
-from django.shortcuts import render, redirect
-from django.contrib import messages
-
-def register_page(request):
-    #the database in this rn is just a placeholder, i don't know the database yet.
     if request.method == "POST":
-        username = request.POST.get("username")
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+        email = request.POST.get("email")
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
 
-        # check if username already exists
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "Username already exists!")
-            return render(request, "register-student.html")
-
-        # check if passwords match
+        # Check if passwords match
         if password != confirm_password:
             messages.error(request, "Passwords do not match!")
             return render(request, "register-student.html")
 
-        # create the user (saved to DB)
-        user = User.objects.create_user(username=username, password=password)
-        user.save()
+        table_name = "users"  # Your Supabase table name (case-sensitive)
 
-        messages.success(request, "Account created successfully! Please log in.")
-        return redirect("login")  
+        try:
+            # Check if email already exists
+            response = supabase.table(table_name).select("email").eq("email", email).execute()
+            if response.data:
+                messages.error(request, "Email already registered!")
+                return render(request, "register-student.html")
+
+            # Hash password
+            hashed_password = make_password(password)
+
+            # Insert new user into Supabase
+            response = supabase.table(table_name).insert({
+                "first_name": first_name,
+                "last_name": last_name,
+                "email": email,
+                "password": hashed_password
+            }).execute()
+
+            if response.error:
+                messages.error(request, "Error creating account: " + str(response.error))
+                return render(request, "register-student.html")
+
+            messages.success(request, "Account created successfully! Please log in.")
+            return redirect("login")
+
+        except Exception as e:
+            messages.error(request, "Unexpected error: " + str(e))
+            return render(request, "register-student.html")
 
     return render(request, "register-student.html")
 
