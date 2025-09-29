@@ -2,8 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
-from .supabase_client import supabase  # Make sure supabase_client.py sets up your Supabase client
-
+from .supabase_client import supabase  
 def hello_page(request):
     return HttpResponse("Hello, Django Page!")
 
@@ -18,24 +17,24 @@ def register_page(request):
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
 
-        # Check if passwords match
+
         if password != confirm_password:
             messages.error(request, "Passwords do not match!")
             return render(request, "register-student.html")
 
-        table_name = "users"  # Your Supabase table name (case-sensitive)
+        table_name = "users"  
 
         try:
-            # Check if email already exists
+    
             response = supabase.table(table_name).select("email").eq("email", email).execute()
             if response.data:
                 messages.error(request, "Email already registered!")
                 return render(request, "register-student.html")
 
-            # Hash password
+         
             hashed_password = make_password(password)
 
-            # Insert new user into Supabase
+           
             response = supabase.table(table_name).insert({
                 "first_name": first_name,
                 "last_name": last_name,
