@@ -1,21 +1,33 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sign Up - MedLink</title>
+    <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
 </head>
-<body>
-    <h1>Register</h1>
-    <form method="post">
-        {% csrf_token %}
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <button type="submit">Register</button>
-        <br>
-        <a href="{% url 'login' %}">Already have an account? Login here.</a>
-    </form>
+<body class="auth-body">
+    <div class="auth-container">
+        <div class="auth-logo">Med<span class="highlight">Link</span></div>
+        <h2>Create an account</h2>
+        <p>Fill Out Everything</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="name-row">
+                <input type="text" name="first_name" placeholder="First Name">
+                <input type="text" name="last_name" placeholder="Last Name">
+            </div>
+
+            <input type="email" name="email" placeholder="Email">
+            <input type="password" name="password" placeholder="Password">
+            <input type="password" name="confirm_password" placeholder="Confirm Password">
+
+            <button type="submit" class="btn">Sign Up</button>
+        </form>
+
+        <p class="switch-page">Already have an account? <a href="{% url 'login' %}">Sign In</a></p>
+    </div>
 </body>
 </html>

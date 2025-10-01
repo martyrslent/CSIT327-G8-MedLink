@@ -12,7 +12,12 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+from decouple import config
+
+SUPABASE_URL = config("SUPABASE_URL")
+SUPABASE_ANON_KEY = config("SUPABASE_ANON_KEY")
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
