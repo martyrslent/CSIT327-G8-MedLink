@@ -3,10 +3,67 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 from .supabase_client import supabase  
+from django.contrib.auth.hashers import check_password
+
 def hello_page(request):
     return HttpResponse("Hello, Django Page!")
 
 def login_page(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+
+        print("DEBUG: Received POST request")
+        print(f"DEBUG: email={email}, password={'*' * len(password) if password else None}")
+
+        if not email or not password:
+            print("DEBUG: Missing email or password")
+            messages.error(request, "Please fill in all fields!")
+            return render(request, "login-student.html")
+
+        table_name = "users"
+
+        try:
+            print(f"DEBUG: Querying Supabase table '{table_name}' for email '{email}'")
+            response = supabase.table(table_name).select("*").eq("email", email).execute()
+            print(f"DEBUG: Supabase response: {response.data}")
+
+            if not response.data:
+                print("DEBUG: No user found with this email")
+                messages.error(request, "Email not found!")
+                return render(request, "login-student.html")
+
+            user = response.data[0]
+            print(f"DEBUG: Found user: {user}")
+            if not check_password(password, user["password"]):
+                print("DEBUG: Password check failed")
+                messages.error(request, "Incorrect password!")
+                return render(request, "login-student.html")
+            else:
+                print("DEBUG: Password check passed")
+
+            #admin checker 
+            if not user.get("is_admin", False):
+                print("DEBUG: User is not admin")
+                messages.error(request, "You do not have admin access!")
+                return render(request, "login-student.html")
+            else:
+                print("DEBUG: User is admin")
+
+            request.session["user_id"] = user["id"]
+            request.session["user_email"] = user["email"]
+            request.session["is_admin"] = user["is_admin"]
+            print("DEBUG: User session set successfully")
+
+            messages.success(request, f"Welcome, {user['first_name']}!")
+            return redirect("https://github.com/Kintoyyy/MedLink")  # placeholder para sa dashboard 
+
+        except Exception as e:
+            print(f"DEBUG: Exception occurred: {str(e)}")
+            messages.error(request, f"Unexpected error: {str(e)}")
+            return render(request, "login-student.html")
+
+    print("DEBUG: GET request received, rendering login page")
     return render(request, "login-student.html")
 
 def register_page(request):
@@ -17,29 +74,26 @@ def register_page(request):
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
 
-
         if password != confirm_password:
             messages.error(request, "Passwords do not match!")
             return render(request, "register-student.html")
 
-        table_name = "users"  
+        table_name = "users"
 
         try:
-    
             response = supabase.table(table_name).select("email").eq("email", email).execute()
             if response.data:
                 messages.error(request, "Email already registered!")
                 return render(request, "register-student.html")
 
-         
             hashed_password = make_password(password)
 
-           
             response = supabase.table(table_name).insert({
                 "first_name": first_name,
                 "last_name": last_name,
                 "email": email,
-                "password": hashed_password
+                "password": hashed_password,
+                "is_admin": False
             }).execute()
 
             if response.error:
