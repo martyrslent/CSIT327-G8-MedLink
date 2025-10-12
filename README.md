@@ -1,3 +1,24 @@
+# 🩺 MedLink
+
+**Description:**  
+MedLink is a web-based healthcare management system that streamlines appointment scheduling and patient record handling to reduce errors and improve efficiency in community health centers.
+
+---
+
+## 🧰 Tech Stack Used
+- **Front End:** HTML, CSS  
+- **Back End:** Django (Python)  
+- **Database:** Supabase  
+
+---
+
+## 👥 Team Members (Name, Role, CIT-U Email)
+- **Ed Lawrenz C. Portes** — Lead Developer — edlawrenz.portes@cit.edu  
+- **Christy Roan N. Reroma** — Developer — christyroan.reroma@cit.edu  
+- **Reden Misael P. Relacion** — Developer — redenmisael.relacion@cit.edu  
+
+---
+
 # 🪟 MedLink Setup & Contribution Guide (Windows)
 
 This step-by-step guide will help you:
