@@ -14,8 +14,8 @@ MedLink is a web-based healthcare management system that streamlines appointment
 
 ## 👥 Team Members (Name, Role, CIT-U Email)
 - **Ed Lawrenz C. Portes** — Lead Developer — edlawrenz.portes@cit.edu  
-- **Christy Roan N. Reroma** — Developer — christyroan.reroma@cit.edu  
-- **Reden Misael P. Relacion** — Developer — redenmisael.relacion@cit.edu  
+- **Christy Roan N. Reroma** — Frontend Developer — christyroan.reroma@cit.edu  
+- **Reden Misael P. Relacion** — Backend Developer — redenmisael.relacion@cit.edu  
 
 ---
 
