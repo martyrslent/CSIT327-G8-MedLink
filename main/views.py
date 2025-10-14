@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 from .supabase_client import supabase  
 from django.contrib.auth.hashers import check_password
+from supabase import create_client, Client
 
 def hello_page(request):
     return HttpResponse("Hello, Django Page!")
@@ -35,6 +36,7 @@ def login_page(request):
 
             user = response.data[0]
             print(f"DEBUG: Found user: {user}")
+
             if not check_password(password, user["password"]):
                 print("DEBUG: Password check failed")
                 messages.error(request, "Incorrect password!")
@@ -42,21 +44,19 @@ def login_page(request):
             else:
                 print("DEBUG: Password check passed")
 
-            #admin checker 
-            if not user.get("is_admin", False):
-                print("DEBUG: User is not admin")
-                messages.error(request, "You do not have admin access!")
-                return render(request, "login-student.html")
-            else:
-                print("DEBUG: User is admin")
-
             request.session["user_id"] = user["id"]
             request.session["user_email"] = user["email"]
-            request.session["is_admin"] = user["is_admin"]
+            request.session["is_admin"] = user.get("is_admin", False)
             print("DEBUG: User session set successfully")
 
-            messages.success(request, f"Welcome, {user['first_name']}!")
-            return redirect("https://github.com/Kintoyyy/MedLink")  # placeholder para sa dashboard 
+            if user.get("is_admin", False):
+                print("DEBUG: User is admin")
+                messages.success(request, f"Welcome, {user['first_name']}!")
+                return redirect("admin_dashboard")
+            else:
+                print("DEBUG: User is normal user")
+                messages.success(request, f"Welcome, {user['first_name']}!")
+                return redirect("user_dashboard")  #redirection para sa user if not admin
 
         except Exception as e:
             print(f"DEBUG: Exception occurred: {str(e)}")
@@ -65,6 +65,32 @@ def login_page(request):
 
     print("DEBUG: GET request received, rendering login page")
     return render(request, "login-student.html")
+
+
+def admin_dashboard(request):
+    if not request.session.get("is_admin"):
+        return redirect("login")
+    
+    try:
+        response = supabase.table("users").select("*").eq("is_admin", False).execute()
+        total_patients = len(response.data) if response.data else 0
+
+        new_registrations = total_patients
+
+        context = {
+            "total_patients": total_patients,
+            "total_appointments": 0,   # placeholder for now
+            "recent_activity": [],     # placeholder
+            "new_registrations": new_registrations,
+        }
+
+    except Exception as e:
+        context = {
+            "total_patients": "Error",
+            "error_message": str(e),
+        }
+
+    return render(request, "admin_dashboard.html", context)
 
 def register_page(request):
     if request.method == "POST":
