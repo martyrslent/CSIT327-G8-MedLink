@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
+</head>
+<body>
+  <div class="dashboard-wrap">
+    <aside class="sidebar">
+      <div class="logo">MedLink</div>
+      <nav class="nav">
+        <ul>
+          <li><a href="#">Dashboard</a></li>
+          <li><a href="#">Users</a></li>
+          <li><a href="#">Appointments</a></li>
+          <li><a href="#">Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <h1 class="page-title">Dashboard (Admin)</h1>
+
+      <section class="top-row">
+        <div class="card">
+          <h3>Total Active Patients</h3>
+          <div class="stat">0</div>
+          <div class="muted">+3% this month</div>
+        </div>
+
+        <div class="card">
+          <h3>Appointments Today</h3>
+          <div class="stat">0</div>
+          <div class="muted red-text">Completed</div>
+        </div>
+      </section>
+
+      <section class="wide-card">
+  <div class="card full">
+    <h3>New Patient Registrations</h3>
+    <div class="stat">{{ new_registrations }}</div>
+    <a class="btn" href="#">View All New Patients</a>
+  </div>
+</section>
+
+      <section class="bottom-row">
+        <div class="card">
+          <h3>Staff Availability Overview (Weekly)</h3>
+          <a class="btn">Manage Staff Schedule</a>
+        </div>
+
+        <div class="card">
+          <h3>Reports Summary</h3>
+          <ul class="report-list">
+            <li>Monthly Patient Report</li>
+            <li>Monthly Staff Report</li>
+          </ul>
+
+          <div class="actions">
+            <a class="btn block" href="#">+ Register New Patient</a>
+            <a class="btn block" href="#">+ Add New Staff Member</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
