@@ -5,17 +5,17 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Load secrets
+# Secrets
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = ["*", "localhost", "127.0.0.1", ".onrender.com"]
+ALLOWED_HOSTS = [".onrender.com"]
 
-# Supabase keys
+# Supabase API keys (for your frontend/backend integration)
 SUPABASE_URL = config("SUPABASE_URL")
 SUPABASE_ANON_KEY = config("SUPABASE_ANON_KEY")
 
-# Database (Supabase = PostgreSQL)
+# Database (PostgreSQL via Supabase)
 DATABASES = {
     "default": dj_database_url.config(default=config("DATABASE_URL"))
 }
@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "main",
 ]
 
+# Middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -44,6 +45,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "medlink.urls"
 
+# Templates
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -61,6 +63,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "medlink.wsgi.application"
 
+# Auth password validators
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -68,11 +71,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# Internationalization
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+# Static & media files
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
