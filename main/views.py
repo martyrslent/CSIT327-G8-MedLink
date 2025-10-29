@@ -140,3 +140,7 @@ def forgot_password_page(request):
 
 def home_page(request):
     return render(request, "home.html")
+
+def logout_page(request):
+    request.session.flush()  
+    return redirect("login")  

@@ -16,7 +16,7 @@
           <li><a href="#">Dashboard</a></li>
           <li><a href="#">Users</a></li>
           <li><a href="#">Appointments</a></li>
-          <li><a href="#">Logout</a></li>
+          <li><a href="{% url 'logout' %}">Logout</a></li>
         </ul>
       </nav>
     </aside>
@@ -28,7 +28,7 @@
         <div class="card">
           <h3>Total Active Patients</h3>
           <div class="stat">0</div>
-          <div class="muted">+3% this month</div>
+          <div class="muted"></div>
         </div>
 
         <div class="card">
@@ -37,6 +37,7 @@
           <div class="muted red-text">Completed</div>
         </div>
       </section>
+
 
       <section class="wide-card">
   <div class="card full">
@@ -60,7 +61,7 @@
           </ul>
 
           <div class="actions">
-            <a class="btn block" href="#">+ Register New Patient</a>
+            <a class="btn block" href="#">+ Register New Appointment</a>
             <a class="btn block" href="#">+ Add New Staff Member</a>
           </div>
         </div>
