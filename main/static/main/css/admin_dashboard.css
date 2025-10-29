@@ -10,10 +10,10 @@ body {
   min-height: 100vh;
 }
 
-/* Sidebar */
+
 .sidebar {
   width: 240px;
-  background: #dc3545; /* red */
+  background: #dc3545; 
   color: #fff;
   padding: 26px 18px;
   display: flex;
@@ -42,7 +42,6 @@ body {
 }
 .nav a:hover { background: rgba(0,0,0,0.08); }
 
-/* Main content area */
 .content {
   flex: 1;
   padding: 26px;
@@ -50,7 +49,6 @@ body {
 }
 .page-title { margin: 6px 0 20px; font-size: 20px; color: #333; }
 
-/* Grid rows */
 .top-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -64,19 +62,21 @@ body {
   gap: 18px;
 }
 
-/* Card base */
 .card {
   background: #fff;
-  border: 2px solid #fff; /* subtle */
+  border: 2px solid #fff; 
   border-radius: 10px;
   padding: 18px;
 }
-.card.full { display: flex; flex-direction: column; gap: 12px; }
+.card.full { display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    align-items: flex-start; }
 
-/* Titles & numbers */
+
 .card h3 {
   margin: 0 0 10px 0;
-  color: #b21f2a; /* darker red for headings */
+  color: #b21f2a; 
   font-size: 16px;
 }
 .stat {
@@ -88,7 +88,6 @@ body {
 .muted { font-size: 13px; color: #7b7b7b; }
 .red-text { color: #dc3545; font-weight: 600; }
 
-/* Buttons */
 .btn {
   display: inline-block;
   background: #dc3545;
@@ -102,14 +101,11 @@ body {
 }
 .btn:hover { background: #b8232b; }
 
-/* Stacked action buttons */
 .actions { margin-top: 12px; display: flex; flex-direction: column; gap: 10px; }
 .btn.block { display: inline-block; width: 100%; text-align: center; }
 
-/* Reports list */
 .report-list { margin: 8px 0 0 16px; padding: 0; color: #444; font-size: 14px; }
 
-/* Responsive */
 @media (max-width: 880px) {
   .dashboard-wrap { flex-direction: column; }
   .sidebar { width: 100%; flex-direction: row; gap: 12px; padding: 12px; align-items: center; }
@@ -117,3 +113,4 @@ body {
   .top-row, .bottom-row { grid-template-columns: 1fr; }
   .wide-card { grid-column: unset; }
 }
+
