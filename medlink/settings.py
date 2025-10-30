@@ -8,6 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
+# Add your deployment URL here
 ALLOWED_HOSTS = ["your-deployment-url.onrender.com"]
 
 SUPABASE_URL = config("SUPABASE_URL")
@@ -21,8 +22,12 @@ DATABASES = {
     )
 }
 
+# Security for deployment
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_SSL_REDIRECT = True
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 INSTALLED_APPS = [
