@@ -17,11 +17,12 @@ try:
     else:
         # Only initialize if both are present
         
-        # 🛑 CRITICAL FIX: Set a 30-second timeout to prevent Gunicorn worker crash 🛑
+        # 🛑 CRITICAL FIX: Changed 'options' to 'client_options'
+        # This fixes the 'dict' object has no attribute 'headers' crash
         supabase = create_client(
             SUPABASE_URL,
             SUPABASE_ANON_KEY,
-            options={"timeout": 30} 
+            client_options={"timeout": 30} 
         )
         print("DEBUG: Supabase Client Initialized Successfully with 30s timeout.")
 
