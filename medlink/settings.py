@@ -18,20 +18,21 @@ DATABASES = {
         os.environ.get("DATABASE_URL"),
         conn_max_age=600,
         ssl_require=True,
-        # 🛑 FINAL CRITICAL FIX: Force IPv4 connection to prevent Network Unreachable error
-        conn_health_checks=True,
-        host_chars=4 
+        # IMPORTANT: Removed host_chars=4 and conn_health_checks=True
+        # host_chars is now in the DATABASE_URL env var itself.
     )
 }
 
-# 🛑 CRITICAL FIX: CACHE CONFIGURATION
-# Define a simple, in-memory local cache. This is fast and avoids external services.
+# Add the CACHES and SESSION_ENGINE settings back for stability
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'medlink-cache-key', # A unique name for the cache instance
+        'LOCATION': 'medlink-cache-key',
     }
 }
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+SESSION_CACHE_ALIAS = "default"
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
