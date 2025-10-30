@@ -17,12 +17,11 @@ try:
     else:
         # Only initialize if both are present
         
-        # 🛑 CRITICAL FIX: Changed 'options' to 'client_options'
-        # This fixes the 'dict' object has no attribute 'headers' crash
+        # 🛑 FINAL FIX: Pass timeout directly as a keyword argument (older style) 🛑
         supabase = create_client(
             SUPABASE_URL,
             SUPABASE_ANON_KEY,
-            client_options={"timeout": 30} 
+            timeout=30 
         )
         print("DEBUG: Supabase Client Initialized Successfully with 30s timeout.")
 
