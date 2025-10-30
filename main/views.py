@@ -2,7 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
-from .supabase_client import supabase  
+from .supabase_client import supabase
 from django.contrib.auth.hashers import check_password
 from supabase import create_client, Client
 from django.urls import reverse, NoReverseMatch
@@ -66,8 +66,9 @@ def login_page(request):
 def admin_dashboard(request):
     if not request.session.get("is_admin"):
         return redirect("login")
-    
+
     try:
+        # The complex Supabase interaction happens here.
         response = supabase.table("users").select("*").eq("is_admin", False).execute()
         total_patients = len(response.data) if response.data else 0
 
@@ -75,18 +76,16 @@ def admin_dashboard(request):
 
         context = {
             "total_patients": total_patients,
-            "total_appointments": 0,   # placeholder for now
-            "recent_activity": [],     # placeholder
+            "total_appointments": 0,    # placeholder for now
+            "recent_activity": [],      # placeholder
             "new_registrations": new_registrations,
         }
+        return render(request, "admin_dashboard.html", context)
 
     except Exception as e:
-        context = {
-            "total_patients": "Error",
-            "error_message": str(e),
-        }
-
-    return render(request, "admin_dashboard.html", context)
+        # CRITICAL DEBUGGING LINES ADDED HERE
+        print(f"CRITICAL ERROR IN ADMIN DASHBOARD: {e}")
+        return HttpResponse(f"Admin Dashboard Crash: {e}", status=500)
 
 def register_page(request):
     if request.method == "POST":
@@ -138,17 +137,23 @@ def home_page(request):
     return render(request, "home.html")
 
 def logout_page(request):
-    request.session.flush()  
-    return redirect("login")  
+    request.session.flush()
+    return redirect("login")
 
 
 def user_dashboard(request):
     if not request.session.get("user_id"):
         return redirect("login")
-    
-    # Example context; customize as needed
-    context = {
-        "user_email": request.session.get("user_email"),
-        "first_name": request.session.get("first_name", "User"),
-    }
-    return render(request, "user_dashboard.html", context)
+
+    try:
+        # Example context; customize as needed
+        context = {
+            "user_email": request.session.get("user_email"),
+            "first_name": request.session.get("first_name", "User"),
+        }
+        return render(request, "user_dashboard.html", context)
+
+    except Exception as e:
+        # CRITICAL DEBUGGING LINES ADDED HERE
+        print(f"CRITICAL ERROR IN USER DASHBOARD: {e}")
+        return HttpResponse(f"User Dashboard Crash: {e}", status=500)
