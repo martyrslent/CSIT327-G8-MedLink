@@ -23,11 +23,9 @@ def login_page(request):
             messages.error(request, "Please fill in all fields!")
             return render(request, "login-student.html")
 
-        table_name = "users"
-
         try:
-            print(f"DEBUG: Querying Supabase table '{table_name}' for email '{email}'")
-            response = supabase.table(table_name).select("*").eq("email", email).execute()
+            print(f"DEBUG: Querying Supabase for email '{email}'")
+            response = supabase.table("users").select("*").eq("email", email).execute()
             print(f"DEBUG: Supabase response: {response.data}")
 
             if not response.data:
@@ -42,27 +40,19 @@ def login_page(request):
                 print("DEBUG: Password check failed")
                 messages.error(request, "Incorrect password!")
                 return render(request, "login-student.html")
-            else:
-                print("DEBUG: Password check passed")
 
+            print("DEBUG: Password check passed, setting session")
             request.session["user_id"] = user["id"]
             request.session["user_email"] = user["email"]
             request.session["is_admin"] = user.get("is_admin", False)
-            print("DEBUG: User session set successfully")
+            request.session["first_name"] = user.get("first_name", "User")
 
-            try:
-                if user.get("is_admin", False):
-                    print("DEBUG: User is admin, redirecting")
-                    return redirect("admin_dashboard")
-                else:
-                    print("DEBUG: User is normal user, redirecting")
-                    # Replace "user_dashboard" with a valid URL name if it exists
-                    return redirect("register")  # fallback to register page for now
-
-            except NoReverseMatch as e:
-                print(f"DEBUG: Redirect failed: {e}")
-                messages.error(request, f"Redirect failed: {e}")
-                return render(request, "login-student.html")
+            if user.get("is_admin", False):
+                print("DEBUG: User is admin, redirecting to admin_dashboard")
+                return redirect("admin_dashboard")
+            else:
+                print("DEBUG: User is normal user, redirecting to user_dashboard")
+                return redirect("user_dashboard")
 
         except Exception as e:
             print(f"DEBUG: Exception occurred: {str(e)}")
