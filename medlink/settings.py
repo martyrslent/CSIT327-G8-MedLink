@@ -23,7 +23,11 @@ DATABASES = {
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+# 🛑 CRITICAL DIAGNOSTIC CHANGE: Bypassing the PostgreSQL Session Backend
+SESSION_ENGINE = "django.contrib.sessions.backends.file"
+SESSION_FILE_PATH = os.path.join(BASE_DIR, 'django_sessions') 
+# -------------------------------------------------------------------------
 
 INSTALLED_APPS = [
     "django.contrib.admin",

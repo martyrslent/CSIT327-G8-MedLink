@@ -1,3 +1,4 @@
+
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -25,12 +26,11 @@ def login_page(request):
 
         try:
             print(f"DEBUG: Querying Supabase for email '{email}'")
-            # ... (Supabase query logic is fine here, it succeeded in previous logs)
             response = supabase.table("users").select("*").eq("email", email).execute()
             print(f"DEBUG: Supabase response: {response.data}")
 
             if not response.data:
-                # ... (error handling)
+                print("DEBUG: No user found with this email")
                 messages.error(request, "Email not found!")
                 return render(request, "login-student.html")
 
@@ -38,7 +38,7 @@ def login_page(request):
             print(f"DEBUG: Found user: {user}")
 
             if not check_password(password, user["password"]):
-                # ... (error handling)
+                print("DEBUG: Password check failed")
                 messages.error(request, "Incorrect password!")
                 return render(request, "login-student.html")
 
@@ -48,20 +48,14 @@ def login_page(request):
             request.session["is_admin"] = user.get("is_admin", False)
             request.session["first_name"] = user.get("first_name", "User")
 
-            # 🛑 DIAGNOSTIC CHANGE: Temporary redirect for all users 🛑
-            print("DIAGNOSTIC: Forcing redirect to user_dashboard for testing.")
-            return redirect("user_dashboard")
-            
-            # --- Original Redirection Logic (Commented out) ---
-            # if user.get("is_admin", False):
-            #     print("DEBUG: User is admin, redirecting to admin_dashboard")
-            #     return redirect("admin_dashboard")
-            # else:
-            #     print("DEBUG: User is normal user, redirecting to user_dashboard")
-            #     return redirect("user_dashboard")
+            if user.get("is_admin", False):
+                print("DEBUG: User is admin, redirecting to admin_dashboard")
+                return redirect("admin_dashboard")
+            else:
+                print("DEBUG: User is normal user, redirecting to user_dashboard")
+                return redirect("user_dashboard")
 
         except Exception as e:
-            # ... (exception handling)
             print(f"DEBUG: Exception occurred: {str(e)}")
             messages.error(request, f"Unexpected error: {str(e)}")
             return render(request, "login-student.html")
@@ -69,45 +63,28 @@ def login_page(request):
     print("DEBUG: GET request received, rendering login page")
     return render(request, "login-student.html")
 
-# --- (Rest of views.py remains unchanged, including your safe admin_dashboard and user_dashboard) ---
 
 def admin_dashboard(request):
     if not request.session.get("is_admin"):
         return redirect("login")
-    
-    # This check confirms the client loaded, which it did in the logs.
-    if supabase is None:
-        print("FATAL: Supabase client is None, cannot query database.")
-        return HttpResponse("Database connection error. Check server logs.", status=500)
 
     try:
-        # 🛑 TEMPORARY WORKAROUND 🛑
-        # Bypassing the Supabase query to prevent the low network timeout crash (500 error).
-        print("DEBUG: Bypassing Supabase query to test redirect stability.")
-        
-        # NOTE: Using placeholder data to ensure the dashboard loads.
-        total_patients = 150 
-        new_registrations = 8
+        # The complex Supabase interaction happens here.
+        response = supabase.table("users").select("*").eq("is_admin", False).execute()
+        total_patients = len(response.data) if response.data else 0
 
-        # --- (Original code commented out below) ---
-        # print("DEBUG: Attempting Supabase query for patient count...")
-        # response = supabase.table("users").select("*").eq("is_admin", False).execute()
-        # print("DEBUG: Supabase query successful.")
-        # total_patients = len(response.data) if response.data else 0
-        # new_registrations = total_patients
-        # -------------------------------------------
+        new_registrations = total_patients
 
         context = {
             "total_patients": total_patients,
-            "total_appointments": 0,      # placeholder for now
-            "recent_activity": [],        # placeholder
+            "total_appointments": 0,    # placeholder for now
+            "recent_activity": [],      # placeholder
             "new_registrations": new_registrations,
         }
-        
         return render(request, "admin_dashboard.html", context)
 
     except Exception as e:
-        # This logging will now only fire if a Python error (not a Gunicorn crash) occurs.
+        # CRITICAL DEBUGGING LINES ADDED HERE
         print(f"CRITICAL ERROR IN ADMIN DASHBOARD: {e}")
         return HttpResponse(f"Admin Dashboard Crash: {e}", status=500)
 
