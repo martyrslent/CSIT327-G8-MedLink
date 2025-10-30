@@ -21,13 +21,24 @@ DATABASES = {
     )
 }
 
+# 🛑 CRITICAL FIX: CACHE CONFIGURATION
+# Define a simple, in-memory local cache. This is fast and avoids external services.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'medlink-cache-key', # A unique name for the cache instance
+    }
+}
+
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-# 🛑 CRITICAL DIAGNOSTIC CHANGE: Bypassing the PostgreSQL Session Backend
-SESSION_ENGINE = "django.contrib.sessions.backends.file"
-SESSION_FILE_PATH = os.path.join(BASE_DIR, 'django_sessions') 
-# -------------------------------------------------------------------------
+# 🚀 FINAL FIX: Use the CACHE-BACKED DATABASE SESSION ENGINE
+# This uses the fast, non-crashing in-memory cache for session reads,
+# and falls back to the database for writes, resolving both previous crash points.
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+SESSION_CACHE_ALIAS = "default" # Tells the session engine to use the 'default' cache defined above
+# ---------------------------------------------------------------------------------------------
 
 INSTALLED_APPS = [
     "django.contrib.admin",
