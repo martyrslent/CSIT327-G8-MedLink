@@ -71,24 +71,12 @@ def admin_dashboard(request):
     if not request.session.get("is_admin"):
         return redirect("login")
     
-    try:
-        response = supabase.table("users").select("*").eq("is_admin", False).execute()
-        total_patients = len(response.data) if response.data else 0
-
-        new_registrations = total_patients
-
-        context = {
-            "total_patients": total_patients,
-            "total_appointments": 0,   # placeholder for now
-            "recent_activity": [],     # placeholder
-            "new_registrations": new_registrations,
-        }
-
-    except Exception as e:
-        context = {
-            "total_patients": "Error",
-            "error_message": str(e),
-        }
+    context = {
+        "total_patients": 0,
+        "total_appointments": 0,
+        "recent_activity": [],
+        "new_registrations": 0,
+    }
 
     return render(request, "admin_dashboard.html", context)
 
