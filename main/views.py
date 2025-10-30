@@ -5,6 +5,7 @@ from django.contrib.auth.hashers import make_password
 from .supabase_client import supabase  
 from django.contrib.auth.hashers import check_password
 from supabase import create_client, Client
+from django.urls import reverse, NoReverseMatch
 
 def hello_page(request):
     return HttpResponse("Hello, Django Page!")
@@ -52,11 +53,21 @@ def login_page(request):
             if user.get("is_admin", False):
                 print("DEBUG: User is admin")
                 messages.success(request, f"Welcome, {user['first_name']}!")
-                return redirect("admin_dashboard")
+                try:
+                    url = reverse("admin_dashboard")
+                except NoReverseMatch:
+                    print("DEBUG: admin_dashboard URL not found, using fallback")
+                    url = "/admin-dashboard/"
+                return redirect(url)
             else:
                 print("DEBUG: User is normal user")
                 messages.success(request, f"Welcome, {user['first_name']}!")
-                return redirect("user_dashboard")  #redirection para sa user if not admin
+                try:
+                    url = reverse("user_dashboard")
+                except NoReverseMatch:
+                    print("DEBUG: user_dashboard URL not found, using fallback")
+                    url = "/user-dashboard/"
+                return redirect(url)
 
         except Exception as e:
             print(f"DEBUG: Exception occurred: {str(e)}")
@@ -68,21 +79,28 @@ def login_page(request):
 
 
 def admin_dashboard(request):
-    print("DEBUG: admin_dashboard called")  # <- check if view is entered
     if not request.session.get("is_admin"):
-        print("DEBUG: Not admin, redirecting to login")
         return redirect("login")
+    
+    try:
+        response = supabase.table("users").select("*").eq("is_admin", False).execute()
+        total_patients = len(response.data) if response.data else 0
 
-    print("DEBUG: Admin session confirmed")  # <- confirms admin session is set
+        new_registrations = total_patients
 
-    context = {
-        "total_patients": 0,
-        "total_appointments": 0,
-        "recent_activity": [],
-        "new_registrations": 0,
-    }
+        context = {
+            "total_patients": total_patients,
+            "total_appointments": 0,   # placeholder for now
+            "recent_activity": [],     # placeholder
+            "new_registrations": new_registrations,
+        }
 
-    print("DEBUG: Rendering admin_dashboard.html")
+    except Exception as e:
+        context = {
+            "total_patients": "Error",
+            "error_message": str(e),
+        }
+
     return render(request, "admin_dashboard.html", context)
 
 def register_page(request):
