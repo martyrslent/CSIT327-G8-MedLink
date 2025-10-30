@@ -25,11 +25,12 @@ def login_page(request):
 
         try:
             print(f"DEBUG: Querying Supabase for email '{email}'")
+            # ... (Supabase query logic is fine here, it succeeded in previous logs)
             response = supabase.table("users").select("*").eq("email", email).execute()
             print(f"DEBUG: Supabase response: {response.data}")
 
             if not response.data:
-                print("DEBUG: No user found with this email")
+                # ... (error handling)
                 messages.error(request, "Email not found!")
                 return render(request, "login-student.html")
 
@@ -37,7 +38,7 @@ def login_page(request):
             print(f"DEBUG: Found user: {user}")
 
             if not check_password(password, user["password"]):
-                print("DEBUG: Password check failed")
+                # ... (error handling)
                 messages.error(request, "Incorrect password!")
                 return render(request, "login-student.html")
 
@@ -47,14 +48,20 @@ def login_page(request):
             request.session["is_admin"] = user.get("is_admin", False)
             request.session["first_name"] = user.get("first_name", "User")
 
-            if user.get("is_admin", False):
-                print("DEBUG: User is admin, redirecting to admin_dashboard")
-                return redirect("admin_dashboard")
-            else:
-                print("DEBUG: User is normal user, redirecting to user_dashboard")
-                return redirect("user_dashboard")
+            # 🛑 DIAGNOSTIC CHANGE: Temporary redirect for all users 🛑
+            print("DIAGNOSTIC: Forcing redirect to user_dashboard for testing.")
+            return redirect("user_dashboard")
+            
+            # --- Original Redirection Logic (Commented out) ---
+            # if user.get("is_admin", False):
+            #     print("DEBUG: User is admin, redirecting to admin_dashboard")
+            #     return redirect("admin_dashboard")
+            # else:
+            #     print("DEBUG: User is normal user, redirecting to user_dashboard")
+            #     return redirect("user_dashboard")
 
         except Exception as e:
+            # ... (exception handling)
             print(f"DEBUG: Exception occurred: {str(e)}")
             messages.error(request, f"Unexpected error: {str(e)}")
             return render(request, "login-student.html")
@@ -62,6 +69,7 @@ def login_page(request):
     print("DEBUG: GET request received, rendering login page")
     return render(request, "login-student.html")
 
+# --- (Rest of views.py remains unchanged, including your safe admin_dashboard and user_dashboard) ---
 
 def admin_dashboard(request):
     if not request.session.get("is_admin"):
