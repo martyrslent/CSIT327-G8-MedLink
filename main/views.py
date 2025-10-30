@@ -53,21 +53,11 @@ def login_page(request):
             if user.get("is_admin", False):
                 print("DEBUG: User is admin")
                 messages.success(request, f"Welcome, {user['first_name']}!")
-                try:
-                    url = reverse("admin_dashboard")
-                except NoReverseMatch:
-                    print("DEBUG: admin_dashboard URL not found, using fallback")
-                    url = "/admin-dashboard/"
-                return redirect(url)
+                return redirect("admin_dashboard")
             else:
                 print("DEBUG: User is normal user")
                 messages.success(request, f"Welcome, {user['first_name']}!")
-                try:
-                    url = reverse("user_dashboard")
-                except NoReverseMatch:
-                    print("DEBUG: user_dashboard URL not found, using fallback")
-                    url = "/user-dashboard/"
-                return redirect(url)
+                return redirect("user_dashboard")  #redirection para sa user if not admin
 
         except Exception as e:
             print(f"DEBUG: Exception occurred: {str(e)}")
