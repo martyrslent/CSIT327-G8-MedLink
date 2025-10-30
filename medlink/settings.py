@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = ["your-render-deployment-url.onrender.com"]
+ALLOWED_HOSTS = ["*"]
 
 SUPABASE_URL = config("SUPABASE_URL")
 SUPABASE_ANON_KEY = config("SUPABASE_ANON_KEY")

@@ -1,0 +1,104 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.login-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+    width: 350px;
+    text-align: center; 
+}
+
+.login-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    text-align: left; 
+}
+
+.login-container form label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 0.3rem;
+    text-align: left; 
+}
+
+.logo {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+.logo .med {
+    color: #e60023;
+}
+
+.logo .link {
+    color: #000000;
+}
+
+h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+p {
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    text-align: left; 
+}
+
+
+
+form input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    width: 100%;
+    background-color: white;
+}
+
+.btn {
+    background: #e60023;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: #c1001d;
+}
+
+.forgot, .signup-text {
+    font-size: 0.9rem;
+    margin-top: 0.8rem;
+    text-align: left; 
+}
+
+.forgot a, .signup-text a {
+    color: #e60023; 
+    text-decoration: none;
+}
+
+.forgot a:hover, .signup-text a:hover {
+    text-decoration: underline;
+}
