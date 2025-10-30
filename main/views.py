@@ -66,24 +66,40 @@ def login_page(request):
 def admin_dashboard(request):
     if not request.session.get("is_admin"):
         return redirect("login")
+    
+    # This check confirms the client loaded, which it did in the logs.
+    if supabase is None:
+        print("FATAL: Supabase client is None, cannot query database.")
+        return HttpResponse("Database connection error. Check server logs.", status=500)
 
     try:
-        # The complex Supabase interaction happens here.
-        response = supabase.table("users").select("*").eq("is_admin", False).execute()
-        total_patients = len(response.data) if response.data else 0
+        # 🛑 TEMPORARY WORKAROUND 🛑
+        # Bypassing the Supabase query to prevent the low network timeout crash (500 error).
+        print("DEBUG: Bypassing Supabase query to test redirect stability.")
+        
+        # NOTE: Using placeholder data to ensure the dashboard loads.
+        total_patients = 150 
+        new_registrations = 8
 
-        new_registrations = total_patients
+        # --- (Original code commented out below) ---
+        # print("DEBUG: Attempting Supabase query for patient count...")
+        # response = supabase.table("users").select("*").eq("is_admin", False).execute()
+        # print("DEBUG: Supabase query successful.")
+        # total_patients = len(response.data) if response.data else 0
+        # new_registrations = total_patients
+        # -------------------------------------------
 
         context = {
             "total_patients": total_patients,
-            "total_appointments": 0,    # placeholder for now
-            "recent_activity": [],      # placeholder
+            "total_appointments": 0,      # placeholder for now
+            "recent_activity": [],        # placeholder
             "new_registrations": new_registrations,
         }
+        
         return render(request, "admin_dashboard.html", context)
 
     except Exception as e:
-        # CRITICAL DEBUGGING LINES ADDED HERE
+        # This logging will now only fire if a Python error (not a Gunicorn crash) occurs.
         print(f"CRITICAL ERROR IN ADMIN DASHBOARD: {e}")
         return HttpResponse(f"Admin Dashboard Crash: {e}", status=500)
 
