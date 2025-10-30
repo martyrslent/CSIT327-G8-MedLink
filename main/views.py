@@ -50,14 +50,19 @@ def login_page(request):
             request.session["is_admin"] = user.get("is_admin", False)
             print("DEBUG: User session set successfully")
 
-            if user.get("is_admin", False):
-                print("DEBUG: User is admin")
-                messages.success(request, f"Welcome, {user['first_name']}!")
-                return redirect("admin_dashboard")
-            else:
-                print("DEBUG: User is normal user")
-                messages.success(request, f"Welcome, {user['first_name']}!")
-                return redirect("user_dashboard")  #redirection para sa user if not admin
+            try:
+                if user.get("is_admin", False):
+                    print("DEBUG: User is admin, redirecting")
+                    return redirect("admin_dashboard")
+                else:
+                    print("DEBUG: User is normal user, redirecting")
+                    # Replace "user_dashboard" with a valid URL name if it exists
+                    return redirect("register")  # fallback to register page for now
+
+            except NoReverseMatch as e:
+                print(f"DEBUG: Redirect failed: {e}")
+                messages.error(request, f"Redirect failed: {e}")
+                return render(request, "login-student.html")
 
         except Exception as e:
             print(f"DEBUG: Exception occurred: {str(e)}")
@@ -145,3 +150,15 @@ def home_page(request):
 def logout_page(request):
     request.session.flush()  
     return redirect("login")  
+
+
+def user_dashboard(request):
+    if not request.session.get("user_id"):
+        return redirect("login")
+    
+    # Example context; customize as needed
+    context = {
+        "user_email": request.session.get("user_email"),
+        "first_name": request.session.get("first_name", "User"),
+    }
+    return render(request, "user_dashboard.html", context)
