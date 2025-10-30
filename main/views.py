@@ -68,9 +68,13 @@ def login_page(request):
 
 
 def admin_dashboard(request):
+    print("DEBUG: admin_dashboard called")  # <- check if view is entered
     if not request.session.get("is_admin"):
+        print("DEBUG: Not admin, redirecting to login")
         return redirect("login")
-    
+
+    print("DEBUG: Admin session confirmed")  # <- confirms admin session is set
+
     context = {
         "total_patients": 0,
         "total_appointments": 0,
@@ -78,6 +82,7 @@ def admin_dashboard(request):
         "new_registrations": 0,
     }
 
+    print("DEBUG: Rendering admin_dashboard.html")
     return render(request, "admin_dashboard.html", context)
 
 def register_page(request):
