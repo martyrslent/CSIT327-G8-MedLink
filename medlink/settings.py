@@ -17,7 +17,10 @@ DATABASES = {
     "default": dj_database_url.parse(
         os.environ.get("DATABASE_URL"),
         conn_max_age=600,
-        ssl_require=True
+        ssl_require=True,
+        # 🛑 FINAL CRITICAL FIX: Force IPv4 connection to prevent Network Unreachable error
+        conn_health_checks=True,
+        host_chars=4 
     )
 }
 
