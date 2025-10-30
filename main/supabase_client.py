@@ -16,10 +16,16 @@ try:
         # We can't use the client, so leave it as None
     else:
         # Only initialize if both are present
-        supabase = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
-        print("DEBUG: Supabase Client Initialized Successfully.")
+        
+        # 🛑 CRITICAL FIX: Set a 30-second timeout to prevent Gunicorn worker crash 🛑
+        supabase = create_client(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY,
+            options={"timeout": 30} 
+        )
+        print("DEBUG: Supabase Client Initialized Successfully with 30s timeout.")
 
 except Exception as e:
-    # If anything else goes wrong during setup (like a typo in settings.py)
+    # If anything else goes wrong during setup
     print(f"CRITICAL ERROR DURING SUPABASE CLIENT SETUP: {e}", file=sys.stderr)
     supabase = None
