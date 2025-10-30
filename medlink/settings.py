@@ -15,7 +15,7 @@ SUPABASE_ANON_KEY = config("SUPABASE_ANON_KEY")
 
 DATABASES = {
     "default": dj_database_url.parse(
-        config("DATABASE_URL", default=""),  # default="" to avoid crash locally
+        os.environ.get("DATABASE_URL"),
         conn_max_age=600,
         ssl_require=True
     )
