@@ -10,8 +10,8 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = ["medlink-fnd7.onrender.com"]
 
-SUPABASE_URL = config("SUPABASE_URL")
-SUPABASE_ANON_KEY = config("SUPABASE_ANON_KEY")
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
 
 DATABASES = {
     "default": dj_database_url.parse(
