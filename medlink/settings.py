@@ -31,7 +31,7 @@ CACHES = {
     }
 }
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db" 
 SESSION_CACHE_ALIAS = "default"
 
 SESSION_COOKIE_SECURE = True
