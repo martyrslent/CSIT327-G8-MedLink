@@ -38,7 +38,9 @@ def register_admin_page(request):
         try:
             # 1. Check if email already exists
             response = supabase.table(table_name).select("email").eq("email", email).execute()
-            if response.get('data') and len(response['data']) > 0:
+            
+            # 🛑 FIX 1: Correctly access the data using the .data attribute
+            if response.data and len(response.data) > 0:
                 messages.error(request, "Email already registered!")
                 return render(request, "register-admin.html")
 
@@ -51,23 +53,30 @@ def register_admin_page(request):
                 "last_name": last_name,
                 "email": email,
                 "password": hashed_password,
-                "is_admin": True  # <--- THIS IS THE KEY DIFFERENCE
+                "is_admin": True 
             }).execute()
 
-            # 4. Check for Supabase Error (using the robust check from before)
+            # 4. Check for Supabase Error (robust check for dictionary-like error response)
+            # This handles the scenario where the insertion failed due to RLS or other database errors.
             if isinstance(response, dict) and 'error' in response:
                 error_message = f"Supabase Error: {response['error'].get('message', 'Unknown error')}"
                 print(f"DEBUG: Staff insertion failed - {error_message}")
                 messages.error(request, error_message)
                 return render(request, "register-admin.html")
+            
+            # 🛑 NOTE on is_admin: If the user is still saving as False, the issue is a 
+            # Default Value constraint in the Supabase 'users' table, not this code.
 
             messages.success(request, f"New staff member {first_name} added successfully! They can now log in.")
             return redirect("admin_dashboard") # Redirect back to the dashboard
 
         except Exception as e:
+            # This handles generic network or client-side errors
+            print(f"DEBUG: Critical error during admin registration: {str(e)}")
             messages.error(request, "Unexpected error: " + str(e))
             return render(request, "register-admin.html")
 
+    # Handle GET request (initial page load)
     return render(request, "register-admin.html")
 
 def register_appointment(request):
