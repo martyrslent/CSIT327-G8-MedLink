@@ -4,8 +4,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Dashboard</title>
+  <title>{% block title %}Admin Dashboard{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
+  {% block style %}{% endblock %}
 </head>
 <body>
   <div class="dashboard-wrap">
@@ -13,21 +14,22 @@
       <div class="logo">MedLink</div>
       <nav class="nav">
         <ul>
-          <li><a href="#">Dashboard</a></li>
+          <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
           <li><a href="#">Users</a></li>
-          <li><a href="#">Appointments</a></li>
-          <li><a href="{% url 'login' %}">Login</a></li>
+          <li><a href="{% url 'appointment_list' %}">Appointments</a></li>
+          <li><a href="{% url 'logout' %}">Logout</a></li> {# Changed from login to logout #}
         </ul>
       </nav>
     </aside>
 
     <main class="content">
+      {% block content %}
       <h1 class="page-title">Dashboard (Admin)</h1>
 
       <section class="top-row">
         <div class="card">
           <h3>Total Active Patients</h3>
-          <div class="stat">0</div>
+          <div class="stat">{{ total_patients }}</div>
           <div class="muted"></div>
         </div>
 
@@ -40,12 +42,12 @@
 
 
       <section class="wide-card">
-  <div class="card full">
-    <h3>New Patient Registrations</h3>
-    <div class="stat">{{ new_registrations }}</div>
-    <a class="btn" href="#">View All New Patients</a>
-  </div>
-</section>
+        <div class="card full">
+          <h3>New Patient Registrations</h3>
+          <div class="stat">{{ new_registrations }}</div>
+          <a class="btn" href="#">View All New Patients</a>
+        </div>
+      </section>
 
       <section class="bottom-row">
         <div class="card">
@@ -66,6 +68,7 @@
           </div>
         </div>
       </section>
+      {% endblock %}
     </main>
   </div>
 </body>
