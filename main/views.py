@@ -38,24 +38,22 @@ def register_appointment(request):
         try:
             # Insert the new appointment record into the 'appointment' table
             response = (
-                supabase.table("appointment") # Use your actual table name if different
+                supabase.table("appointment")
                 .insert(appointment_data)
                 .execute()
             )
-
-            # Check if Supabase returned an error (Supabase response structure)
-            if response.error:
-                error_message = f"Supabase Error: {response.error.message}"
+            
+            if isinstance(response, dict) and 'error' in response:
+                error_message = f"Supabase Error: {response['error'].get('message', 'Unknown error')}"
                 print(f"DEBUG: Supabase Insertion Failed - {error_message}")
                 messages.error(request, error_message)
                 return render(request, "appointment_form.html")
 
-            # Success
             messages.success(request, f"Appointment for {first_name} {last_name} on {appointment_date} successfully registered!")
-            # Redirect back to the form or the admin dashboard
             return redirect("admin_dashboard")
 
         except Exception as e:
+            # This handles generic network or client-side errors
             print(f"DEBUG: Critical error during appointment registration: {str(e)}")
             messages.error(request, f"An unexpected error occurred: {str(e)}")
             return render(request, "appointment_form.html")
