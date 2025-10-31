@@ -11,6 +11,65 @@ from django.urls import reverse, NoReverseMatch
 def hello_page(request):
     return HttpResponse("Hello, Django Page!")
 
+def register_admin_page(request):
+    # Security check: Only existing admins should be able to create new admins
+    if not request.session.get("is_admin"):
+        messages.error(request, "Access denied. Only existing administrators can add new staff.")
+        return redirect("login")
+    
+    if request.method == "POST":
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
+
+        # Basic Validation
+        if password != confirm_password:
+            messages.error(request, "Passwords do not match!")
+            return render(request, "register-admin.html")
+        
+        if not all([first_name, last_name, email, password]):
+            messages.error(request, "All fields are required!")
+            return render(request, "register-admin.html")
+
+        table_name = "users"
+
+        try:
+            # 1. Check if email already exists
+            response = supabase.table(table_name).select("email").eq("email", email).execute()
+            if response.get('data') and len(response['data']) > 0:
+                messages.error(request, "Email already registered!")
+                return render(request, "register-admin.html")
+
+            # 2. Hash Password
+            hashed_password = make_password(password)
+
+            # 3. Insert new staff member (CRITICAL: is_admin is True)
+            response = supabase.table(table_name).insert({
+                "first_name": first_name,
+                "last_name": last_name,
+                "email": email,
+                "password": hashed_password,
+                "is_admin": True  # <--- THIS IS THE KEY DIFFERENCE
+            }).execute()
+
+            # 4. Check for Supabase Error (using the robust check from before)
+            if isinstance(response, dict) and 'error' in response:
+                error_message = f"Supabase Error: {response['error'].get('message', 'Unknown error')}"
+                print(f"DEBUG: Staff insertion failed - {error_message}")
+                messages.error(request, error_message)
+                return render(request, "register-admin.html")
+
+            messages.success(request, f"New staff member {first_name} added successfully! They can now log in.")
+            return redirect("admin_dashboard") # Redirect back to the dashboard
+
+        except Exception as e:
+            messages.error(request, "Unexpected error: " + str(e))
+            return render(request, "register-admin.html")
+
+    return render(request, "register-admin.html")
+
 def register_appointment(request):
     # Security check: only allow admins to book appointments from this page
     if not request.session.get("is_admin"):
