@@ -1,22 +1,41 @@
-
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from .supabase_client import supabase
-from django.contrib.auth.hashers import check_password
 from supabase import create_client, Client
 from django.urls import reverse, NoReverseMatch
+from functools import wraps  # ✅ Added this import
+
+# ============================================================
+# ADMIN AUTHENTICATION DECORATOR
+# ============================================================
+def admin_required(view_func):
+    """
+    Decorator to restrict access to admin-only views.
+    If the current session does not belong to an admin,
+    redirects to login with an error message.
+    """
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.session.get("is_admin"):
+            messages.error(request, "Access denied. Please log in as an administrator.")
+            return redirect("login")
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+
+# ============================================================
+# VIEWS
+# ============================================================
 
 def hello_page(request):
     return HttpResponse("Hello, Django Page!")
 
+
+@admin_required
 def register_admin_page(request):
-    # Security check: Only existing admins should be able to create new admins
-    if not request.session.get("is_admin"):
-        messages.error(request, "Access denied. Only existing administrators can add new staff.")
-        return redirect("login")
-    
+    # Security check handled by decorator
     if request.method == "POST":
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
@@ -36,18 +55,14 @@ def register_admin_page(request):
         table_name = "users"
 
         try:
-            # 1. Check if email already exists
             response = supabase.table(table_name).select("email").eq("email", email).execute()
             
-            # 🛑 FIX 1: Correctly access the data using the .data attribute
             if response.data and len(response.data) > 0:
                 messages.error(request, "Email already registered!")
                 return render(request, "register-admin.html")
 
-            # 2. Hash Password
             hashed_password = make_password(password)
 
-            # 3. Insert new staff member (CRITICAL: is_admin is True)
             response = supabase.table(table_name).insert({
                 "first_name": first_name,
                 "last_name": last_name,
@@ -56,60 +71,42 @@ def register_admin_page(request):
                 "is_admin": True 
             }).execute()
 
-            # 4. Check for Supabase Error (robust check for dictionary-like error response)
-            # This handles the scenario where the insertion failed due to RLS or other database errors.
             if isinstance(response, dict) and 'error' in response:
                 error_message = f"Supabase Error: {response['error'].get('message', 'Unknown error')}"
                 print(f"DEBUG: Staff insertion failed - {error_message}")
                 messages.error(request, error_message)
                 return render(request, "register-admin.html")
-            
-            # 🛑 NOTE on is_admin: If the user is still saving as False, the issue is a 
-            # Default Value constraint in the Supabase 'users' table, not this code.
 
             messages.success(request, f"New staff member {first_name} added successfully! They can now log in.")
-            return redirect("admin_dashboard") # Redirect back to the dashboard
+            return redirect("admin_dashboard")
 
         except Exception as e:
-            # This handles generic network or client-side errors
             print(f"DEBUG: Critical error during admin registration: {str(e)}")
             messages.error(request, "Unexpected error: " + str(e))
             return render(request, "register-admin.html")
 
-    # Handle GET request (initial page load)
     return render(request, "register-admin.html")
 
-def register_appointment(request):
-    # Security check: only allow admins to book appointments from this page
-    if not request.session.get("is_admin"):
-        messages.error(request, "Access denied. Please log in as an administrator.")
-        return redirect("login") 
 
+@admin_required
+def register_appointment(request):
     if request.method == "POST":
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         appointment_date = request.POST.get("appointment_date")
 
-        # Basic server-side validation
         if not all([first_name, last_name, appointment_date]):
             messages.error(request, "All fields are required!")
             return render(request, "appointment_form.html")
 
-        # Supabase Data Structure (assuming your 'appointment' table has these columns)
         appointment_data = {
             "first_name": first_name,
             "last_name": last_name,
-            "appointment_date": appointment_date, # This will be inserted as a date/timestamp type
-            # You might add an admin_id or created_by field here using request.session.get("user_id")
+            "appointment_date": appointment_date,
         }
 
         try:
-            # Insert the new appointment record into the 'appointment' table
-            response = (
-                supabase.table("appointment")
-                .insert(appointment_data)
-                .execute()
-            )
+            response = supabase.table("appointment").insert(appointment_data).execute()
             
             if isinstance(response, dict) and 'error' in response:
                 error_message = f"Supabase Error: {response['error'].get('message', 'Unknown error')}"
@@ -121,13 +118,12 @@ def register_appointment(request):
             return redirect("admin_dashboard")
 
         except Exception as e:
-            # This handles generic network or client-side errors
             print(f"DEBUG: Critical error during appointment registration: {str(e)}")
             messages.error(request, f"An unexpected error occurred: {str(e)}")
             return render(request, "appointment_form.html")
 
-    # Handle GET request (initial page load)
     return render(request, "appointment_form.html")
+
 
 def login_page(request):
     if request.method == "POST":
@@ -138,39 +134,30 @@ def login_page(request):
         print(f"DEBUG: email={email}, password={'*' * len(password) if password else None}")
 
         if not email or not password:
-            print("DEBUG: Missing email or password")
             messages.error(request, "Please fill in all fields!")
             return render(request, "login-student.html")
 
         try:
-            print(f"DEBUG: Querying Supabase for email '{email}'")
             response = supabase.table("users").select("*").eq("email", email).execute()
-            print(f"DEBUG: Supabase response: {response.data}")
 
             if not response.data:
-                print("DEBUG: No user found with this email")
                 messages.error(request, "Email not found!")
                 return render(request, "login-student.html")
 
             user = response.data[0]
-            print(f"DEBUG: Found user: {user}")
 
             if not check_password(password, user["password"]):
-                print("DEBUG: Password check failed")
                 messages.error(request, "Incorrect password!")
                 return render(request, "login-student.html")
 
-            print("DEBUG: Password check passed, setting session")
             request.session["user_id"] = user["id"]
             request.session["user_email"] = user["email"]
             request.session["is_admin"] = user.get("is_admin", False)
             request.session["first_name"] = user.get("first_name", "User")
 
             if user.get("is_admin", False):
-                print("DEBUG: User is admin, redirecting to admin_dashboard")
                 return redirect("admin_dashboard")
             else:
-                print("DEBUG: User is normal user, redirecting to user_dashboard")
                 return redirect("user_dashboard")
 
         except Exception as e:
@@ -178,33 +165,28 @@ def login_page(request):
             messages.error(request, f"Unexpected error: {str(e)}")
             return render(request, "login-student.html")
 
-    print("DEBUG: GET request received, rendering login page")
     return render(request, "login-student.html")
 
 
+@admin_required
 def admin_dashboard(request):
-    if not request.session.get("is_admin"):
-        return redirect("login")
-
     try:
-        # The complex Supabase interaction happens here.
         response = supabase.table("users").select("*").eq("is_admin", False).execute()
         total_patients = len(response.data) if response.data else 0
-
         new_registrations = total_patients
 
         context = {
             "total_patients": total_patients,
-            "total_appointments": 0,    # placeholder for now
-            "recent_activity": [],      # placeholder
+            "total_appointments": 0,
+            "recent_activity": [],
             "new_registrations": new_registrations,
         }
         return render(request, "admin_dashboard.html", context)
 
     except Exception as e:
-        # CRITICAL DEBUGGING LINES ADDED HERE
         print(f"CRITICAL ERROR IN ADMIN DASHBOARD: {e}")
         return HttpResponse(f"Admin Dashboard Crash: {e}", status=500)
+
 
 def register_page(request):
     if request.method == "POST":
@@ -236,10 +218,6 @@ def register_page(request):
                 "is_admin": False
             }).execute()
 
-            if response.error:
-                messages.error(request, "Error creating account: " + str(response.error))
-                return render(request, "register-student.html")
-
             messages.success(request, "Account created successfully! Please log in.")
             return redirect("login")
 
@@ -249,11 +227,14 @@ def register_page(request):
 
     return render(request, "register-student.html")
 
+
 def forgot_password_page(request):
     return render(request, "forgot-password.html")
 
+
 def home_page(request):
     return render(request, "home.html")
+
 
 def logout_page(request):
     request.session.flush()
@@ -265,7 +246,6 @@ def user_dashboard(request):
         return redirect("login")
 
     try:
-        # Example context; customize as needed
         context = {
             "user_email": request.session.get("user_email"),
             "first_name": request.session.get("first_name", "User"),
@@ -273,6 +253,84 @@ def user_dashboard(request):
         return render(request, "user_dashboard.html", context)
 
     except Exception as e:
-        # CRITICAL DEBUGGING LINES ADDED HERE
         print(f"CRITICAL ERROR IN USER DASHBOARD: {e}")
         return HttpResponse(f"User Dashboard Crash: {e}", status=500)
+
+
+# ============================================================
+# NEW ADMIN APPOINTMENT MANAGEMENT VIEWS
+# ============================================================
+
+@admin_required
+def appointment_list_page(request):
+    """Displays all appointments."""
+    try:
+        response = supabase.table("appointment").select("*").order("appointment_date", desc=False).execute()
+        appointments = response.data if response.data else []
+        context = {"appointments": appointments}
+        return render(request, "appointments.html", context)
+    except Exception as e:
+        print(f"DEBUG: Error fetching appointments: {str(e)}")
+        messages.error(request, f"An error occurred: {str(e)}")
+        return render(request, "appointments.html", {"appointments": []})
+
+
+@admin_required
+def edit_appointment(request, appointment_id):
+    """Handles editing an appointment."""
+    try:
+        if request.method == "POST":
+            first_name = request.POST.get("first_name")
+            last_name = request.POST.get("last_name")
+            appointment_date = request.POST.get("appointment_date")
+
+            if not all([first_name, last_name, appointment_date]):
+                messages.error(request, "All fields are required!")
+                response = supabase.table("appointment").select("*").eq("id", appointment_id).single().execute()
+                return render(request, "edit_appointment.html", {"appointment": response.data})
+
+            update_data = {
+                "first_name": first_name,
+                "last_name": last_name,
+                "appointment_date": appointment_date
+            }
+
+            response = supabase.table("appointment").update(update_data).eq("id", appointment_id).execute()
+            
+            if response.data:
+                messages.success(request, "Appointment updated successfully!")
+                return redirect("appointment_list")
+            else:
+                messages.error(request, "Failed to update appointment. Please try again.")
+                return render(request, "edit_appointment.html", {"appointment": update_data})
+
+        else:
+            response = supabase.table("appointment").select("*").eq("id", appointment_id).single().execute()
+            if response.data:
+                return render(request, "edit_appointment.html", {"appointment": response.data})
+            else:
+                messages.error(request, "Appointment not found.")
+                return redirect("appointment_list")
+
+    except Exception as e:
+        print(f"DEBUG: Error editing appointment {appointment_id}: {str(e)}")
+        messages.error(request, f"An unexpected error occurred: {str(e)}")
+        return redirect("appointment_list")
+
+
+@admin_required
+def delete_appointment(request, appointment_id):
+    """Deletes an appointment record."""
+    try:
+        response = supabase.table("appointment").delete().eq("id", appointment_id).execute()
+        
+        if response.data:
+            messages.success(request, f"Appointment #{appointment_id} deleted successfully.")
+        else:
+            messages.error(request, f"Could not find or delete appointment #{appointment_id}.")
+
+    except Exception as e:
+        print(f"DEBUG: Error deleting appointment {appointment_id}: {str(e)}")
+        messages.error(request, f"An unexpected error occurred: {str(e)}")
+    
+    return redirect("appointment_list")
