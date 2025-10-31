@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Register Appointment</title>
+    <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
+    <style>
+        /* Minimal form styling for scannability, you can integrate with your existing CSS */
+        .form-container { max-width: 500px; margin: 50px auto; padding: 30px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; }
+        .form-container h2 { text-align: center; color: #333; margin-bottom: 25px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #555; }
+        .form-group input[type="text"], 
+        .form-group input[type="date"] { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            box-sizing: border-box; 
+        }
+        .error-message { color: red; margin-bottom: 15px; text-align: center; font-weight: bold; }
+        .success-message { color: green; margin-bottom: 15px; text-align: center; font-weight: bold; }
+        .btn-submit { background-color: #007bff; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
+        .btn-submit:hover { background-color: #0056b3; }
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Book New Appointment 🧑‍⚕️</h2>
+
+        {% if messages %}
+            {% for message in messages %}
+                <p class="{% if message.tags %}error-message{% endif %}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="first_name">Patient First Name</label>
+                <input type="text" id="first_name" name="first_name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">Patient Last Name</label>
+                <input type="text" id="last_name" name="last_name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="appointment_date">Appointment Date (YYYY-MM-DD)</label>
+                <input type="date" id="appointment_date" name="appointment_date" required>
+            </div>
+
+            <button type="submit" class="btn-submit">Register New Appointment</button>
+        </form>
+
+        <a href="{% url 'admin_dashboard' %}" class="back-link">← Back to Dashboard</a>
+    </div>
+</body>
+</html>

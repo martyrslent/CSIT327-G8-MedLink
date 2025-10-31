@@ -11,6 +11,58 @@ from django.urls import reverse, NoReverseMatch
 def hello_page(request):
     return HttpResponse("Hello, Django Page!")
 
+def register_appointment(request):
+    # Security check: only allow admins to book appointments from this page
+    if not request.session.get("is_admin"):
+        messages.error(request, "Access denied. Please log in as an administrator.")
+        return redirect("login") 
+
+    if request.method == "POST":
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+        appointment_date = request.POST.get("appointment_date")
+
+        # Basic server-side validation
+        if not all([first_name, last_name, appointment_date]):
+            messages.error(request, "All fields are required!")
+            return render(request, "appointment_form.html")
+
+        # Supabase Data Structure (assuming your 'appointment' table has these columns)
+        appointment_data = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "appointment_date": appointment_date, # This will be inserted as a date/timestamp type
+            # You might add an admin_id or created_by field here using request.session.get("user_id")
+        }
+
+        try:
+            # Insert the new appointment record into the 'appointment' table
+            response = (
+                supabase.table("appointment") # Use your actual table name if different
+                .insert(appointment_data)
+                .execute()
+            )
+
+            # Check if Supabase returned an error (Supabase response structure)
+            if response.error:
+                error_message = f"Supabase Error: {response.error.message}"
+                print(f"DEBUG: Supabase Insertion Failed - {error_message}")
+                messages.error(request, error_message)
+                return render(request, "appointment_form.html")
+
+            # Success
+            messages.success(request, f"Appointment for {first_name} {last_name} on {appointment_date} successfully registered!")
+            # Redirect back to the form or the admin dashboard
+            return redirect("admin_dashboard")
+
+        except Exception as e:
+            print(f"DEBUG: Critical error during appointment registration: {str(e)}")
+            messages.error(request, f"An unexpected error occurred: {str(e)}")
+            return render(request, "appointment_form.html")
+
+    # Handle GET request (initial page load)
+    return render(request, "appointment_form.html")
+
 def login_page(request):
     if request.method == "POST":
         email = request.POST.get("email")
