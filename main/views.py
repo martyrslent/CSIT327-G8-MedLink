@@ -1,3 +1,8 @@
+# --- NEW IMPORTS FOR SPRINT 3 ---
+import os
+from .email_utils import send_appointment_confirmation_email
+
+# --- Existing Imports ---
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -5,10 +10,11 @@ from django.contrib.auth.hashers import make_password, check_password
 from .supabase_client import supabase
 from supabase import create_client, Client
 from django.urls import reverse, NoReverseMatch
-from functools import wraps  # ✅ Added this import
+from functools import wraps
+
 
 # ============================================================
-# ADMIN AUTHENTICATION DECORATOR
+# ADMIN AUTHENTICATION DECORATOR (Cleaned up)
 # ============================================================
 def admin_required(view_func):
     """
@@ -20,7 +26,7 @@ def admin_required(view_func):
     def _wrapped_view(request, *args, **kwargs):
         if not request.session.get("is_admin"):
             messages.error(request, "Access denied. Please log in as an administrator.")
-            return redirect("login")
+            return redirect("login")  # Assumes your login URL is named 'login'
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
@@ -88,6 +94,9 @@ def register_admin_page(request):
     return render(request, "register-admin.html")
 
 
+# ============================================================
+# SPRINT 3 FEATURE: EMAIL NOTIFICATION
+# ============================================================
 @admin_required
 def register_appointment(request):
     if request.method == "POST":
@@ -95,17 +104,26 @@ def register_appointment(request):
         last_name = request.POST.get("last_name")
         appointment_date = request.POST.get("appointment_date")
 
-        if not all([first_name, last_name, appointment_date]):
-            messages.error(request, "All fields are required!")
+        # --- NEW FIELDS FOR SPRINT 3 ---
+        # You MUST add these to your appointment_form.html
+        doctor_name = request.POST.get("doctor_name", "Your Doctor") # 'Your Doctor' is a default
+        user_email = request.POST.get("user_email")
+
+        # --- Updated Validation ---
+        if not all([first_name, last_name, appointment_date, doctor_name, user_email]):
+            messages.error(request, "All fields (First Name, Last Name, Date, Doctor, Email) are required!")
             return render(request, "appointment_form.html")
 
         appointment_data = {
             "first_name": first_name,
             "last_name": last_name,
             "appointment_date": appointment_date,
+            "doctor_name": doctor_name,  # So you can save it
+            "user_email": user_email    # So you can save it
         }
 
         try:
+            # --- 1. Save appointment to Supabase ---
             response = supabase.table("appointment").insert(appointment_data).execute()
             
             if isinstance(response, dict) and 'error' in response:
@@ -113,6 +131,21 @@ def register_appointment(request):
                 print(f"DEBUG: Supabase Insertion Failed - {error_message}")
                 messages.error(request, error_message)
                 return render(request, "appointment_form.html")
+
+            # --- 2. Trigger Email Notification ---
+            try:
+                full_name = f"{first_name} {last_name}"
+                send_appointment_confirmation_email(
+                    user_name=full_name,
+                    user_email=user_email,
+                    doctor_name=doctor_name,
+                    appointment_date=appointment_date
+                )
+            except Exception as e:
+                # Don't crash the page if email fails. Just log it.
+                print(f"CRITICAL: Email send failed after booking: {e}")
+                messages.warning(request, "Appointment saved, but email notification failed.")
+            # --- End of Email Code ---
 
             messages.success(request, f"Appointment for {first_name} {last_name} on {appointment_date} successfully registered!")
             return redirect("admin_dashboard")
@@ -168,29 +201,47 @@ def login_page(request):
     return render(request, "login-student.html")
 
 
+# ============================================================
+# SPRINT 3 FEATURE: ADMIN PANEL UI
+# ============================================================
 @admin_required
 def admin_dashboard(request):
     try:
-        response = supabase.table("users").select("*").eq("is_admin", False).execute()
-        total_patients = len(response.data) if response.data else 0
-        new_registrations = total_patients
+        # Get Total Patients (using count for efficiency)
+        user_response = supabase.table("users").select("id", count='exact').eq("is_admin", False).execute()
+        total_patients = user_response.count if user_response.count is not None else 0
+        
+        # Get Total Appointments
+        appt_response = supabase.table("appointment").select("id", count='exact').execute()
+        total_appointments = appt_response.count if appt_response.count is not None else 0
+
+        # Get recent patients
+        recent_users_response = supabase.table("users").select("*").eq("is_admin", False).order("created_at", desc=True).limit(5).execute()
+        recent_activity = recent_users_response.data if recent_users_response.data else []
 
         context = {
             "total_patients": total_patients,
-            "total_appointments": 0,
-            "recent_activity": [],
-            "new_registrations": new_registrations,
+            "total_appointments": total_appointments, # New context for your UI
+            "recent_activity": recent_activity, # New context for your UI
+            "new_registrations": total_patients, # This is fine
         }
         return render(request, "admin_dashboard.html", context)
 
     except Exception as e:
         print(f"CRITICAL ERROR IN ADMIN DASHBOARD: {e}")
-        return HttpResponse(f"Admin Dashboard Crash: {e}", status=500)
+        messages.error(request, f"Could not load dashboard data: {e}")
+        # Render the page with an empty context so it doesn't crash
+        return render(request, "admin_dashboard.html", {
+            "total_patients": 0,
+            "total_appointments": 0,
+            "recent_activity": [],
+            "new_registrations": 0,
+        })
 
 
 def register_page(request):
     if request.method == "POST":
-        first_name = request.POST.get("first_name")
+        first_.name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -275,7 +326,7 @@ def appointment_list_page(request):
         return render(request, "appointments.html", {"appointments": []})
 
 
-@admin_required
+@admin_images
 def edit_appointment(request, appointment_id):
     """Handles editing an appointment."""
     try:
@@ -283,16 +334,23 @@ def edit_appointment(request, appointment_id):
             first_name = request.POST.get("first_name")
             last_name = request.POST.get("last_name")
             appointment_date = request.POST.get("appointment_date")
+            
+            # --- SPRINT 3: Also update the new fields ---
+            doctor_name = request.POST.get("doctor_name")
+            user_email = request.POST.get("user_email")
 
-            if not all([first_name, last_name, appointment_date]):
+            if not all([first_name, last_name, appointment_date, doctor_name, user_email]):
                 messages.error(request, "All fields are required!")
+                # Re-fetch data for the form
                 response = supabase.table("appointment").select("*").eq("id", appointment_id).single().execute()
                 return render(request, "edit_appointment.html", {"appointment": response.data})
 
             update_data = {
                 "first_name": first_name,
                 "last_name": last_name,
-                "appointment_date": appointment_date
+                "appointment_date": appointment_date,
+                "doctor_name": doctor_name, # Add this
+                "user_email": user_email    # Add this
             }
 
             response = supabase.table("appointment").update(update_data).eq("id", appointment_id).execute()
@@ -305,6 +363,7 @@ def edit_appointment(request, appointment_id):
                 return render(request, "edit_appointment.html", {"appointment": update_data})
 
         else:
+            # GET request
             response = supabase.table("appointment").select("*").eq("id", appointment_id).single().execute()
             if response.data:
                 return render(request, "edit_appointment.html", {"appointment": response.data})
