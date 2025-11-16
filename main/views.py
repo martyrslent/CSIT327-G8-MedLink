@@ -326,7 +326,7 @@ def appointment_list_page(request):
         return render(request, "appointments.html", {"appointments": []})
 
 
-@admin_images
+# @admin_images
 def edit_appointment(request, appointment_id):
     """Handles editing an appointment."""
     try:

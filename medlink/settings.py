@@ -15,12 +15,12 @@ ALLOWED_HOSTS = [
     ".onrender.com",  # Wildcard for robust domain handling
 ]
 
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY")
+SUPABASE_URL = config("SUPABASE_URL")
+SUPABASE_ANON_KEY = config("SUPABASE_ANON_KEY")
 
 DATABASES = {
     "default": dj_database_url.parse(
-        os.environ.get("DATABASE_URL"),
+        config("DATABASE_URL"),
         conn_max_age=600,
         ssl_require=True,
         # IMPORTANT: Removed host_chars=4 and conn_health_checks=True
