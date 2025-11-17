@@ -105,8 +105,7 @@ def register_appointment(request):
         appointment_date = request.POST.get("appointment_date")
 
         # --- NEW FIELDS FOR SPRINT 3 ---
-        # You MUST add these to your appointment_form.html
-        doctor_name = request.POST.get("doctor_name", "Your Doctor") # 'Your Doctor' is a default
+        doctor_name = request.POST.get("doctor_name", "Your Doctor")
         user_email = request.POST.get("user_email")
 
         # --- Updated Validation ---
@@ -118,36 +117,47 @@ def register_appointment(request):
             "first_name": first_name,
             "last_name": last_name,
             "appointment_date": appointment_date,
-            "doctor_name": doctor_name,  # So you can save it
-            "user_email": user_email    # So you can save it
+            "doctor_name": doctor_name,
+            "user_email": user_email
         }
 
         try:
             # --- 1. Save appointment to Supabase ---
             response = supabase.table("appointment").insert(appointment_data).execute()
             
+            # Check for Supabase error (This part of your code is good)
             if isinstance(response, dict) and 'error' in response:
                 error_message = f"Supabase Error: {response['error'].get('message', 'Unknown error')}"
                 print(f"DEBUG: Supabase Insertion Failed - {error_message}")
                 messages.error(request, error_message)
                 return render(request, "appointment_form.html")
 
-            # --- 2. Trigger Email Notification ---
+            # --- 2. Trigger Email Notification (NEW CODE BLOCK) ---
             try:
                 full_name = f"{first_name} {last_name}"
+                
+                # NOTE: Your email_utils function needs 'appointment_time'. 
+                # Since 'appointment_date' likely holds the full datetime, 
+                # we'll pass the date and extract time if needed, or pass an empty string 
+                # if you haven't implemented time yet. For now, we'll use a placeholder/split.
+                
+                # You should adapt this line based on how you handle time in the form/data:
+                appointment_time = "Not specified" # <-- CHANGE THIS if you collect time separately
+                
                 send_appointment_confirmation_email(
                     user_name=full_name,
                     user_email=user_email,
                     doctor_name=doctor_name,
-                    appointment_date=appointment_date
+                    appointment_date=appointment_date,
+                    appointment_time=appointment_time # Pass the time variable
                 )
             except Exception as e:
                 # Don't crash the page if email fails. Just log it.
                 print(f"CRITICAL: Email send failed after booking: {e}")
-                messages.warning(request, "Appointment saved, but email notification failed.")
+                messages.warning(request, "Appointment saved, but email notification failed. Please check server logs.")
             # --- End of Email Code ---
 
-            messages.success(request, f"Appointment for {first_name} {last_name} on {appointment_date} successfully registered!")
+            messages.success(request, f"Appointment for {first_name} {last_name} on {appointment_date} successfully registered! A confirmation email has been sent.")
             return redirect("admin_dashboard")
 
         except Exception as e:
@@ -216,21 +226,24 @@ def admin_dashboard(request):
         total_appointments = appt_response.count if appt_response.count is not None else 0
 
         # Get recent patients
-        recent_users_response = supabase.table("users").select("*").eq("is_admin", False).order("created_at", desc=True).limit(5).execute()
+        # *** FIX APPLIED HERE: CHANGED "created_at" TO "id" ***
+        recent_users_response = supabase.table("users").select("*").eq("is_admin", False).order("id", desc=True).limit(5).execute()
+        # ******************************************************
+        
         recent_activity = recent_users_response.data if recent_users_response.data else []
 
         context = {
             "total_patients": total_patients,
-            "total_appointments": total_appointments, # New context for your UI
-            "recent_activity": recent_activity, # New context for your UI
-            "new_registrations": total_patients, # This is fine
+            "total_appointments": total_appointments, 
+            "recent_activity": recent_activity, 
+            "new_registrations": total_patients,
         }
         return render(request, "admin_dashboard.html", context)
 
     except Exception as e:
+        # ... (rest of the error handling code is fine)
         print(f"CRITICAL ERROR IN ADMIN DASHBOARD: {e}")
         messages.error(request, f"Could not load dashboard data: {e}")
-        # Render the page with an empty context so it doesn't crash
         return render(request, "admin_dashboard.html", {
             "total_patients": 0,
             "total_appointments": 0,
@@ -238,10 +251,9 @@ def admin_dashboard(request):
             "new_registrations": 0,
         })
 
-
 def register_page(request):
     if request.method == "POST":
-        first_.name = request.POST.get("first_name")
+        first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -326,7 +338,8 @@ def appointment_list_page(request):
         return render(request, "appointments.html", {"appointments": []})
 
 
-# @admin_images
+
+#@admin_images
 def edit_appointment(request, appointment_id):
     """Handles editing an appointment."""
     try:

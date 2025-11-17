@@ -46,7 +46,9 @@ Thank you for choosing MedLink!
 
     try:
         # We use SMTP_SSL for port 465
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
+        with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+            smtp.ehlo() 
+            smtp.starttls(context=context) # Encrypts the connection after the initial handshake
             smtp.login(email_sender, email_password)
             smtp.sendmail(email_sender, email_receiver, em.as_string())
         print(f"✅ Successfully sent appointment confirmation to {user_email}")

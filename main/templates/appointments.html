@@ -34,14 +34,14 @@
 </head>
 <body>
     <div class="sidebar">
-        <h2>MedLink</h2>
-        <ul>
-            <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
-            <li><a href="{% url 'register_admin_page' %}">Users</a></li>
-            <li><a href="{% url 'appointment_list' %}" class="active">Appointments</a></li>
-            <li><a href="{% url 'logout_page' %}">Logout</a></li>
-        </ul>
-    </div>
+    <h2>MedLink</h2>
+    <ul>
+        <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+        <li><a href="{% url 'register_admin' %}">Users</a></li> 
+        <li><a href="{% url 'appointment_list' %}" class="active">Appointments</a></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+    </ul>
+</div>
 
     <div class="content">
         <div class="header">
