@@ -61,6 +61,13 @@
         {% endfor %}
       {% endif %}
 
+      <!-- ✅ ADDED BOOK APPOINTMENT BUTTON -->
+      <div style="margin-bottom: 20px; text-align: right;">
+          <a href="{% url 'book_appointment' %}" class="btn" style="background-color: #28a745; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+              + Book New Appointment
+          </a>
+      </div>
+
       <section class="bottom-row">
         <div class="card full">
           <h3>Your Upcoming Appointments</h3>
