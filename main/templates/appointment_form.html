@@ -55,9 +55,17 @@
             </div>
             
             <div class="form-group">
-                <label for="doctor_name">Doctor's Name</label>
-                <input type="text" id="doctor_name" name="doctor_name" required>
-            </div>
+    <label for="doctor_name">Select Doctor</label>
+    <select id="doctor_name" name="doctor_name" required 
+            style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+        <option value="" disabled selected>-- Choose a Medical Staff Member --</option>
+        {% for doctor in doctors %}
+            <option value="{{ doctor.first_name }} {{ doctor.last_name }}">
+                {{ doctor.first_name }} {{ doctor.last_name }}
+            </option>
+        {% endfor %}
+    </select>
+</div>
             
             <div class="form-group">
                 <label for="user_email">Patient's Email</label>
@@ -74,5 +82,5 @@
 
         <a href="{% url 'admin_dashboard' %}" class="back-link">← Back to Dashboard</a>
     </div>
-</body>
+</body>was
 </html>

@@ -14,12 +14,17 @@
         .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #555; }
         .form-group input[type="text"], 
         .form-group input[type="email"],
-        .form-group input[type="password"] { 
+        .form-group input[type="password"],
+        /* New style for the select dropdown */
+        .form-group select { 
             width: 100%; 
             padding: 10px; 
             border: 1px solid #ccc; 
             border-radius: 4px; 
             box-sizing: border-box; 
+            appearance: none; /* Removes default OS styling for select */
+            background-color: white;
+            cursor: pointer;
         }
         .error-message { color: red; margin-bottom: 15px; text-align: center; font-weight: bold; }
         .success-message { color: green; margin-bottom: 15px; text-align: center; font-weight: bold; }
@@ -55,6 +60,17 @@
                 <label for="email">Email Address</label>
                 <input type="email" id="email" name="email" required>
             </div>
+
+            <!-- NEW ROLE DROPDOWN -->
+            <div class="form-group">
+                <label for="role">Staff Role</label>
+                <select id="role" name="role" required>
+                    <option value="">-- Select Role --</option>
+                    <option value="doctor">Doctor</option>
+                    <option value="staff">Admin/Staff (e.g., Receptionist)</option>
+                </select>
+            </div>
+            <!-- END NEW ROLE DROPDOWN -->
 
             <div class="form-group">
                 <label for="password">Password</label>
