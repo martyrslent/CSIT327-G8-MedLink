@@ -104,69 +104,83 @@ def register_appointment(request):
         last_name = request.POST.get("last_name")
         appointment_date = request.POST.get("appointment_date")
 
-        # --- NEW FIELDS FOR SPRINT 3 ---
         doctor_name = request.POST.get("doctor_name", "Your Doctor")
         user_email = request.POST.get("user_email")
+        appointment_time = request.POST.get("appointment_time", "Not specified") # Adjusted to collect time if available
 
-        # --- Updated Validation ---
+        # --- Initial Validation ---
         if not all([first_name, last_name, appointment_date, doctor_name, user_email]):
-            messages.error(request, "All fields (First Name, Last Name, Date, Doctor, Email) are required!")
+            messages.error(request, "All required fields are needed to book an appointment.")
             return render(request, "appointment_form.html")
 
+        # --- 1. Find Patient ID (Foreign Key) ---
+        patient_id = None
+        try:
+            # Look up the patient's ID in the 'users' table using the email
+            patient_response = supabase.table("users").select("id").eq("email", user_email).single().execute()
+            if patient_response.data:
+                patient_id = patient_response.data.get("id")
+        except Exception:
+            # If the user is not found, we can't link the record
+            messages.error(request, "Patient with that email was not found in the users database. Appointment not booked.")
+            return render(request, "appointment_form.html")
+
+        
         appointment_data = {
             "first_name": first_name,
             "last_name": last_name,
             "appointment_date": appointment_date,
             "doctor_name": doctor_name,
-            "user_email": user_email
+            "user_email": user_email,
+            "patient_id": patient_id # Link to the patient's user record
         }
 
         try:
-            # --- 1. Save appointment to Supabase ---
+            # --- 2. INSERT into Appointment Table ---
             response = supabase.table("appointment").insert(appointment_data).execute()
             
-            # Check for Supabase error (This part of your code is good)
-            if isinstance(response, dict) and 'error' in response:
-                error_message = f"Supabase Error: {response['error'].get('message', 'Unknown error')}"
-                print(f"DEBUG: Supabase Insertion Failed - {error_message}")
-                messages.error(request, error_message)
-                return render(request, "appointment_form.html")
+            # Assuming the Supabase client returns a dictionary with 'data' key upon successful insert
+            new_appointment_data = response.data[0]
+            new_appointment_id = new_appointment_data.get('id')
 
-            # --- 2. Trigger Email Notification (NEW CODE BLOCK) ---
+            # --- 3. INSERT into Patient Records Table (The new requirement) ---
+            patient_record_data = {
+                "user_id": patient_id,
+                "appointment_id": new_appointment_id,
+                "record_date": appointment_date,  # Use the appointment date as the visit date
+                "successful_appointment_visit": False, # Default to pending/scheduled
+                "doctor_notes": "Appointment scheduled."
+            }
+            
+            # Execute the second insertion
+            supabase.table("patient_records").insert(patient_record_data).execute()
+            
+            # --- 4. Trigger Email Notification (Your existing code) ---
             try:
                 full_name = f"{first_name} {last_name}"
-                
-                # NOTE: Your email_utils function needs 'appointment_time'. 
-                # Since 'appointment_date' likely holds the full datetime, 
-                # we'll pass the date and extract time if needed, or pass an empty string 
-                # if you haven't implemented time yet. For now, we'll use a placeholder/split.
-                
-                # You should adapt this line based on how you handle time in the form/data:
-                appointment_time = "Not specified" # <-- CHANGE THIS if you collect time separately
                 
                 send_appointment_confirmation_email(
                     user_name=full_name,
                     user_email=user_email,
                     doctor_name=doctor_name,
                     appointment_date=appointment_date,
-                    appointment_time=appointment_time # Pass the time variable
+                    appointment_time=appointment_time
                 )
             except Exception as e:
-                # Don't crash the page if email fails. Just log it.
                 print(f"CRITICAL: Email send failed after booking: {e}")
                 messages.warning(request, "Appointment saved, but email notification failed. Please check server logs.")
             # --- End of Email Code ---
 
-            messages.success(request, f"Appointment for {first_name} {last_name} on {appointment_date} successfully registered! A confirmation email has been sent.")
+            messages.success(request, f"Appointment for {first_name} {last_name} on {appointment_date} successfully registered, and patient record created!")
             return redirect("admin_dashboard")
 
         except Exception as e:
+            # This catch-all handles errors from appointment insert, patient_records insert, or email
             print(f"DEBUG: Critical error during appointment registration: {str(e)}")
-            messages.error(request, f"An unexpected error occurred: {str(e)}")
+            messages.error(request, f"An unexpected error occurred during booking: {str(e)}")
             return render(request, "appointment_form.html")
 
     return render(request, "appointment_form.html")
-
 
 def login_page(request):
     if request.method == "POST":
@@ -406,3 +420,24 @@ def delete_appointment(request, appointment_id):
         messages.error(request, f"An unexpected error occurred: {str(e)}")
     
     return redirect("appointment_list")
+
+@admin_required
+def patient_records_list_page(request):
+    """Displays all patient records along with the patient's name."""
+    try:
+        # Fetch records and SELECT the related 'user_id' object,
+        # specifying the columns you want from the related 'users' table.
+        # We assume the user's name columns are 'first_name' and 'last_name'.
+        
+        response = supabase.table("patient_records").select("*, user_id(first_name, last_name)").order("record_date", desc=True).execute()
+        
+        records = response.data if response.data else []
+        
+        context = {"records": records}
+        return render(request, "patient_records_list.html", context)
+    
+    except Exception as e:
+        # ... (error handling remains the same)
+        print(f"DEBUG: Error fetching patient records: {str(e)}")
+        messages.error(request, f"Could not load patient records: {str(e)}")
+        return render(request, "patient_records_list.html", {"records": []})
