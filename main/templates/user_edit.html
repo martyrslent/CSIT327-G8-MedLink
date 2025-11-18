@@ -1,0 +1,120 @@
+{% extends 'admin_dashboard.html' %}
+{% load static %}
+
+{% block title %}Edit User: {{ user.first_name }} {{ user.last_name }}{% endblock %}
+
+{% block style %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="email"] {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+    }
+    .form-group input:focus {
+        border-color: #007bff;
+        outline: none;
+    }
+    .checkbox-group {
+        display: flex;
+        align-items: center;
+        margin-top: 25px;
+    }
+    .checkbox-group input[type="checkbox"] {
+        margin-right: 10px;
+        width: 20px;
+        height: 20px;
+    }
+    .btn-submit {
+        background-color: #28a745;
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: background-color 0.3s;
+        margin-right: 10px;
+    }
+    .btn-submit:hover {
+        background-color: #1e7e34;
+    }
+    .btn-back {
+        background-color: #6c757d;
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 600;
+        transition: background-color 0.3s;
+    }
+    .btn-back:hover {
+        background-color: #5a6268;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Editing User: {{ user.first_name }} {{ user.last_name }} (ID: {{ user.id }})</h1>
+
+{% if messages %}
+    {% for message in messages %}
+        <p style="padding: 10px; background: #f8d7da; color: #721c24; border-radius: 5px; margin-bottom: 15px;">{{ message }}</p>
+    {% endfor %}
+{% endif %}
+
+<div class="form-container">
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required>
+        </div>
+        
+        <!-- Role Management (Check box status reflects user.is_doctor) -->
+        <div class="form-group checkbox-group">
+            <input type="checkbox" id="is_doctor" name="is_doctor" {% if user.is_doctor %}checked{% endif %}>
+            <label for="is_doctor">User is a Doctor (Medical Staff)</label>
+        </div>
+
+        <div class="actions" style="margin-top: 30px;">
+            <button type="submit" class="btn-submit">Save Changes</button>
+            <a href="{% url 'user_management' %}" class="btn-back">Cancel and Back to Users</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

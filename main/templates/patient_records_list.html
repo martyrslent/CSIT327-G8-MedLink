@@ -1,0 +1,42 @@
+{% extends 'admin_dashboard.html' %}
+{% load static %}
+
+{% block title %}Patient Records List{% endblock %}
+
+{% block content %}
+<h1 class="page-title">All Patient Visit Records 🧑‍⚕️</h1>
+
+<div class="appointment-table-container">
+    {% if records %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Record ID</th>
+                    <th>Patient Name</th> <th>Visit Date</th>
+                    <th>Successful Visit</th>
+                    <th>Doctor Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                    <tr>
+                        <td>{{ record.id }}</td>
+                        <td>{{ record.user_id.first_name }} {{ record.user_id.last_name }}</td>
+                        <td>{{ record.record_date|date:"Y-m-d" }}</td>
+                        <td>
+                            {% if record.successful_appointment_visit %}
+                                ✅ Yes
+                            {% else %}
+                                ❌ No
+                            {% endif %}
+                        </td>
+                        <td>{{ record.doctor_notes|truncatechars:100 }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No patient records found.</p>
+    {% endif %}
+</div>
+{% endblock %}
