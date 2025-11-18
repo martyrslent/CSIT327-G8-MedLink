@@ -1,0 +1,92 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>My Profile</title>
+    <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
+    <style>
+        .profile-card {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto; /* Center the card */
+        }
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 20px;
+        }
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid #dc3545;
+        }
+        .info-group {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .label { font-weight: bold; color: #555; }
+        .value { color: #333; font-size: 1.1em; }
+        .back-btn { display: block; margin-top: 20px; text-align: center; color: #dc3545; text-decoration: none; }
+    </style>
+</head>
+<body>
+  <div class="dashboard-wrap">
+    
+    <aside class="sidebar">
+      <div class="logo">MedLink</div>
+      <nav class="nav">
+        <ul>
+          <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
+          <li><a href="{% url 'user_profile' %}">Profile</a></li> <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <h1 class="page-title">User Profile</h1>
+
+      <div class="profile-card">
+        <div class="profile-header">
+             <img src="{% static 'main/img/person.png' %}" alt="Profile" class="profile-img">
+            <h2>{{ full_name }}</h2>
+        </div>
+
+        <div class="info-group">
+            <span class="label">📧 Email:</span>
+            <span class="value">{{ email }}</span>
+        </div>
+
+        <div class="info-group">
+            <span class="label">👤 Full Name:</span>
+            <span class="value">{{ full_name }}</span>
+        </div>
+
+        <div class="info-group">
+            <span class="label">🎂 Age:</span>
+            <span class="value">{{ age }}</span>
+        </div>
+
+        <div class="info-group">
+            <span class="label">⚧ Gender:</span>
+            <span class="value">{{ gender }}</span>
+        </div>
+        
+        <a href="{% url 'user_dashboard' %}" class="back-btn">← Back to Dashboard</a>
+      </div>
+
+    </main>
+  </div>
+</body>
+</html>
