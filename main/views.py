@@ -14,7 +14,7 @@ from functools import wraps
 
 
 # ============================================================
-# ADMIN AUTHENTICATION DECORATOR (Cleaned up)
+# ADMIN AUTHENTICATION DECORATOR (Moved here to fix NameError)
 # ============================================================
 def admin_required(view_func):
     """
@@ -309,15 +309,35 @@ def user_dashboard(request):
         return redirect("login")
 
     try:
+        user_email = request.session.get("user_email")
+        first_name = request.session.get("first_name", "User")
+        
+        appointment_response = supabase.table("appointment").select("*").eq("user_email", user_email).order("appointment_date", desc=True).execute()
+        appointments = appointment_response.data if appointment_response.data else []
+        # --- END NEW ---
+
         context = {
-            "user_email": request.session.get("user_email"),
-            "first_name": request.session.get("first_name", "User"),
+            "user_email": user_email,
+            "first_name": first_name,
+            "appointments": appointments  # Pass the appointments to the template
         }
-        return render(request, "user_dashboard.html", context)
+        # --- FIX #1 ---
+        # We make the path more specific so Django can find it.
+        return render(request, "user-dashboard.html", context)
 
     except Exception as e:
-        print(f"CRITICAL ERROR IN USER DASHBOARD: {e}")
-        return HttpResponse(f"User Dashboard Crash: {e}", status=500)
+        print(f"--- DEBUG: USER DASHBOARD CRASH ---")
+        print(f"Error type: {type(e)}")
+        print(f"Error details: {e}")
+        print(f"--- END DEBUG ---")
+        # Add a message for the user even if things break
+        messages.error(request, f"Could not load dashboard data: {e}")
+        # --- FIX #2 ---
+        # We also update the path here in the error case.
+        return render(request, "user-dashboard.html", {
+            "first_name": request.session.get("first_name", "User"),
+            "appointments": [] # Send an empty list on error
+        })
 
 
 # ============================================================
