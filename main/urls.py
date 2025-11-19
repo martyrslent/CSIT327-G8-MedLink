@@ -15,6 +15,10 @@ urlpatterns = [
     path('appointments/', views.appointment_list_page, name='appointment_list'),
     path('appointments/edit/<int:appointment_id>/', views.edit_appointment, name='edit_appointment'),
     path('appointments/delete/<int:appointment_id>/', views.delete_appointment, name='delete_appointment'),
+    path('patient-records/', views.patient_records_list_page, name='patient_records_list'),
+    path('users/', views.user_management_page, name='user_management'),
+    path('users/edit/<int:user_id>/', views.edit_user_page, name='edit_user'),
+    path('appointments/complete/<int:appointment_id>/', views.complete_appointment, name='complete_appointment'),
     path('profile/', views.profile_page, name='user_profile'),
     path('book-appointment/', views.book_appointment, name='book_appointment'),
 ]
