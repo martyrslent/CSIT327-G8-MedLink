@@ -25,8 +25,16 @@
 
     <main class="content">
       {% block content %}
-      <h1 class="page-title">Dashboard (Admin)</h1>
-
+     <h1 class="page-title">
+  Dashboard (
+  {% if request.session.role == "superadmin" %}
+    Superadmin
+  {% elif request.session.role == "admin" %}
+    Admin
+  {% endif %}
+  )
+</h1>
+</h1>
       <section class="top-row">
         <div class="card">
           <h3>Total Active Patients</h3>

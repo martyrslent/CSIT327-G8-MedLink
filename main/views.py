@@ -17,19 +17,22 @@ from .email_utils import send_appointment_confirmation_email
 # ADMIN AUTHENTICATION DECORATOR
 # ============================================================
 def admin_required(view_func):
-    """
-    Decorator to restrict access to admin-only views.
-    If the current session does not belong to an admin,
-    redirects to login with an error message.
-    """
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
-        if not request.session.get("is_admin"):
+        if request.session.get("role") not in ["admin", "superadmin"]:
             messages.error(request, "Access denied. Please log in as an administrator.")
             return redirect("login")
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
+def superadmin_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        if request.session.get("role") != "superadmin":
+            messages.error(request, "Access denied. Superadmin privileges required.")
+            return redirect("admin_dashboard")  # Or "login"
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
 
 # ============================================================
 # CORE VIEWS
@@ -39,7 +42,7 @@ def hello_page(request):
     return HttpResponse("Hello, Django Page!")
 
 # --- ADMIN REGISTRATION PAGE (Includes staff roles) ---
-@admin_required
+@superadmin_required
 def register_admin_page(request):
     if request.method == "POST":
         first_name = request.POST.get("first_name")
@@ -47,7 +50,7 @@ def register_admin_page(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
-        role = request.POST.get("role") # NEW: Get the selected role
+        role = request.POST.get("role")  # NEW: Get the selected role
         
         # Basic Validation
         if password != confirm_password:
@@ -80,11 +83,15 @@ def register_admin_page(request):
                 "last_name": last_name,
                 "email": email,
                 "password": hashed_password,
-                "is_admin": is_admin_flag, 
-                "is_doctor": is_doctor_flag
+                "is_admin": is_admin_flag,
+                "is_doctor": is_doctor_flag,
+                "is_superadmin": False  # IMPORTANT: never create new superadmins from here
             }).execute()
 
-            messages.success(request, f"New {role.capitalize()} {first_name} added successfully! They can now log in.")
+            messages.success(
+                request,
+                f"New {role.capitalize()} {first_name} added successfully! They can now log in."
+            )
             return redirect("admin_dashboard")
 
         except Exception as e:
@@ -93,7 +100,6 @@ def register_admin_page(request):
             return render(request, "register-admin.html")
 
     return render(request, "register-admin.html")
-
 
 # --- APPOINTMENT REGISTRATION (Includes doctor list fetch and record creation) ---
 @admin_required
@@ -199,7 +205,6 @@ def login_page(request):
             return render(request, "login-student.html")
 
         try:
-            # Fetch user
             response = supabase.table("users").select("*").eq("email", email).execute()
 
             if not response.data:
@@ -208,7 +213,6 @@ def login_page(request):
 
             user = response.data[0]
 
-            # Check password
             if not check_password(password, user["password"]):
                 messages.error(request, "Incorrect password!")
                 return render(request, "login-student.html")
@@ -216,12 +220,17 @@ def login_page(request):
             # Set session
             request.session["user_id"] = user["id"]
             request.session["user_email"] = user["email"]
-            request.session["is_admin"] = user.get("is_admin", False)
             request.session["first_name"] = user.get("first_name", "User")
 
-            if user.get("is_admin", False):
+            # Only one role per user
+            if user.get("is_superadmin", False):
+                request.session["role"] = "superadmin"
+                return redirect("admin_dashboard")
+            elif user.get("is_admin", False):
+                request.session["role"] = "admin"
                 return redirect("admin_dashboard")
             else:
+                request.session["role"] = "user"
                 return redirect("user_dashboard")
 
         except Exception as e:

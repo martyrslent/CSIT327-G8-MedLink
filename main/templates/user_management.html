@@ -17,7 +17,6 @@
         }
     }
     
-    /* Table Styling */
     .user-table {
         width: 100%;
         border-collapse: collapse;
@@ -47,8 +46,7 @@
     }
     .doctor-badge { background-color: #d4edda; color: #155724; }
     .patient-badge { background-color: #fff3cd; color: #856404; }
-    
-    /* Updated action button styling and link for Django URL */
+
     .action-btn {
         background: #007bff; 
         border: none;
@@ -73,13 +71,16 @@
 {% if messages %}
     <div class="messages-container">
         {% for message in messages %}
-            <p style="padding: 10px; background: #f8d7da; color: #721c24; border-radius: 5px; margin-bottom: 15px;">{{ message }}</p>
+            <p style="padding: 10px; background: #f8d7da; color: #721c24; border-radius: 5px; margin-bottom: 15px;">
+                {{ message }}
+            </p>
         {% endfor %}
     </div>
 {% endif %}
 
 <div class="user-management-grid">
     
+    <!-- Doctors Section -->
     <div class="card full">
         <h3>Medical Staff (Doctors: {{ doctors|length }})</h3>
         
@@ -100,7 +101,9 @@
                             <td>{{ doctor.email }}</td>
                             <td><span class="status-badge doctor-badge">Doctor</span></td>
                             <td>
-                                <a href="{% url 'edit_user' doctor.id %}" class="action-btn" title="Edit User Details">Edit</a>
+                                {% if request.session.role == "superadmin" %}
+                                    <a href="{% url 'edit_user' doctor.id %}" class="action-btn">Edit</a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
@@ -111,6 +114,7 @@
         {% endif %}
     </div>
 
+    <!-- Patients Section -->
     <div class="card full">
         <h3>Registered Patients ({{ patients|length }})</h3>
         
@@ -131,7 +135,9 @@
                             <td>{{ patient.email }}</td>
                             <td><span class="status-badge patient-badge">Patient</span></td>
                             <td>
-                                <a href="{% url 'edit_user' patient.id %}" class="action-btn" title="Edit User Details">Edit</a>
+                                {% if request.session.role == "superadmin" or request.session.role == "admin" %}
+                                    <a href="{% url 'edit_user' patient.id %}" class="action-btn">Edit</a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
