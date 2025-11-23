@@ -2,6 +2,7 @@
 # IMPORTS
 # ============================================================
 import os
+import time # To generate unique filenames
 from functools import wraps
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -359,8 +360,8 @@ def user_dashboard(request):
             "first_name": request.session.get("first_name", "User"),
             "appointments": []
         })
-
-# --- PROFILE PAGE (New from your friend's diff) ---
+    
+# --- PROFILE PAGE (Updated to include profile_image) ---
 def profile_page(request):
     if not request.session.get("user_id"):
         return redirect("login")
@@ -378,6 +379,8 @@ def profile_page(request):
             "email": user_data.get("email"),
             "age": user_data.get("age", "Not Specified"),
             "gender": user_data.get("gender", "Not Specified"),
+            # Pass the profile image URL to the template
+            "profile_image": user_data.get("profile_image"), 
         }
 
         return render(request, "profile.html", context)
@@ -386,6 +389,45 @@ def profile_page(request):
         print(f"DEBUG: Error loading profile: {e}")
         messages.error(request, "Could not load profile data.")
         return redirect("user_dashboard")
+
+# --- NEW: UPDATE PROFILE PICTURE ---
+def update_profile_picture(request):
+    if not request.session.get("user_id"):
+        return redirect("login")
+        
+    if request.method == "POST" and request.FILES.get("profile_picture"):
+        user_id = request.session.get("user_id")
+        image_file = request.FILES["profile_picture"]
+        
+        try:
+            # 1. Create a unique filename to prevent caching issues
+            file_ext = image_file.name.split('.')[-1]
+            file_path = f"user_{user_id}_{int(time.time())}.{file_ext}"
+            
+            # 2. Read file content
+            file_content = image_file.read()
+            
+            # 3. Upload to Supabase Storage (Bucket: 'avatars')
+            # Note: Ensure you created a public bucket named 'avatars' in Supabase
+            supabase.storage.from_("avatars").upload(
+                file=file_content,
+                path=file_path,
+                file_options={"content-type": image_file.content_type}
+            )
+            
+            # 4. Get the Public URL
+            public_url = supabase.storage.from_("avatars").get_public_url(file_path)
+            
+            # 5. Update the Users table
+            supabase.table("users").update({"profile_image": public_url}).eq("id", user_id).execute()
+            
+            messages.success(request, "Profile picture updated successfully!")
+            
+        except Exception as e:
+            print(f"Error uploading image: {e}")
+            messages.error(request, "Failed to upload image. Please try again.")
+            
+    return redirect("user_profile")
 
 
 # ============================================================
