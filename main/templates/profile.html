@@ -109,6 +109,21 @@
             <span class="value">{{ gender }}</span>
         </div>
 
+        <!-- ===================== ADDED BIO SECTION ===================== -->
+        <div class="info-group" style="display: block;">
+            <span class="label" style="display: block; margin-bottom: 5px;">📝 Bio:</span>
+            <p class="value" style="background: #f9f9f9; padding: 10px; border-radius: 5px; font-size: 0.95em; line-height: 1.5;">
+                {{ bio|default:"No bio yet. Click 'Edit Profile' to add your story!" }}
+            </p>
+        </div>
+
+        <!-- Edit Profile Button -->
+        <button onclick="openEditModal()" style="width: 100%; background-color: #28a745; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 1em; margin-top: 15px; font-weight: bold;">
+            ✏️ Edit Profile
+        </button>
+        <!-- =============================================================== -->
+
+        
         <div style="margin-top: 30px; border-top: 2px solid #f0f0f0; padding-top: 20px;">
             <h3 style="margin-bottom: 15px; color: #333;">Account Settings</h3>
             
@@ -141,6 +156,69 @@
         </div>
 
       </div>
+
+      <!-- ===================== EDIT PROFILE MODAL (FULL) ===================== -->
+      <div id="editModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+        <div style="background-color: #fff; margin: 5% auto; padding: 30px; border-radius: 10px; width: 90%; max-width: 500px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+            <h2 style="margin-top: 0; color: #333;">Edit Personal Info</h2>
+            
+            <form action="{% url 'update_personal_info' %}" method="POST">
+                {% csrf_token %}
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">First Name</label>
+                    <input type="text" name="first_name" value="{{ first_name }}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Last Name</label>
+                    <input type="text" name="last_name" value="{{ last_name }}" required style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Age</label>
+                        <input type="number" name="age" value="{{ age }}" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Gender</label>
+                        <select name="gender" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                            <option value="Male" {% if gender == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if gender == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if gender == 'Other' %}selected{% endif %}>Other</option>
+                            <option value="Prefer not to say" {% if gender == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 5px;">Bio / Story</label>
+                    <textarea name="bio" rows="4" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" placeholder="Tell us about yourself...">{{ bio }}</textarea>
+                </div>
+
+                <div style="text-align: right;">
+                    <button type="button" onclick="closeEditModal()" style="background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;">Cancel</button>
+                    <button type="submit" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Save Changes</button>
+                </div>
+            </form>
+        </div>
+      </div>
+
+      <script>
+        function openEditModal() {
+            document.getElementById('editModal').style.display = 'block';
+        }
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+        window.onclick = function(event) {
+            var modal = document.getElementById('editModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+      </script>
+      <!-- ===================================================================== -->
 
     </main>
   </div>

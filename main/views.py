@@ -377,9 +377,9 @@ def profile_page(request):
         context = {
             "full_name": full_name,
             "email": user_data.get("email"),
-            "age": user_data.get("age", "Not Specified"),
-            "gender": user_data.get("gender", "Not Specified"),
-            # Pass the profile image URL to the template
+            "age": user_data.get("age", ""), # Changed default to empty string for form
+            "gender": user_data.get("gender", ""),
+            "bio": user_data.get("bio", ""), # <--- NEW
             "profile_image": user_data.get("profile_image"), 
         }
 
@@ -793,3 +793,45 @@ def delete_account(request):
             messages.error(request, "Could not delete account. Please try again.")
 
     return redirect("user_dashboard")
+# --- USER SETTINGS: UPDATE PERSONAL INFO ---
+def update_personal_info(request):
+    if not request.session.get("user_id"):
+        return redirect("login")
+
+    if request.method == "POST":
+        user_id = request.session.get("user_id")
+        
+        # Get data from form
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+        age = request.POST.get("age")
+        gender = request.POST.get("gender")
+        bio = request.POST.get("bio")
+
+        # Validate Age (Optional but good practice)
+        if age and not age.isdigit():
+            messages.error(request, "Age must be a valid number.")
+            return redirect("user_profile")
+
+        try:
+            # Update Supabase
+            update_data = {
+                "first_name": first_name,
+                "last_name": last_name,
+                "age": int(age) if age else None,
+                "gender": gender,
+                "bio": bio
+            }
+            
+            supabase.table("users").update(update_data).eq("id", user_id).execute()
+            
+            # Update Session data if name changed
+            request.session["first_name"] = first_name
+            
+            messages.success(request, "Profile updated successfully!")
+
+        except Exception as e:
+            print(f"Error updating profile: {e}")
+            messages.error(request, "An error occurred while updating profile.")
+
+    return redirect("user_profile")
