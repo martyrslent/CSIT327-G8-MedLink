@@ -82,7 +82,26 @@
             <span class="label">⚧ Gender:</span>
             <span class="value">{{ gender }}</span>
         </div>
+
+        <div style="margin-top: 30px; border-top: 2px solid #f0f0f0; padding-top: 20px;">
+            <h3 style="margin-bottom: 15px; color: #333;">Account Settings</h3>
+            
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;">
+    <a href="{% url 'change_password' %}" style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; font-size: 0.9em;">
+        🔒 Change Password
+    </a>
+
+    <form action="{% url 'delete_account' %}" method="POST" onsubmit="return confirm('WARNING: Are you sure you want to delete your account? This action cannot be undone.');" style="display: flex; gap: 5px;">
+        {% csrf_token %}
         
+        <input type="password" name="password_confirmation" placeholder="Confirm Password" required 
+               style="padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 0.9em; width: 150px;">
+        
+        <button type="submit" style="background-color: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.9em;">
+            🗑️ Delete Account
+        </button>
+    </form>
+</div>
         <a href="{% url 'user_dashboard' %}" class="back-btn">← Back to Dashboard</a>
       </div>
 
