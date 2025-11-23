@@ -13,7 +13,7 @@
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             max-width: 600px;
-            margin: 0 auto; /* Center the card */
+            margin: 0 auto;
         }
         .profile-header {
             text-align: center;
@@ -49,7 +49,8 @@
       <nav class="nav">
         <ul>
           <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
-          <li><a href="{% url 'user_profile' %}">Profile</a></li> <li><a href="{% url 'logout' %}">Logout</a></li>
+          <li><a href="{% url 'user_profile' %}">Profile</a></li>
+          <li><a href="{% url 'logout' %}">Logout</a></li>
         </ul>
       </nav>
     </aside>
@@ -58,10 +59,35 @@
       <h1 class="page-title">User Profile</h1>
 
       <div class="profile-card">
+        
+        <!-- ================= PROFILE HEADER WITH AVATAR UPLOAD ================= -->
         <div class="profile-header">
-             <img src="{% static 'main/img/person.png' %}" alt="Profile" class="profile-img">
+            <div style="position: relative; display: inline-block;">
+
+                {% if profile_image %}
+                    <img src="{{ profile_image }}" alt="Profile" class="profile-img">
+                {% else %}
+                    <img src="{% static 'main/img/person.png' %}" alt="Profile" class="profile-img">
+                {% endif %}
+
+                <form id="avatar-form" action="{% url 'update_profile_picture' %}" 
+                      method="POST" enctype="multipart/form-data" style="margin-top: 10px;">
+                    {% csrf_token %}
+                    
+                    <label for="file-input" 
+                        style="cursor: pointer; color: #007bff; font-size: 0.9em; text-decoration: underline;">
+                        Change Photo 📷
+                    </label>
+
+                    <input id="file-input" type="file" name="profile_picture" accept="image/*" 
+                           style="display: none;"
+                           onchange="document.getElementById('avatar-form').submit();">
+                </form>
+            </div>
+
             <h2>{{ full_name }}</h2>
         </div>
+        <!-- ==================================================================== -->
 
         <div class="info-group">
             <span class="label">📧 Email:</span>
@@ -87,22 +113,33 @@
             <h3 style="margin-bottom: 15px; color: #333;">Account Settings</h3>
             
             <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;">
-    <a href="{% url 'change_password' %}" style="background-color: #007bff; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; font-size: 0.9em;">
-        🔒 Change Password
-    </a>
 
-    <form action="{% url 'delete_account' %}" method="POST" onsubmit="return confirm('WARNING: Are you sure you want to delete your account? This action cannot be undone.');" style="display: flex; gap: 5px;">
-        {% csrf_token %}
-        
-        <input type="password" name="password_confirmation" placeholder="Confirm Password" required 
-               style="padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 0.9em; width: 150px;">
-        
-        <button type="submit" style="background-color: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.9em;">
-            🗑️ Delete Account
-        </button>
-    </form>
-</div>
-        <a href="{% url 'user_dashboard' %}" class="back-btn">← Back to Dashboard</a>
+                <a href="{% url 'change_password' %}" 
+                   style="background-color: #007bff; color: white; padding: 10px 15px; 
+                          border-radius: 5px; text-decoration: none; font-size: 0.9em;">
+                    🔒 Change Password
+                </a>
+
+                <form action="{% url 'delete_account' %}" method="POST" 
+                      onsubmit="return confirm('WARNING: Are you sure you want to delete your account? This action cannot be undone.');" 
+                      style="display: flex; gap: 5px;">
+                    {% csrf_token %}
+                    
+                    <input type="password" name="password_confirmation" placeholder="Confirm Password" required 
+                           style="padding: 8px; border: 1px solid #ccc; border-radius: 5px; 
+                                  font-size: 0.9em; width: 150px;">
+                    
+                    <button type="submit" 
+                            style="background-color: #dc3545; color: white; padding: 10px 15px; 
+                                   border: none; border-radius: 5px; cursor: pointer; font-size: 0.9em;">
+                        🗑️ Delete Account
+                    </button>
+                </form>
+            </div>
+
+            <a href="{% url 'user_dashboard' %}" class="back-btn">← Back to Dashboard</a>
+        </div>
+
       </div>
 
     </main>

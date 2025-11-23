@@ -23,6 +23,8 @@ urlpatterns = [
     path('book-appointment/', views.book_appointment, name='book_appointment'),
     path('settings/change-password/', views.change_password, name='change_password'),
     path('settings/delete-account/', views.delete_account, name='delete_account'),
+    path('profile/', views.profile_page, name='user_profile'),
+    path('profile/upload-image/', views.update_profile_picture, name='update_profile_picture'),
 
 
 ]
