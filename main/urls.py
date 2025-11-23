@@ -25,6 +25,6 @@ urlpatterns = [
     path('settings/delete-account/', views.delete_account, name='delete_account'),
     path('profile/', views.profile_page, name='user_profile'),
     path('profile/upload-image/', views.update_profile_picture, name='update_profile_picture'),
-
+    path('profile/update-info/', views.update_personal_info, name='update_personal_info'),
 
 ]
