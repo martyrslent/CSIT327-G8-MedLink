@@ -21,6 +21,8 @@ urlpatterns = [
     path('appointments/complete/<int:appointment_id>/', views.complete_appointment, name='complete_appointment'),
     path('profile/', views.profile_page, name='user_profile'),
     path('book-appointment/', views.book_appointment, name='book_appointment'),
+    path('settings/change-password/', views.change_password, name='change_password'),
+    path('settings/delete-account/', views.delete_account, name='delete_account'),
 
 
 ]

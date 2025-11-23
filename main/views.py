@@ -657,3 +657,97 @@ def patient_records_list_page(request):
         print(f"DEBUG: Error fetching patient records: {str(e)}")
         messages.error(request, f"Could not load patient records: {str(e)}")
         return render(request, "patient_records_list.html", {"records": []})
+    # --- USER SETTINGS: CHANGE PASSWORD ---
+def change_password(request):
+    # 1. Security: Ensure user is logged in
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return redirect("login")
+
+    if request.method == "POST":
+        old_password = request.POST.get("old_password")
+        new_password = request.POST.get("new_password")
+        confirm_password = request.POST.get("confirm_password")
+
+        try:
+            # Fetch current user data to get the real password hash
+            response = supabase.table("users").select("*").eq("id", user_id).single().execute()
+            user = response.data
+
+            if not user:
+                messages.error(request, "User not found.")
+                return redirect("user_dashboard")
+
+            # --- RULE 1: Verify Old Password ---
+            if not check_password(old_password, user["password"]):
+                messages.error(request, "Incorrect current password.")
+                return render(request, "change_password.html")
+
+            # --- RULE 2: Prevent Reuse (Old != New) ---
+            if old_password == new_password:
+                messages.error(request, "New password cannot be the same as the old password.")
+                return render(request, "change_password.html")
+
+            # --- RULE 3: Complexity (Caps + Number) ---
+            if not any(char.isupper() for char in new_password):
+                messages.error(request, "Password must contain at least one uppercase letter.")
+                return render(request, "change_password.html")
+            
+            if not any(char.isdigit() for char in new_password):
+                messages.error(request, "Password must contain at least one number.")
+                return render(request, "change_password.html")
+
+            # Basic Match Check
+            if new_password != confirm_password:
+                messages.error(request, "New passwords do not match.")
+                return render(request, "change_password.html")
+
+            # Validation passed: Hash and Update
+            new_hashed_password = make_password(new_password)
+            supabase.table("users").update({"password": new_hashed_password}).eq("id", user_id).execute()
+
+            messages.success(request, "Password updated successfully! Please log in again.")
+            # Optional: Force logout after password change for security
+            request.session.flush()
+            return redirect("login")
+
+        except Exception as e:
+            print(f"Error changing password: {e}")
+            messages.error(request, "An unexpected error occurred.")
+
+    return render(request, "change_password.html")
+
+
+# --- USER SETTINGS: DELETE ACCOUNT ---
+def delete_account(request):
+    # 1. Security: Ensure user is logged in
+    user_id = request.session.get("user_id")
+    if not user_id:
+        return redirect("login")
+
+    if request.method == "POST":
+        # Optional: Require password confirmation before deletion for extra safety
+        password_confirmation = request.POST.get("password_confirmation")
+        
+        try:
+            # Verify user exists and password matches (Safety check)
+            response = supabase.table("users").select("*").eq("id", user_id).single().execute()
+            user = response.data
+
+            if user and check_password(password_confirmation, user["password"]):
+                # DELETE ACTION
+                supabase.table("users").delete().eq("id", user_id).execute()
+                
+                # Clear session
+                request.session.flush()
+                messages.success(request, "Your account has been successfully deleted.")
+                return redirect("login")
+            else:
+                messages.error(request, "Incorrect password. Account deletion aborted.")
+                return redirect("user_profile") # Or wherever the settings page is
+
+        except Exception as e:
+            print(f"Error deleting account: {e}")
+            messages.error(request, "Could not delete account. Please try again.")
+
+    return redirect("user_dashboard")
