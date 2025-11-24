@@ -26,5 +26,7 @@ urlpatterns = [
     path('profile/', views.profile_page, name='user_profile'),
     path('profile/upload-image/', views.update_profile_picture, name='update_profile_picture'),
     path('profile/update-info/', views.update_personal_info, name='update_personal_info'),
-
+    path('appointments/cancel/<int:appointment_id>/', views.cancel_appointment, name='cancel_appointment'),
+    path('appointments/approve/<int:appointment_id>/', views.approve_appointment, name='approve_appointment'),
+    path('appointments/decline/<int:appointment_id>/', views.decline_appointment, name='decline_appointment'),
 ]

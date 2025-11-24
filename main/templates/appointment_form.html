@@ -7,23 +7,21 @@
     <title>Register Appointment</title>
     <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
     <style>
-        /* Minimal form styling for scannability, you can integrate with your existing CSS */
         .form-container { max-width: 500px; margin: 50px auto; padding: 30px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; }
         .form-container h2 { text-align: center; color: #333; margin-bottom: 25px; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #555; }
-        
-        /* --- UPDATED THIS STYLE to include email --- */
         .form-group input[type="text"], 
         .form-group input[type="date"],
-        .form-group input[type="email"] { 
+        .form-group input[type="email"],
+        .form-group input[type="time"],
+        .form-group select { 
             width: 100%; 
             padding: 10px; 
             border: 1px solid #ccc; 
             border-radius: 4px; 
             box-sizing: border-box; 
         }
-        
         .error-message { color: red; margin-bottom: 15px; text-align: center; font-weight: bold; }
         .success-message { color: green; margin-bottom: 15px; text-align: center; font-weight: bold; }
         .btn-submit { background-color: #007bff; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; }
@@ -53,19 +51,18 @@
                 <label for="last_name">Patient Last Name</label>
                 <input type="text" id="last_name" name="last_name" required>
             </div>
-            
+
             <div class="form-group">
-    <label for="doctor_name">Select Doctor</label>
-    <select id="doctor_name" name="doctor_name" required 
-            style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-        <option value="" disabled selected>-- Choose a Medical Staff Member --</option>
-        {% for doctor in doctors %}
-            <option value="{{ doctor.first_name }} {{ doctor.last_name }}">
-                {{ doctor.first_name }} {{ doctor.last_name }}
-            </option>
-        {% endfor %}
-    </select>
-</div>
+                <label for="doctor_name">Select Doctor</label>
+                <select id="doctor_name" name="doctor_name" required>
+                    <option value="" disabled selected>-- Choose a Medical Staff Member --</option>
+                    {% for doctor in doctors %}
+                        <option value="{{ doctor.first_name }} {{ doctor.last_name }}">
+                            {{ doctor.first_name }} {{ doctor.last_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
             
             <div class="form-group">
                 <label for="user_email">Patient's Email</label>
@@ -73,14 +70,31 @@
             </div>
             
             <div class="form-group">
-                <label for="appointment_date">Appointment Date (YYYY-MM-DD)</label>
+                <label for="appointment_date">Appointment Date</label>
                 <input type="date" id="appointment_date" name="appointment_date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="appointment_time">Appointment Time</label>
+                <input type="time" id="appointment_time" name="appointment_time" required>
+            </div>
+
+            <div class="form-group">
+                <label for="reason_for_visit">Reason for Visit</label>
+                <select id="reason_for_visit" name="reason_for_visit" required>
+                    <option value="" disabled selected>-- Select Reason --</option>
+                    <option value="Check-up">Check-up</option>
+                    <option value="Consultation">Consultation</option>
+                    <option value="Vaccination">Vaccination</option>
+                    <option value="Follow-up">Follow-up</option>
+                    <option value="Other">Other</option>
+                </select>
             </div>
 
             <button type="submit" class="btn-submit">Register New Appointment</button>
         </form>
 
-        <a href="{% url 'admin_dashboard' %}" class="back-link">← Back to Dashboard</a>
+        <a href="{% url 'appointment_list' %}" class="back-link">← Back to Dashboard</a>
     </div>
-</body>was
+</body>
 </html>

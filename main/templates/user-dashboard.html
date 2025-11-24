@@ -10,7 +10,7 @@
   
   <style>
     .card.full {
-        display: block; /* Override flex from admin.css to allow table to be full-width */
+        display: block;
     }
     .appointment-table {
         width: 100%;
@@ -31,6 +31,17 @@
     .appointment-table tr:hover {
         background-color: #f5f5f5;
     }
+    .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.8em;
+        color: white;
+    }
+    .status-pending { background-color: #ffc107; }
+    .status-approved { background-color: #28a745; }
+    .status-cancelled { background-color: #dc3545; }
     .no-appointments {
         padding: 20px;
         text-align: center;
@@ -47,6 +58,7 @@
         <ul>
           <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
           <li><a href="{% url 'user_profile' %}">Profile</a></li>
+          <li><a href="">History</a>
           <li><a href="{% url 'logout' %}">Logout</a></li>
         </ul>
       </nav>
@@ -61,7 +73,6 @@
         {% endfor %}
       {% endif %}
 
-      <!-- ✅ ADDED BOOK APPOINTMENT BUTTON -->
       <div style="margin-bottom: 20px; text-align: right;">
           <a href="{% url 'book_appointment' %}" class="btn" style="background-color: #28a745; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
               + Book New Appointment
@@ -78,6 +89,8 @@
                     <tr>
                         <th>Doctor</th>
                         <th>Date</th>
+                        <th>Time</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -85,6 +98,18 @@
                         <tr>
                             <td>{{ appt.doctor_name }}</td>
                             <td>{{ appt.appointment_date }}</td>
+                            <td>{{ appt.appointment_time }}</td>
+                            <td>
+                                {% if appt.status == "Pending" %}
+                                    <span class="status-badge status-pending">{{ appt.status }}</span>
+                                {% elif appt.status == "Approved" %}
+                                    <span class="status-badge status-approved">{{ appt.status }}</span>
+                                {% elif appt.status == "Cancelled" %}
+                                    <span class="status-badge status-cancelled">{{ appt.status }}</span>
+                                {% else %}
+                                    <span class="status-badge">{{ appt.status }}</span>
+                                {% endif %}
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

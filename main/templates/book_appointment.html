@@ -7,32 +7,67 @@
     <title>Book Appointment</title>
     <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
     <style>
-        .form-container { max-width: 400px; margin: 50px auto; padding: 30px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .form-container { max-width: 450px; margin: 50px auto; padding: 30px; border: 1px solid #ddd; border-radius: 8px; background-color: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
         .form-container h2 { text-align: center; color: #333; margin-bottom: 25px; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #555; }
-        .form-group input[type="date"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 16px; }
         .btn-submit { background-color: #28a745; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold; }
         .btn-submit:hover { background-color: #218838; }
         .back-link { display: block; text-align: center; margin-top: 20px; color: #dc3545; text-decoration: none; }
+        .messages { text-align: center; margin-bottom: 15px; }
+        .messages p { margin: 5px 0; font-weight: bold; }
+        .messages .error { color: red; }
+        .messages .success { color: green; }
     </style>
 </head>
 <body>
     <div class="form-container">
         <h2>Book an Appointment 📅</h2>
-        
-        {% if messages %}
+
+        <div class="messages">
             {% for message in messages %}
-                <p style="color: red; text-align: center;">{{ message }}</p>
+                <p class="{{ message.tags }}">{{ message }}</p>
             {% endfor %}
-        {% endif %}
+        </div>
 
         <form method="POST">
             {% csrf_token %}
+
+            <div class="form-group">
+                <label for="doctor_name">Select Doctor</label>
+                <select id="doctor_name" name="doctor_name" required>
+                    <option value="">-- Choose Doctor --</option>
+                    {% for doctor in doctors %}
+                        <option value="{{ doctor.first_name }} {{ doctor.last_name }}">
+                            {{ doctor.first_name }} {{ doctor.last_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
             <div class="form-group">
                 <label for="appointment_date">Select Preferred Date</label>
                 <input type="date" id="appointment_date" name="appointment_date" required>
             </div>
+
+            <div class="form-group">
+                <label for="appointment_time">Select Preferred Time</label>
+                <input type="time" id="appointment_time" name="appointment_time" required>
+            </div>
+
+            <div class="form-group">
+                <label for="reason_for_visit">Reason for Visit</label>
+                <select id="reason_for_visit" name="reason_for_visit" required>
+                    <option value="">-- Choose Reason --</option>
+                    <option value="Checkup">Checkup</option>
+                    <option value="Consultation">Consultation</option>
+                    <option value="Follow-up">Follow-up</option>
+                    <option value="Vaccination">Vaccination</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+
             <button type="submit" class="btn-submit">Confirm Booking</button>
         </form>
 
