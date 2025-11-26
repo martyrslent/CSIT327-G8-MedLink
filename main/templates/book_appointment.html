@@ -31,30 +31,52 @@
             {% endfor %}
         </div>
 
-        <form method="POST">
-            {% csrf_token %}
-
-            <div class="form-group">
-                <label for="doctor_name">Select Doctor</label>
-                <select id="doctor_name" name="doctor_name" required>
-                    <option value="">-- Choose Doctor --</option>
-                    {% for doctor in doctors %}
-                        <option value="{{ doctor.first_name }} {{ doctor.last_name }}">
-                            {{ doctor.first_name }} {{ doctor.last_name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
+       <div class="form-group">
+    <label for="doctor_name">Select Doctor</label>
+    <select id="doctor_name" name="doctor_name" required>
+        <option value="">-- Choose Doctor --</option>
+        {% for doctor in doctors %}
+            {% if doctor.is_in %}
+                <option value="{{ doctor.first_name }} {{ doctor.last_name }}">
+                    {{ doctor.first_name }} {{ doctor.last_name }}
+                </option>
+            {% else %}
+                <option value="{{ doctor.first_name }} {{ doctor.last_name }}" disabled>
+                    {{ doctor.first_name }} {{ doctor.last_name }} (Not In)
+                </option>
+            {% endif %}
+        {% endfor %}
+    </select>
+</div>
 
             <div class="form-group">
                 <label for="appointment_date">Select Preferred Date</label>
                 <input type="date" id="appointment_date" name="appointment_date" required>
             </div>
 
-            <div class="form-group">
-                <label for="appointment_time">Select Preferred Time</label>
-                <input type="time" id="appointment_time" name="appointment_time" required>
-            </div>
+<div class="form-group">
+    <label for="appointment_time">Select Preferred Time</label>
+    <select id="appointment_time" name="appointment_time" required>
+        <option value="">-- Choose Time --</option>
+        <option value="08:00 AM">08:00 AM</option>
+        <option value="08:30 AM">08:30 AM</option>
+        <option value="09:00 AM">09:00 AM</option>
+        <option value="09:30 AM">09:30 AM</option>
+        <option value="10:00 AM">10:00 AM</option>
+        <option value="10:30 AM">10:30 AM</option>
+        <option value="11:00 AM">11:00 AM</option>
+        <option value="11:30 AM">11:30 AM</option>
+        <option value="12:00 PM">12:00 PM</option>
+        <option value="12:30 PM">12:30 PM</option>
+        <option value="01:00 PM">01:00 PM</option>
+        <option value="01:30 PM">01:30 PM</option>
+        <option value="02:00 PM">02:00 PM</option>
+        <option value="02:30 PM">02:30 PM</option>
+        <option value="03:00 PM">03:00 PM</option>
+    </select>
+</div>
+
+
 
             <div class="form-group">
                 <label for="reason_for_visit">Reason for Visit</label>

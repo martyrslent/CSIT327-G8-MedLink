@@ -5,15 +5,14 @@
 
 {% block style %}
 <style>
-    /* Responsive Grid for Two Columns */
     .user-management-grid {
         display: grid;
-        grid-template-columns: 1fr; /* Stack on mobile */
+        grid-template-columns: 1fr;
         gap: 20px;
     }
     @media (min-width: 768px) {
         .user-management-grid {
-            grid-template-columns: 1fr 1fr; /* Side-by-side on desktop */
+            grid-template-columns: 1fr 1fr;
         }
     }
     
@@ -45,6 +44,7 @@
         font-size: 0.8em;
     }
     .doctor-badge { background-color: #d4edda; color: #155724; }
+    .doctor-notin-badge { background-color: #f8d7da; color: #721c24; }
     .patient-badge { background-color: #fff3cd; color: #856404; }
 
     .action-btn {
@@ -59,13 +59,17 @@
         display: inline-block;
         text-align: center;
     }
-    .action-btn:hover {
-        background-color: #0056b3;
+    .action-btn:hover { background-color: #0056b3; }
+
+    .toggle-btn {
+        background-color: #ffc107;
+        color: #212529;
+    }
+    .toggle-btn:hover {
+        background-color: #e0a800;
     }
 
-    .actions {
-        margin-bottom: 15px;
-    }
+    .actions { margin-bottom: 15px; }
     .actions .btn.block {
         display: block;
         width: 100%;
@@ -78,9 +82,7 @@
         font-weight: bold;
         transition: background-color 0.2s;
     }
-    .actions .btn.block:hover {
-        background-color: #218838;
-    }
+    .actions .btn.block:hover { background-color: #218838; }
 </style>
 {% endblock %}
 
@@ -122,10 +124,24 @@
                         <tr>
                             <td>{{ doctor.first_name }} {{ doctor.last_name }}</td>
                             <td>{{ doctor.email }}</td>
-                            <td><span class="status-badge doctor-badge">Doctor</span></td>
+                            <td>
+                                {% if doctor.is_in %}
+                                    <span class="status-badge doctor-badge">Doctor</span>
+                                {% else %}
+                                    <span class="status-badge doctor-notin-badge">Doctor (Not In)</span>
+                                {% endif %}
+                            </td>
                             <td>
                                 {% if request.session.role == "superadmin" %}
                                     <a href="{% url 'edit_user' doctor.id %}" class="action-btn">Edit</a>
+                                    <form method="POST" action="{% url 'toggle_is_in' doctor.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        {% if doctor.is_in %}
+                                            <button type="submit" class="action-btn toggle-btn">Set Not In</button>
+                                        {% else %}
+                                            <button type="submit" class="action-btn toggle-btn">Set In</button>
+                                        {% endif %}
+                                    </form>
                                 {% endif %}
                             </td>
                         </tr>

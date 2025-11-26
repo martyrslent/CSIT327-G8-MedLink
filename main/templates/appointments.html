@@ -141,9 +141,9 @@
     {% endif %}
 </div>
 
-<!-- Approved Appointments -->
+<!-- Approved / Cancelled Appointments -->
 <div class="appointment-table-container">
-    <h3>Approved Appointments</h3>
+    <h3>Approved / Cancelled Appointments</h3>
     {% if appointments %}
     <table>
         <thead>
@@ -159,23 +159,42 @@
         </thead>
         <tbody>
             {% for appointment in appointments %}
-                {% if appointment.status == "Approved" and not appointment.successful_appointment_visit %}
+                {% if appointment.status == "Approved" or appointment.status == "Cancelled" %}
                 <tr>
                     <td>{{ appointment.id }}</td>
                     <td>{{ appointment.first_name }} {{ appointment.last_name }}</td>
                     <td>{{ appointment.doctor_name }}</td> 
                     <td>{{ appointment.user_email }}</td> 
                     <td>{{ appointment.appointment_date }}</td>
-                    <td><span class="status-completed">Approved</span></td>
+                    <td>
+                        {% if appointment.status == "Cancelled" %}
+                            <span class="status-pending">Cancelled</span>
+                        {% else %}
+                            <span class="status-completed">Approved</span>
+                        {% endif %}
+                    </td>
                     <td class="action-buttons">
+                        {% if appointment.status == "Cancelled" %}
+                            <form action="{% url 'reinstate_appointment' appointment.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="complete-btn">Reinstate</button>
+                            </form>
+                        {% else %}
+                            <form action="{% url 'cancel_appointment' appointment.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn">Cancel</button>
+                            </form>
+                        {% endif %}
+                        {% if appointment.status != "Cancelled" %}
+                            <form action="{% url 'complete_appointment' appointment.id %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="complete-btn">Complete</button>
+                            </form>
+                        {% endif %}
                         <a href="{% url 'edit_appointment' appointment.id %}" class="edit-btn">Edit</a>
-                        <form action="{% url 'delete_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Delete this appointment?');">
+                        <form action="{% url 'delete_appointment' appointment.id %}" method="post" style="display:inline;">
                             {% csrf_token %}
                             <button type="submit" class="delete-btn">Delete</button>
-                        </form>
-                        <form action="{% url 'complete_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Mark this appointment as completed?');">
-                            {% csrf_token %}
-                            <button type="submit" class="complete-btn">Complete</button>
                         </form>
                     </td>
                 </tr>
@@ -184,7 +203,8 @@
         </tbody>
     </table>
     {% else %}
-    <p>No approved appointments.</p>
+    <p>No approved or cancelled appointments.</p>
     {% endif %}
 </div>
+
 {% endblock %}

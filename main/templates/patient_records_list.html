@@ -6,13 +6,45 @@
 {% block content %}
 <h1 class="page-title">All Patient Visit Records 🧑‍⚕️</h1>
 
+<!-- 🔎 SEARCH BAR -->
+<!-- Search Bar -->
+<form method="get" style="margin-bottom: 20px; width: 100%; text-align: left;">
+    <input 
+        type="text" 
+        name="search" 
+        placeholder="Search patient name..." 
+        value="{{ search }}" 
+        style="
+            padding: 10px; 
+            width: 250px; 
+            border: 1px solid #ccc; 
+            border-radius: 6px;
+        "
+    >
+    <button 
+        type="submit" 
+        style="
+            padding: 10px 15px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer;
+            font-weight: bold;
+        "
+    >
+        Search
+    </button>
+</form>
+
 <div class="appointment-table-container">
     {% if records %}
         <table>
             <thead>
                 <tr>
                     <th>Record ID</th>
-                    <th>Patient Name</th> <th>Visit Date</th>
+                    <th>Patient Name</th>
+                    <th>Visit Date</th>
                     <th>Successful Visit</th>
                     <th>Doctor Notes</th>
                 </tr>
