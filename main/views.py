@@ -3,6 +3,7 @@
 # ============================================================
 import os
 import time # To generate unique filenames
+from datetime import datetime, timedelta
 from functools import wraps
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -477,6 +478,7 @@ def book_appointment(request):
 
             # Insert appointment
             appointment_data = {
+                "patient_id": user_id,
                 "first_name": user.get("first_name"),
                 "last_name": user.get("last_name"),
                 "user_email": user.get("email"),
@@ -999,14 +1001,38 @@ def user_dashboard(request):
         user_email = request.session.get("user_email")
         first_name = request.session.get("first_name", "User")
         
-        # Fetch user's appointments
-        appointment_response = supabase.table("appointment").select("*").eq("user_email", user_email).order("appointment_date", desc=True).execute()
-        appointments = appointment_response.data or []
+        # Fetch all appointments for the user
+        response = supabase.table("appointment").select("*").eq("user_email", user_email).order("appointment_date", desc=False).execute()
+        all_appointments = response.data or []
+
+        # Date Logic
+        today = datetime.now().date()
+        reminder_threshold = today + timedelta(days=3) # Reminder for next 3 days
+
+        upcoming_appointments = []
+        reminders = []
+
+        for appt in all_appointments:
+            try:
+                # Parse date string from Supabase (YYYY-MM-DD)
+                appt_date_obj = datetime.strptime(appt['appointment_date'], '%Y-%m-%d').date()
+                
+                # Filter 1: Show only Future or Today in Dashboard
+                if appt_date_obj >= today:
+                    upcoming_appointments.append(appt)
+                    
+                    # Filter 2: Check for Reminder (Approved + Within 3 days)
+                    if appt_date_obj <= reminder_threshold and appt.get('status') == 'Approved':
+                        reminders.append(appt)
+                        
+            except ValueError:
+                continue # Skip records with invalid dates
 
         context = {
             "user_email": user_email,
             "first_name": first_name,
-            "appointments": appointments
+            "appointments": upcoming_appointments, # Only upcoming shown in main table
+            "reminders": reminders,                # Passed for alert boxes
         }
         return render(request, "user-dashboard.html", context)
 
@@ -1016,5 +1042,36 @@ def user_dashboard(request):
         messages.error(request, f"Could not load dashboard data: {e}")
         return render(request, "user-dashboard.html", {
             "first_name": request.session.get("first_name", "User"),
-            "appointments": []
-        })    
+            "appointments": [],
+            "reminders": []
+        })
+
+def appointment_history(request):
+    if not request.session.get("user_id"):
+        return redirect("login")
+        
+    try:
+        user_email = request.session.get("user_email")
+        
+        # Fetch all appointments
+        response = supabase.table("appointment").select("*").eq("user_email", user_email).order("appointment_date", desc=True).execute()
+        all_appointments = response.data or []
+        
+        today = datetime.now().date()
+        past_appointments = []
+
+        for appt in all_appointments:
+            try:
+                appt_date_obj = datetime.strptime(appt['appointment_date'], '%Y-%m-%d').date()
+                # Filter: Only Past dates
+                if appt_date_obj < today:
+                    past_appointments.append(appt)
+            except ValueError:
+                continue
+
+        return render(request, "appointment_history.html", {"history": past_appointments})
+
+    except Exception as e:
+        print(f"Error fetching history: {e}")
+        messages.error(request, "Could not fetch appointment history.")
+        return redirect("user_dashboard")

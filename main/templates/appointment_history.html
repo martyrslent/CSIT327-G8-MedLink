@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Appointment History</title>
+  <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
+  <style>
+    .history-card { background: white; padding: 25px; border-radius: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+    th { background: #f8f9fa; color: #333; }
+    .status-completed { color: green; font-weight: bold; }
+    .status-cancelled { color: #dc3545; font-weight: bold; }
+    .back-link { display: inline-block; margin-bottom: 15px; color: #f01111; text-decoration: none; font-weight: bold; }
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="dashboard-wrap">
+    <aside class="sidebar">
+      <div class="logo">MedLink</div>
+      <nav class="nav">
+        <ul>
+          <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
+          <li><a href="{% url 'user_profile' %}">Profile</a></li>
+          <li><a href="{% url 'appointment_history' %}">History</a></li>
+          <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <a href="{% url 'user_dashboard' %}" class="back-link">← Back to Dashboard</a>
+      <h1 class="page-title">📜 Past Appointment History</h1>
+
+      <div class="card full history-card">
+        {% if history %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Doctor</th>
+                        <th>Reason</th>
+                        <th>Final Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appt in history %}
+                    <tr>
+                        <td>{{ appt.appointment_date }}</td>
+                        <td>{{ appt.appointment_time }}</td>
+                        <td>{{ appt.doctor_name }}</td>
+                        <td>{{ appt.reason_for_visit }}</td>
+                        <td>
+                            {% if appt.status == 'Approved' %}
+                                <span class="status-completed">Completed</span>
+                            {% elif appt.status == 'Cancelled' %}
+                                <span class="status-cancelled">Cancelled</span>
+                            {% else %}
+                                <span style="color: #777;">{{ appt.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p style="text-align: center; color: #666; padding: 20px;">No past appointment history found.</p>
+        {% endif %}
+      </div>
+    </main>
+  </div>
+</body>
+</html>
