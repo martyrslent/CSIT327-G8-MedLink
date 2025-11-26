@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password, check_password
+from datetime import datetime, timedelta 
 
 # Note: You need to ensure 'supabase_client' provides the initialized Supabase client
 from .supabase_client import supabase 
@@ -347,14 +348,38 @@ def user_dashboard(request):
         user_email = request.session.get("user_email")
         first_name = request.session.get("first_name", "User")
         
-        # Fetch user's appointments
-        appointment_response = supabase.table("appointment").select("*").eq("user_email", user_email).order("appointment_date", desc=True).execute()
-        appointments = appointment_response.data or []
+        # Fetch all appointments for the user
+        response = supabase.table("appointment").select("*").eq("user_email", user_email).order("appointment_date", desc=False).execute()
+        all_appointments = response.data or []
+
+        # Get current date
+        today = datetime.now().date()
+        reminder_threshold = today + timedelta(days=3) # Remind for appts in next 3 days
+
+        upcoming_appointments = []
+        reminders = []
+
+        for appt in all_appointments:
+            try:
+                # Convert string date to object
+                appt_date = datetime.strptime(appt['appointment_date'], '%Y-%m-%d').date()
+                
+                # Filter for Upcoming (Future or Today)
+                if appt_date >= today:
+                    upcoming_appointments.append(appt)
+                    
+                    # Check for Reminder (Approved AND within 3 days)
+                    if appt_date <= reminder_threshold and appt.get('status') == 'Approved':
+                        reminders.append(appt)
+                        
+            except ValueError:
+                continue # Skip if date format is invalid
 
         context = {
             "user_email": user_email,
             "first_name": first_name,
-            "appointments": appointments
+            "appointments": upcoming_appointments, # Only show upcoming here
+            "reminders": reminders, # Pass reminders to template
         }
         return render(request, "user-dashboard.html", context)
 
@@ -364,9 +389,41 @@ def user_dashboard(request):
         messages.error(request, f"Could not load dashboard data: {e}")
         return render(request, "user-dashboard.html", {
             "first_name": request.session.get("first_name", "User"),
-            "appointments": []
+            "appointments": [],
+            "reminders": []
         })
-    
+
+# --- NEW: APPOINTMENT HISTORY VIEW ---
+def appointment_history(request):
+    if not request.session.get("user_id"):
+        return redirect("login")
+        
+    try:
+        user_email = request.session.get("user_email")
+        
+        # Fetch all appointments
+        response = supabase.table("appointment").select("*").eq("user_email", user_email).order("appointment_date", desc=True).execute()
+        all_appointments = response.data or []
+        
+        today = datetime.now().date()
+        past_appointments = []
+
+        for appt in all_appointments:
+            try:
+                appt_date = datetime.strptime(appt['appointment_date'], '%Y-%m-%d').date()
+                # Filter for Past
+                if appt_date < today:
+                    past_appointments.append(appt)
+            except ValueError:
+                continue
+
+        return render(request, "appointment_history.html", {"history": past_appointments})
+
+    except Exception as e:
+        print(f"Error fetching history: {e}")
+        messages.error(request, "Could not fetch appointment history.")
+        return redirect("user_dashboard")
+
 # --- PROFILE PAGE (Updated to include profile_image) ---
 def profile_page(request):
     if not request.session.get("user_id"):
