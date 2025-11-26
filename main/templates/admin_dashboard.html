@@ -25,31 +25,31 @@
 
     <main class="content">
       {% block content %}
-     <h1 class="page-title">
-  Dashboard (
-  {% if request.session.role == "superadmin" %}
-    Superadmin
-  {% elif request.session.role == "admin" %}
-    Admin
-  {% endif %}
-  )
-</h1>
-</h1>
+      <h1 class="page-title">
+          Dashboard (
+          {% if request.session.role == "superadmin" %}
+            Superadmin
+          {% elif request.session.role == "admin" %}
+            Admin
+          {% endif %}
+          )
+      </h1>
+
+      <!-- TOP ROW -->
       <section class="top-row">
         <div class="card">
           <h3>Total Active Patients</h3>
           <div class="stat">{{ total_patients }}</div>
-          <div class="muted"></div>
         </div>
 
         <div class="card">
           <h3>Appointments Today</h3>
-          <div class="stat">0</div>
+          <div class="stat">{{ appointments_today }}</div>
           <div class="muted red-text">Completed</div>
         </div>
       </section>
 
-
+      <!-- NEW PATIENT REGISTRATIONS -->
       <section class="wide-card">
         <div class="card full">
           <h3>New Patient Registrations</h3>
@@ -58,6 +58,7 @@
         </div>
       </section>
 
+      <!-- STAFF & REPORTS -->
       <section class="bottom-row">
         <div class="card">
           <h3>Staff Availability Overview (Weekly)</h3>
@@ -70,10 +71,56 @@
             <li>Monthly Patient Report</li>
             <li>Monthly Staff Report</li>
           </ul>
-
-          
         </div>
       </section>
+
+
+      <!-- ======================================= -->
+      <!--       APPOINTMENTS TABLE SECTION        -->
+      <!-- ======================================= -->
+      <section class="wide-card" style="margin-top: 40px;">
+        <div class="card full">
+          <h3>Recent Appointments</h3>
+
+          <table class="appointments-table" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+            <tr style="border-bottom: 2px solid #ddd;">
+              <th style="padding: 8px; text-align: left;">Patient</th>
+              <th style="padding: 8px; text-align: left;">Date</th>
+              <th style="padding: 8px; text-align: left;">Status</th>
+              <th style="padding: 8px; text-align: left;">Action</th>
+            </tr>
+
+            {% for appt in appointments %}
+            <tr style="border-bottom: 1px solid #eee;">
+              <td style="padding: 8px;">{{ appt.patient_name }}</td>
+              <td style="padding: 8px;">{{ appt.date }}</td>
+              <td style="padding: 8px;">{{ appt.status }}</td>
+
+              <td style="padding: 8px;">
+                {% if appt.status == 'Approved' %}
+                    <a href="{% url 'complete_appointment' appt.id %}" 
+                       class="btn-complete"
+                       onclick="return confirm('Mark this appointment as fully complete?')"
+                       style="background-color: #28a745; color: white; padding: 6px 12px; 
+                              text-decoration: none; border-radius: 4px;">
+                       ✓ Complete
+                    </a>
+
+                {% elif appt.status == 'Pending' %}
+                    <a href="{% url 'approve_appointment' appt.id %}" style="color: blue;">Approve</a> |
+                    <a href="{% url 'decline_appointment' appt.id %}" style="color: red;">Decline</a>
+
+                {% else %}
+                    {{ appt.status }}
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </table>
+
+        </div>
+      </section>
+
       {% endblock %}
     </main>
   </div>

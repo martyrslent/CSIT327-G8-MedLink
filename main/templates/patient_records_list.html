@@ -1,74 +1,70 @@
 {% extends 'admin_dashboard.html' %}
 {% load static %}
 
-{% block title %}Patient Records List{% endblock %}
+{% block title %}Patient Visit Records{% endblock %}
 
 {% block content %}
-<h1 class="page-title">All Patient Visit Records 🧑‍⚕️</h1>
+<div class="content-wrapper">
 
-<!-- 🔎 SEARCH BAR -->
-<!-- Search Bar -->
-<form method="get" style="margin-bottom: 20px; width: 100%; text-align: left;">
-    <input 
-        type="text" 
-        name="search" 
-        placeholder="Search patient name..." 
-        value="{{ search }}" 
-        style="
-            padding: 10px; 
-            width: 250px; 
-            border: 1px solid #ccc; 
-            border-radius: 6px;
-        "
-    >
-    <button 
-        type="submit" 
-        style="
-            padding: 10px 15px; 
-            background-color: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 6px; 
-            cursor: pointer;
-            font-weight: bold;
-        "
-    >
-        Search
-    </button>
-</form>
+    <h1 class="page-title">📂 Patient Visit Records (Completed)</h1>
 
-<div class="appointment-table-container">
-    {% if records %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Record ID</th>
-                    <th>Patient Name</th>
-                    <th>Visit Date</th>
-                    <th>Successful Visit</th>
-                    <th>Doctor Notes</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for record in records %}
-                    <tr>
-                        <td>{{ record.id }}</td>
-                        <td>{{ record.user_id.first_name }} {{ record.user_id.last_name }}</td>
-                        <td>{{ record.record_date|date:"Y-m-d" }}</td>
-                        <td>
-                            {% if record.successful_appointment_visit %}
-                                ✅ Yes
-                            {% else %}
-                                ❌ No
-                            {% endif %}
-                        </td>
-                        <td>{{ record.doctor_notes|truncatechars:100 }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <p>No patient records found.</p>
-    {% endif %}
+    <!-- 🔎 SEARCH BAR -->
+    <form method="get" style="margin-bottom: 20px;">
+        <input 
+            type="text" 
+            name="search" 
+            placeholder="Search patient name..." 
+            value="{{ search }}" 
+            style="padding: 10px; width: 250px; border: 1px solid #ccc; border-radius: 6px;"
+        >
+        <button 
+            type="submit" 
+            style="padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;"
+        >
+            Search
+        </button>
+    </form>
+
+    <!-- 📋 COMPLETED RECORDS TABLE -->
+    <table class="table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid #ddd;">
+                <th style="padding: 10px; text-align: left;">Patient</th>
+                <th style="padding: 10px; text-align: left;">Doctor</th>
+                <th style="padding: 10px; text-align: left;">Date</th>
+                <th style="padding: 10px; text-align: left;">Status</th>
+                <th style="padding: 10px; text-align: left;">Notes</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for record in records %}
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 10px;">
+                    {{ record.user_id.first_name }} {{ record.user_id.last_name }}
+                </td>
+                <td style="padding: 10px;">
+                    {{ record.appointment_id.doctor_name|default:"N/A" }}
+                </td>
+                <td style="padding: 10px;">
+                    {{ record.appointment_id.appointment_date }}
+                </td>
+                <td style="padding: 10px;">
+                    <span style="color: green; font-weight: bold;">Completed ✅</span>
+                </td>
+                <td style="padding: 10px;">
+                    {{ record.doctor_notes|default:"—"|truncatechars:80 }}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" style="padding: 15px; text-align: center;">
+                    No completed records found.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
 </div>
 {% endblock %}
