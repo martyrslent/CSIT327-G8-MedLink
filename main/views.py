@@ -14,6 +14,8 @@ from .supabase_client import supabase
 from supabase import create_client, Client
 from .email_utils import send_appointment_confirmation_email
 
+
+
 # ============================================================
 # ADMIN AUTHENTICATION DECORATOR
 # ============================================================
@@ -429,13 +431,18 @@ def update_personal_info(request):
 # ============================================================
 # APPOINTMENT BOOKING & REGISTRATION (USER & ADMIN)
 # ============================================================
+
 def book_appointment(request):
     if not request.session.get("user_id"):
         return redirect("login")
 
+    # today's date to block past dates
+    today = date.today().isoformat()
+
     try:
-        # Fetch all doctors including is_in status
-        doctors_response = supabase.table("users").select("id, first_name, last_name, is_in").eq("is_doctor", True).execute()
+        doctors_response = supabase.table("users").select(
+            "id, first_name, last_name, is_in"
+        ).eq("is_doctor", True).execute()
         doctors = doctors_response.data or []
     except Exception as e:
         print(f"Error fetching doctors: {e}")
@@ -449,7 +456,7 @@ def book_appointment(request):
 
         if not all([appointment_date, appointment_time, doctor_name, reason_for_visit]):
             messages.error(request, "Please fill in all fields.")
-            return render(request, "book_appointment.html", {"doctors": doctors})
+            return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
 
         try:
             user_id = request.session.get("user_id")
@@ -460,21 +467,26 @@ def book_appointment(request):
                 messages.error(request, "User not found.")
                 return redirect("login")
 
-            # --- Validate that doctor is active ---
-            active_doctors = [f"{d['first_name']} {d['last_name']}" for d in doctors if d.get("is_in", True)]
+            # only active doctors
+            active_doctors = [
+                f"{d['first_name']} {d['last_name']}"
+                for d in doctors if d.get("is_in", True)
+            ]
+
             if doctor_name not in active_doctors:
                 messages.error(request, f"'{doctor_name}' is currently not available for booking.")
-                return render(request, "book_appointment.html", {"doctors": doctors})
+                return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
 
-            # --- DOUBLE BOOKING CHECK ---
+            # double booking check
             existing_response = supabase.table("appointment").select("*") \
                 .eq("doctor_name", doctor_name) \
                 .eq("appointment_date", appointment_date) \
                 .eq("appointment_time", appointment_time) \
                 .execute()
+
             if existing_response.data:
                 messages.error(request, "This doctor is already booked for the selected date and time.")
-                return render(request, "book_appointment.html", {"doctors": doctors})
+                return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
 
             # Insert appointment
             appointment_data = {
@@ -489,8 +501,21 @@ def book_appointment(request):
                 "status": "Pending",
             }
 
-            supabase.table("appointment").insert(appointment_data).execute()
+            inserted = supabase.table("appointment").insert(appointment_data).execute()
+            new_appointment_id = inserted.data[0]["id"]
 
+            # Create patient record entry
+            patient_record_data = {
+                "user_id": user_id,
+                "appointment_id": new_appointment_id,
+                "record_date": appointment_date,
+                "successful_appointment_visit": False,
+                "doctor_notes": "Appointment scheduled."
+            }
+
+            supabase.table("patient_records").insert(patient_record_data).execute()
+
+            # Send email
             try:
                 full_name = f"{user.get('first_name')} {user.get('last_name')}"
                 send_appointment_confirmation_email(
@@ -510,115 +535,141 @@ def book_appointment(request):
             print(f"Error booking appointment: {e}")
             messages.error(request, "An unexpected error occurred. Please try again.")
 
-    return render(request, "book_appointment.html", {"doctors": doctors})
+    return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
 
 
 # --- APPOINTMENT REGISTRATION (Includes doctor list fetch and record creation) ---
 @admin_required
 def register_appointment(request):
-    doctors = []
+    # Load doctors
     try:
-        # Fetch all doctors with is_doctor=True and include is_in column
-        doctors_response = supabase.table("users").select("id, first_name, last_name, is_in").eq("is_doctor", True).execute()
-        doctors = doctors_response.data
+        doctors_response = supabase.table("users").select(
+            "id, first_name, last_name, is_in"
+        ).eq("is_doctor", True).execute()
+        doctors = doctors_response.data or []
     except Exception as e:
-        print(f"DEBUG: Could not fetch list of doctors: {e}")
-        messages.warning(request, "Could not load the list of available doctors due to a database error.")
-    
-    context = {"doctors": doctors}
+        print("Doctor load error:", e)
+        doctors = []
+        messages.error(request, "Could not load doctor list.")
+
+    # today's date to prevent past-date booking
+    today = datetime.date.today().isoformat()
+
+    context = {"doctors": doctors, "today": today}
 
     if request.method == "POST":
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
+        doctor_name = request.POST.get("doctor_name")
+        user_email = request.POST.get("user_email")
         appointment_date = request.POST.get("appointment_date")
         appointment_time = request.POST.get("appointment_time")
-        doctor_name = request.POST.get("doctor_name") 
-        user_email = request.POST.get("user_email")
         reason_for_visit = request.POST.get("reason_for_visit")
 
-        if not all([first_name, last_name, appointment_date, appointment_time, doctor_name, user_email, reason_for_visit]):
-            messages.error(request, "All required fields are needed to book an appointment.")
-            return render(request, "appointment_form.html", context)
-        
-        # Only allow selection of doctors who are is_in=True
-        valid_doctor_names = [f"{d['first_name']} {d['last_name']}" for d in doctors if d.get("is_in", True)]
-        if doctor_name not in valid_doctor_names:
-            messages.error(request, f"'{doctor_name}' is not available for booking. Please select a valid doctor from the list.")
-            return render(request, "appointment_form.html", context)
-        
-        # Fetch patient_id if exists
-        patient_id = None
-        try:
-            patient_response = supabase.table("users").select("id").eq("email", user_email).single().execute()
-            if patient_response.data:
-                patient_id = patient_response.data.get("id")
-        except Exception:
-            messages.error(request, "Patient with that email was not found in the users database. Appointment not booked.")
+        # Required field check
+        if not all([first_name, last_name, appointment_date, appointment_time,
+                    doctor_name, user_email, reason_for_visit]):
+            messages.error(request, "All fields are required.")
             return render(request, "appointment_form.html", context)
 
-        # --- DOUBLE BOOKING CHECK ---
+        # Prevent selecting inactive doctors
+        active_doctors = [
+            f"{d['first_name']} {d['last_name']}" for d in doctors if d.get("is_in", True)
+        ]
+        if doctor_name not in active_doctors:
+            messages.error(request, f"{doctor_name} is not available for booking.")
+            return render(request, "appointment_form.html", context)
+
+        # Prevent booking past dates
         try:
-            existing_response = supabase.table("appointment").select("*") \
+            selected_date = datetime.date.fromisoformat(appointment_date)
+            if selected_date < datetime.date.today():
+                messages.error(request, "You cannot book appointments on past dates.")
+                return render(request, "appointment_form.html", context)
+        except ValueError:
+            messages.error(request, "Invalid date format.")
+            return render(request, "appointment_form.html", context)
+
+        # Find patient by email
+        try:
+            patient_lookup = supabase.table("users").select("id").eq("email", user_email).single().execute()
+            if not patient_lookup.data:
+                messages.error(request, "No user exists with that email.")
+                return render(request, "appointment_form.html", context)
+            patient_id = patient_lookup.data["id"]
+        except Exception:
+            messages.error(request, "Error finding user by email.")
+            return render(request, "appointment_form.html", context)
+
+        # Double booking check
+        try:
+            existing = supabase.table("appointment").select("*") \
                 .eq("doctor_name", doctor_name) \
                 .eq("appointment_date", appointment_date) \
                 .eq("appointment_time", appointment_time) \
                 .execute()
-            if existing_response.data:
-                messages.error(request, f"This doctor is already booked at {appointment_time} on {appointment_date}. Please choose another time.")
+
+            if existing.data:
+                messages.error(
+                    request,
+                    f"{doctor_name} is already booked at {appointment_time} on {appointment_date}."
+                )
                 return render(request, "appointment_form.html", context)
         except Exception as e:
-            print(f"DEBUG: Could not check for double booking: {e}")
+            print("Error checking existing appointments:", e)
+            messages.error(request, "Could not check existing appointments.")
+            return render(request, "appointment_form.html", context)
 
-        # Prepare appointment data
-        appointment_data = {
-            "first_name": first_name,
-            "last_name": last_name,
-            "appointment_date": appointment_date,
-            "appointment_time": appointment_time,
-            "reason_for_visit": reason_for_visit,
-            "status": "Pending",
-            "doctor_name": doctor_name,
-            "user_email": user_email,
-            "patient_id": patient_id
-        }
-
+        # Main appointment insert
         try:
-            # Insert into appointments
-            response = supabase.table("appointment").insert(appointment_data).execute()
-            new_appointment_data = response.data[0]
-            new_appointment_id = new_appointment_data.get('id')
+            appointment_data = {
+                "patient_id": patient_id,
+                "first_name": first_name,
+                "last_name": last_name,
+                "user_email": user_email,
+                "doctor_name": doctor_name,
+                "appointment_date": appointment_date,
+                "appointment_time": appointment_time,
+                "reason_for_visit": reason_for_visit,
+                "status": "Pending",
+            }
 
-            # Insert into patient records
-            patient_record_data = {
+            insert_res = supabase.table("appointment").insert(appointment_data).execute()
+            new_app_id = insert_res.data[0]["id"]
+
+            # Create patient record
+            supabase.table("patient_records").insert({
                 "user_id": patient_id,
-                "appointment_id": new_appointment_id,
-                "record_date": appointment_date, 
+                "appointment_id": new_app_id,
+                "record_date": appointment_date,
                 "successful_appointment_visit": False,
                 "doctor_notes": "Appointment scheduled."
-            }
-            supabase.table("patient_records").insert(patient_record_data).execute()
-            
-            # Send email notification
-            try:
-                full_name = f"{first_name} {last_name}"
-                send_appointment_confirmation_email(
-                    user_name=full_name,
-                    user_email=user_email,
-                    doctor_name=doctor_name,
-                    appointment_date=appointment_date,
-                    appointment_time=appointment_time
-                )
-            except Exception as e:
-                print(f"CRITICAL: Email send failed after booking: {e}")
-                messages.warning(request, "Appointment saved, but email notification failed. Please check server logs.")
-
-            messages.success(request, f"Appointment for {first_name} {last_name} on {appointment_date} successfully registered, and patient record created!")
-            return redirect("appointment_list")
+            }).execute()
 
         except Exception as e:
-            print(f"DEBUG: Critical error during appointment registration: {str(e)}")
-            messages.error(request, f"An unexpected error occurred during booking: {str(e)}")
+            print("Error saving appointment:", e)
+            messages.error(request, "Could not save appointment due to server error.")
             return render(request, "appointment_form.html", context)
+
+        # Email notification
+        try:
+            full_name = f"{first_name} {last_name}"
+            send_appointment_confirmation_email(
+                user_name=full_name,
+                user_email=user_email,
+                doctor_name=doctor_name,
+                appointment_date=appointment_date,
+                appointment_time=appointment_time
+            )
+        except Exception as e:
+            print("Email send failure:", e)
+            messages.warning(request, "Appointment saved, but email failed to send.")
+
+        messages.success(
+            request,
+            f"Appointment for {first_name} {last_name} successfully registered!"
+        )
+        return redirect("appointment_list")
 
     return render(request, "appointment_form.html", context)
 
