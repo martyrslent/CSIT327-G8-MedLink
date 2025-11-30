@@ -5,250 +5,226 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MedLink - User Login</title>
+    <style>
+        /* ===== Background Animation ===== */
+        body {
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(-45deg, #ff5e00ff, #9e0000ff, #ff7e33ff, #9c1700ff);
+            background-size: 400% 400%;
+            animation: moveBg 10s ease infinite;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: Arial, sans-serif;
+        }
 
-<style>
-    body {
-        margin: 0;
-        height: 100vh;
-        font-family: "Segoe UI", sans-serif;
-        overflow: hidden;
-        position: relative;
-    }
+        @keyframes moveBg {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-    /* Animated gradient background */
-    .bg-animation {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: linear-gradient(-45deg, #ff5e00ff, #f34d00ff, #ad0505ff, #420b01ff);
-        background-size: 400% 400%;
-        animation: moveBg 12s ease infinite;
-        z-index: 0;
-    }
+            /* ===== Header ===== */
+        header {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 20px 0;
+            background-color: rgba(0, 0, 0, 0.09); /* transparent background */
+            text-align: center;
+            backdrop-filter: blur(6px);
+            color: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            animation: fadeIn 1.5s ease-in;
+        }
 
-    @keyframes moveBg {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
+        header h1 {
+            font-size: 4rem;
+            letter-spacing: 1px;
+            margin: 0;
+        }
 
-    /* Full-page semi-transparent overlay */
-    .bg-overlay {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: url("{% static 'main/img/room.png' %}") no-repeat center center;
-        background-size: cover;
-        opacity: 0.15;
-        pointer-events: none;
-        z-index: 1;
-    }
+        header h1 span {
+            color: #be0202ff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.41), 
+        }
 
-    /* Main container */
-    .container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 60px;
-        animation: fadeUp 1.2s ease;
-        position: relative;
-        z-index: 2;
-        height: 100%;
-        padding: 20px;
-    }
+        header p {
+            font-size: 1rem;
+            margin-top: 5px;
+            opacity: 0.9;
+        }
 
-    @keyframes fadeUp {
-        from { opacity: 0; transform: translateY(40px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
+        /* ===== Layout Wrapper ===== */
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            flex: 1;
+            animation: fadeIn 1s ease-in;
+        }
 
-    /* Left floating image */
-    .floating-img {
-        width: 500px;
-        max-width: 50vw;
-        animation: float 4s ease-in-out infinite;
-    }
+        /* ===== Floating Image ===== */
+        .floating-img {
+            width: 700px;
+            max-height: 650px;
+            object-fit: contain;
+            animation: float 3s ease-in-out infinite;
+        }
 
-    @keyframes float {
-        0% { transform: translateY(0); }
-        50% { transform: translateY(-15px); }
-        100% { transform: translateY(0); }
-    }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0); }
+        }
 
-    /* Right login card */
-    .card {
-        width: 380px;
-        max-width: 90vw;
-        padding: 45px;
-        border-radius: 25px;
-        background: rgba(255, 255, 255, 0.15);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-        text-align: center;
-        position: relative;
-        overflow: hidden;
-    }
+        /* ===== Login Card ===== */
+        .card {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            width: 350px;
+            text-align: center;
+            animation: slideUp 0.8s ease-out;
+        }
 
-    .card::before {
-        content: "";
-        position: absolute;
-        top: -50px;
-        right: -50px;
-        width: 200px;
-        height: 200px;
-        background: url("{% static 'main/img/your_icon.png' %}") no-repeat center center;
-        background-size: contain;
-        opacity: 0.15;
-        transform: rotate(15deg);
-        pointer-events: none;
-    }
+        .logo img {
+            width: 120px;
+            height: auto;
+            animation: bounceIn 1.2s ease;
+        }
 
-    /* Logo and Title */
-    .logo img {
-        width: 150px;         
-        margin-bottom: 10px;
-        transition: 0.3s ease;
-        position: relative;
-        z-index: 1;
-    }
+        h2 {
+            margin-bottom: 20px;
+            color: #d32f2f;
+            animation: fadeIn 1.5s ease-in;
+        }
 
-    .logo img:hover {
-        transform: scale(1.05);
-    }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
 
-    .title {
-        font-size: 1.9rem;
-        font-weight: bold;
-        margin-bottom: 25px;
-        color: #fff;
-        position: relative;
-        z-index: 1;
-    }
+        input:focus {
+            outline: none;
+            border-color: #d32f2f;
+            box-shadow: 0 0 8px rgba(211, 47, 47, 0.5);
+            transition: all 0.3s ease-in-out;
+        }
 
-    /* Inputs */
-    .input-group {
-        text-align: left;
-        width: 100%;
-        margin-bottom: 18px;
-        position: relative;
-        z-index: 1;
-    }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #d32f2f;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
 
-    .input-group label {
-        font-size: 0.9rem;
-        color: #ffe7e7;
-        margin-bottom: 6px;
-        display: block;
-    }
+        button:hover {
+            background-color: #b71c1c;
+            transform: scale(1.05);
+        }
 
-    .input-group input {
-        width: 100%;
-        padding: 12px;
-        font-size: 1rem;
-        background: rgba(255,255,255,0.18);
-        color: white;
-        border: 1px solid rgba(255,255,255,0.35);
-        border-radius: 10px;
-        outline: none;
-        transition: all .3s ease;
-    }
+        a {
+            color: #d32f2f;
+            text-decoration: none;
+            transition: color 0.3s ease-in-out;
+        }
 
-    .input-group input::placeholder {
-        color: #ffddd1;
-    }
+        a:hover {
+            color: #b71c1c;
+            text-decoration: underline;
+        }
 
-    .input-group input:focus {
-        border-color: #ff9c7a;
-        box-shadow: 0 0 10px rgba(255,255,255,0.6);
-    }
+        /* ===== Footer ===== */
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 15px 0;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.1);
+            color: #fff;
+            font-size: 0.9rem;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            animation: fadeIn 1.5s ease-in;
+        }
 
-    /* Button */
-    button {
-        width: 100%;
-        padding: 13px;
-        background: linear-gradient(to right, #ff7b00, #d10000);
-        border: none;
-        border-radius: 12px;
-        color: white;
-        font-size: 1.1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: .3s ease;
-        position: relative;
-        z-index: 1;
-    }
+        /* ===== Animations ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
 
-    button:hover {
-        transform: scale(1.05);
-        background: linear-gradient(to right, #ff9c51, #b60000);
-    }
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
 
-    /* Links */
-    .links {
-        margin-top: 18px;
-        font-size: 0.9rem;
-        position: relative;
-        z-index: 1;
-    }
-
-    .links a {
-        color: #ffe3d9;
-        text-decoration: none;
-        transition: 0.3s;
-    }
-
-    .links a:hover {
-        text-decoration: underline;
-    }
-
-    /* Responsive: stack vertically */
-    @media (max-width: 900px) {
-        .container { flex-direction: column; gap: 30px; }
-        .floating-img { width: 80%; max-width: 400px; }
-        .card { width: 90%; padding: 35px; }
-    }
-
-</style>
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+    </style>
 </head>
-
 <body>
-    <!-- Background layers -->
-    <div class="bg-animation"></div>
-    <div class="bg-overlay"></div>
 
-    <!-- Main content -->
+    <!-- Transparent Header -->
+    <header>
+        <h1>Welcome to <span>MedLink</span></h1>
+        <p>Your trusted health companion for all</p>
+    </header>
+
     <div class="container">
-        <!-- Left: Floating doctor image -->
-        <img src="{% static 'main/img/doctor.png' %}" class="floating-img" alt="Doctor">
+        <!-- Floating Illustration -->
+        <img src="{% static 'main/img/doctor.png' %}" alt="Doctor Illustration" class="floating-img">
 
-        <!-- Right: Login card -->
+        <!-- Login Card -->
         <div class="card">
-            <div class="logo">
-                <img src="{% static 'main/img/medlink.png' %}" alt="MedLink Logo">
+            <div class="logo" style="margin-bottom: 20px;">
+                <img src="{% static 'main/img/logo.png' %}" alt="MedLink Logo">
             </div>
-            <div class="title">Welcome Back</div>
+
+            <h2>User Login</h2>
 
             <form method="POST" action="{% url 'login' %}">
                 {% csrf_token %}
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" name="email" placeholder="Enter your email" required>
-                </div>
+                <label for="email" style="display:block; text-align:left; color:#333;">Email</label>
+                <input type="email" id="email" name="email" placeholder="example@email.com" required>
 
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" name="password" placeholder="Enter password" required>
-                </div>
+                <label for="password" style="display:block; text-align:left; color:#333;">Password</label>
+                <input type="password" id="password" name="password" placeholder="********" required>
 
-                <button type="submit">Sign In</button>
+                <button type="submit">Login</button>
             </form>
 
-            <div class="links">
-                <a href="{% url 'forgot_password' %}">Forgot Password?</a><br><br>
-                New here? <a href="{% url 'register' %}">Create Account</a>
+            <div style="margin-top: 15px;">
+                <a href="{% url 'forgot_password' %}">Forgot Password?</a>
+            </div>
+            <div style="margin-top: 10px; font-size: 14px;">
+                Don’t have an account? <a href="{% url 'register' %}">Register</a>
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 MedLink. All Rights Reserved.</p>
+    </footer>
+
 </body>
+
 </html>
