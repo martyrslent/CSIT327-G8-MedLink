@@ -3,7 +3,7 @@
 # ============================================================
 import os
 import time # To generate unique filenames
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from functools import wraps
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -13,7 +13,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from .supabase_client import supabase 
 from supabase import create_client, Client
 from .email_utils import send_appointment_confirmation_email
-
+today = date.today().isoformat()
 
 
 # ============================================================
@@ -428,15 +428,10 @@ def update_personal_info(request):
     return redirect("user_profile")
 
 
-# ============================================================
-# APPOINTMENT BOOKING & REGISTRATION (USER & ADMIN)
-# ============================================================
-
 def book_appointment(request):
     if not request.session.get("user_id"):
         return redirect("login")
 
-    # today's date to block past dates
     today = date.today().isoformat()
 
     try:
@@ -467,7 +462,6 @@ def book_appointment(request):
                 messages.error(request, "User not found.")
                 return redirect("login")
 
-            # only active doctors
             active_doctors = [
                 f"{d['first_name']} {d['last_name']}"
                 for d in doctors if d.get("is_in", True)
@@ -477,7 +471,6 @@ def book_appointment(request):
                 messages.error(request, f"'{doctor_name}' is currently not available for booking.")
                 return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
 
-            # double booking check
             existing_response = supabase.table("appointment").select("*") \
                 .eq("doctor_name", doctor_name) \
                 .eq("appointment_date", appointment_date) \
@@ -488,7 +481,7 @@ def book_appointment(request):
                 messages.error(request, "This doctor is already booked for the selected date and time.")
                 return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
 
-            # Insert appointment
+            # Save appointment as Pending (no email sent yet)
             appointment_data = {
                 "patient_id": user_id,
                 "first_name": user.get("first_name"),
@@ -504,7 +497,6 @@ def book_appointment(request):
             inserted = supabase.table("appointment").insert(appointment_data).execute()
             new_appointment_id = inserted.data[0]["id"]
 
-            # Create patient record entry
             patient_record_data = {
                 "user_id": user_id,
                 "appointment_id": new_appointment_id,
@@ -515,20 +507,7 @@ def book_appointment(request):
 
             supabase.table("patient_records").insert(patient_record_data).execute()
 
-            # Send email
-            try:
-                full_name = f"{user.get('first_name')} {user.get('last_name')}"
-                send_appointment_confirmation_email(
-                    user_name=full_name,
-                    user_email=user.get("email"),
-                    doctor_name=doctor_name,
-                    appointment_date=appointment_date,
-                    appointment_time=appointment_time
-                )
-            except Exception as e:
-                print(f"Email error: {e}")
-
-            messages.success(request, "Appointment booked successfully!")
+            messages.success(request, "Appointment request submitted. Awaiting approval.")
             return redirect("user_dashboard")
 
         except Exception as e:
@@ -538,10 +517,9 @@ def book_appointment(request):
     return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
 
 
-# --- APPOINTMENT REGISTRATION (Includes doctor list fetch and record creation) ---
-@admin_required
+
+# --- APPOINTMENT REGISTRATION ---@admin_required
 def register_appointment(request):
-    # Load doctors
     try:
         doctors_response = supabase.table("users").select(
             "id, first_name, last_name, is_in"
@@ -552,9 +530,7 @@ def register_appointment(request):
         doctors = []
         messages.error(request, "Could not load doctor list.")
 
-    # today's date to prevent past-date booking
-    today = datetime.date.today().isoformat()
-
+    today = date.today().isoformat()
     context = {"doctors": doctors, "today": today}
 
     if request.method == "POST":
@@ -566,13 +542,12 @@ def register_appointment(request):
         appointment_time = request.POST.get("appointment_time")
         reason_for_visit = request.POST.get("reason_for_visit")
 
-        # Required field check
         if not all([first_name, last_name, appointment_date, appointment_time,
                     doctor_name, user_email, reason_for_visit]):
             messages.error(request, "All fields are required.")
             return render(request, "appointment_form.html", context)
 
-        # Prevent selecting inactive doctors
+        # Only allow active doctors
         active_doctors = [
             f"{d['first_name']} {d['last_name']}" for d in doctors if d.get("is_in", True)
         ]
@@ -580,10 +555,10 @@ def register_appointment(request):
             messages.error(request, f"{doctor_name} is not available for booking.")
             return render(request, "appointment_form.html", context)
 
-        # Prevent booking past dates
+        # Prevent past-date bookings
         try:
-            selected_date = datetime.date.fromisoformat(appointment_date)
-            if selected_date < datetime.date.today():
+            selected_date = date.fromisoformat(appointment_date)
+            if selected_date < date.today():
                 messages.error(request, "You cannot book appointments on past dates.")
                 return render(request, "appointment_form.html", context)
         except ValueError:
@@ -620,7 +595,7 @@ def register_appointment(request):
             messages.error(request, "Could not check existing appointments.")
             return render(request, "appointment_form.html", context)
 
-        # Main appointment insert
+        # Insert appointment with Pending status
         try:
             appointment_data = {
                 "patient_id": patient_id,
@@ -631,7 +606,7 @@ def register_appointment(request):
                 "appointment_date": appointment_date,
                 "appointment_time": appointment_time,
                 "reason_for_visit": reason_for_visit,
-                "status": "Pending",
+                "status": "Pending",  # <-- Pending, email not sent yet
             }
 
             insert_res = supabase.table("appointment").insert(appointment_data).execute()
@@ -651,27 +626,15 @@ def register_appointment(request):
             messages.error(request, "Could not save appointment due to server error.")
             return render(request, "appointment_form.html", context)
 
-        # Email notification
-        try:
-            full_name = f"{first_name} {last_name}"
-            send_appointment_confirmation_email(
-                user_name=full_name,
-                user_email=user_email,
-                doctor_name=doctor_name,
-                appointment_date=appointment_date,
-                appointment_time=appointment_time
-            )
-        except Exception as e:
-            print("Email send failure:", e)
-            messages.warning(request, "Appointment saved, but email failed to send.")
-
         messages.success(
             request,
-            f"Appointment for {first_name} {last_name} successfully registered!"
+            f"Appointment for {first_name} {last_name} successfully registered! Awaiting approval."
         )
         return redirect("appointment_list")
 
     return render(request, "appointment_form.html", context)
+
+
 
 
 # ============================================================
@@ -694,14 +657,24 @@ def appointment_list_page(request):
 
 @admin_required
 def approve_appointment(request, appointment_id):
-    # Fetch the appointment from Supabase
     response = supabase.table("appointment").select("*").eq("id", appointment_id).execute()
     
     if response.data:
         appointment = response.data[0]
         if appointment["status"] == "Pending":
-            # Update status to Approved
             supabase.table("appointment").update({"status": "Approved"}).eq("id", appointment_id).execute()
+            try:
+                full_name = f"{appointment['first_name']} {appointment['last_name']}"
+                send_appointment_confirmation_email(
+                    user_name=full_name,
+                    user_email=appointment["user_email"],
+                    doctor_name=appointment["doctor_name"],
+                    appointment_date=appointment["appointment_date"],
+                    appointment_time=appointment["appointment_time"],
+                    status="Approved"
+                )
+            except Exception as e:
+                print(f"Email error: {e}")
             messages.success(request, f"Appointment #{appointment_id} approved successfully!")
         else:
             messages.warning(request, f"Appointment #{appointment_id} is already approved.")
@@ -714,9 +687,25 @@ def approve_appointment(request, appointment_id):
 @admin_required
 def decline_appointment(request, appointment_id):
     try:
-        # Mark the appointment as declined
-        supabase.table("appointment").update({"status": "declined"}).eq("id", appointment_id).execute()
-        messages.success(request, f"Appointment #{appointment_id} declined.")
+        response = supabase.table("appointment").select("*").eq("id", appointment_id).execute()
+        if response.data:
+            appointment = response.data[0]
+            supabase.table("appointment").update({"status": "Declined"}).eq("id", appointment_id).execute()
+            try:
+                full_name = f"{appointment['first_name']} {appointment['last_name']}"
+                send_appointment_confirmation_email(
+                    user_name=full_name,
+                    user_email=appointment["user_email"],
+                    doctor_name=appointment["doctor_name"],
+                    appointment_date=appointment["appointment_date"],
+                    appointment_time=appointment["appointment_time"],
+                    status="Declined"
+                )
+            except Exception as e:
+                print(f"Decline email error: {e}")
+            messages.success(request, f"Appointment #{appointment_id} declined.")
+        else:
+            messages.error(request, f"Appointment #{appointment_id} not found.")
     except Exception as e:
         print(f"Error declining appointment: {e}")
         messages.error(request, "Failed to decline the appointment.")
@@ -724,37 +713,76 @@ def decline_appointment(request, appointment_id):
     return redirect("appointment_list")
 
 
-def cancel_appointment(request, appointment_id):
-    if not request.session.get("role") in ["admin", "superadmin"]:
-        messages.error(request, "Unauthorized action.")
-        return redirect("appointment_list")
-
-    try:
-        # Update the appointment status to Cancelled
-        supabase.table("appointment").update({"status": "Cancelled"}).eq("id", appointment_id).execute()
-        messages.success(request, "Appointment has been cancelled successfully.")
-    except Exception as e:
-        print(f"Error cancelling appointment: {e}")
-        messages.error(request, "Failed to cancel the appointment. Please try again.")
-
-    return redirect("appointment_list")
-
-
+@admin_required
 def reinstate_appointment(request, appointment_id):
     if not request.session.get("role") in ["admin", "superadmin"]:
         messages.error(request, "Unauthorized action.")
         return redirect("appointment_list")
 
     try:
-        # Update the appointment status back to Approved
+        response = supabase.table("appointment").select("*").eq("id", appointment_id).execute()
+        if not response.data:
+            messages.error(request, f"Appointment #{appointment_id} not found.")
+            return redirect("appointment_list")
+
+        appointment = response.data[0]
         supabase.table("appointment").update({"status": "Approved"}).eq("id", appointment_id).execute()
         messages.success(request, "Appointment has been reinstated successfully.")
+
+        try:
+            full_name = f"{appointment.get('first_name')} {appointment.get('last_name')}"
+            send_appointment_confirmation_email(
+                user_name=full_name,
+                user_email=appointment.get("user_email"),
+                doctor_name=appointment.get("doctor_name"),
+                appointment_date=appointment.get("appointment_date"),
+                appointment_time=appointment.get("appointment_time"),
+                status="Reinstated"
+            )
+        except Exception as e:
+            print(f"Email send failure: {e}")
+            messages.warning(request, "Appointment reinstated, but email failed to send.")
     except Exception as e:
         print(f"Error reinstating appointment: {e}")
         messages.error(request, "Failed to reinstate the appointment. Please try again.")
 
     return redirect("appointment_list")
 
+
+@admin_required
+def cancel_appointment(request, appointment_id):
+    if not request.session.get("role") in ["admin", "superadmin"]:
+        messages.error(request, "Unauthorized action.")
+        return redirect("appointment_list")
+
+    try:
+        response = supabase.table("appointment").select("*").eq("id", appointment_id).execute()
+        if not response.data:
+            messages.error(request, f"Appointment #{appointment_id} not found.")
+            return redirect("appointment_list")
+
+        appointment = response.data[0]
+        supabase.table("appointment").update({"status": "Cancelled"}).eq("id", appointment_id).execute()
+        messages.success(request, "Appointment has been cancelled successfully.")
+
+        try:
+            full_name = f"{appointment.get('first_name')} {appointment.get('last_name')}"
+            send_appointment_confirmation_email(
+                user_name=full_name,
+                user_email=appointment.get("user_email"),
+                doctor_name=appointment.get("doctor_name"),
+                appointment_date=appointment.get("appointment_date"),
+                appointment_time=appointment.get("appointment_time"),
+                status="Cancelled"
+            )
+        except Exception as e:
+            print(f"Email send failure: {e}")
+            messages.warning(request, "Appointment cancelled, but email failed to send.")
+    except Exception as e:
+        print(f"Error cancelling appointment: {e}")
+        messages.error(request, "Failed to cancel the appointment. Please try again.")
+
+    return redirect("appointment_list")
 
 # --- MARK APPOINTMENT COMPLETE (New from your old version) ---
 @admin_required
