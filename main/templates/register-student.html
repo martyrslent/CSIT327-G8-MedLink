@@ -2,251 +2,268 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedLink - Student Registration</title>
-    <style>
-        /* ===== Background Animation ===== */
-        body {
-            margin: 0;
-            height: 100vh;
-            background: linear-gradient(-45deg, #ff5e00ff, #9e0000ff, #ff7e33ff, #9c1700ff);
-            background-size: 400% 400%;
-            animation: moveBg 10s ease infinite;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MedLink - User Registration</title>
 
-        @keyframes moveBg {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* ===== Header ===== */
-        header {
-            position: absolute;
-            top: 0;
-            width: 100%;
-            padding: 20px 0;
-            background-color: rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(6px);
-            color: #fff;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            animation: fadeIn 1.5s ease-in;
-        }
-
-        header h1 {
-            font-size: 4rem;
-            margin: 0;
-        }
-
-        header h1 span {
-            color: #be0202ff;
-            font-weight: bold;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.41),
-        }
-
-        header p {
-            margin-top: 5px;
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-
-        /* ===== Layout ===== */
-        .container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 60px;
-            animation: fadeIn 1s ease-in;
-        }
-
-        .floating-img {
-            width: 700px;
-            max-height: 650px;
-            object-fit: contain;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-            100% { transform: translateY(0); }
-        }
-
-        /* ===== Card ===== */
-            .card {
-        background-color: #fff;
-        padding: 40px;
-        border-radius: 15px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        width: 380px;
-        text-align: center;
-        animation: slideUp 0.8s ease-out;
-        margin-top: 50px; 
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        font-family: "Segoe UI", sans-serif;
+        overflow: hidden;
+        position: relative;
     }
 
+    /* Animated gradient background */
+    .bg-animation {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: linear-gradient(-45deg, #ff5e00ff, #f34d00ff, #ad0505ff, #420b01ff);
+        background-size: 400% 400%;
+        animation: moveBg 12s ease infinite;
+        z-index: 0;
+    }
 
-        .logo img {
-            width: 120px;
-            height: auto;
-            animation: bounceIn 1.2s ease;
-        }
+    @keyframes moveBg {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
 
-        h2 {
-            margin-bottom: 10px;
-            color: #d32f2f;
-        }
+    /* Full-page semi-transparent overlay image */
+    .bg-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: url("{% static 'main/img/room.png' %}") no-repeat center center;
+        background-size: cover;
+        opacity: 0.15;
+        pointer-events: none;
+        z-index: 1;
+    }
 
-        p {
-            margin-bottom: 20px;
-            color: #ffffffff;
-            font-size: 14px;
-        }
+    /* Main container */
+    .container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 60px;
+        animation: fadeUp 1.2s ease;
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        padding: 20px;
+    }
 
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-        input:focus {
-            outline: none;
-            border-color: #d32f2f;
-            box-shadow: 0 0 5px rgba(211, 47, 47, 0.5);
-            transition: all 0.3s ease-in-out;
-        }
+    /* Left floating image */
+    .floating-img {
+        width: 600px;
+        max-width: 50vw;
+        animation: float 4s ease-in-out infinite;
+    }
 
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #d32f2f;
-            border: none;
-            color: white;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s ease-in-out;
-        }
+    @keyframes float {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-15px); }
+        100% { transform: translateY(0); }
+    }
 
-        button:hover {
-            background-color: #b71c1c;
-            transform: scale(1.05);
-        }
+    /* Right registration card */
+    .card {
+        width: 400px;
+        max-width: 90vw;
+        padding: 45px;
+        border-radius: 25px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
 
-        a {
-            color: #d32f2f;
-            text-decoration: none;
-            transition: color 0.3s ease-in-out;
-        }
+    .card::before {
+        content: "";
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 200px;
+        height: 200px;
+        background: url("{% static 'main/img/your_icon.png' %}") no-repeat center center;
+        background-size: contain;
+        opacity: 0.15;
+        transform: rotate(15deg);
+        pointer-events: none;
+    }
 
-        a:hover {
-            text-decoration: underline;
-            color: #b71c1c;
-        }
+    /* Logo and Title */
+    .logo img {
+        width: 150px;
+        margin-bottom: 10px;
+        transition: 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
 
-        /* ===== Footer ===== */
-        footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            padding: 15px 0;
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.1);
-            color: #ffffffff;
-            font-size: 0.9rem;
-            backdrop-filter: blur(4px);
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            animation: fadeIn 1.5s ease-in;
-        }
+    .logo img:hover {
+        transform: scale(1.05);
+    }
 
-        /* ===== Animations ===== */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes bounceIn { 0% { transform: scale(0.5); opacity: 0; } 60% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); } }
+    .title {
+        font-size: 1.9rem;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            .container {
-                flex-direction: column;
-                gap: 30px;
-                padding-top: 80px;
-            }
-            .floating-img {
-                width: 300px;
-            }
-        }
-    </style>
+    /* Inputs */
+    .input-group {
+        width: 100%;
+        margin-bottom: 15px;
+        text-align: left;
+        position: relative;
+        z-index: 1;
+    }
+
+    .input-group label {
+        font-size: 0.9rem;
+        color: #ffe7e7;
+        margin-bottom: 6px;
+        display: block;
+    }
+
+    .input-group input {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+        background: rgba(255,255,255,0.18);
+        color: white;
+        border: 1px solid rgba(255,255,255,0.35);
+        border-radius: 10px;
+        outline: none;
+        transition: all .3s ease;
+    }
+
+    .input-group input::placeholder {
+        color: #ffe1d1;
+    }
+
+    .input-group input:focus {
+        border-color: #ff9c7a;
+        box-shadow: 0 0 10px rgba(255,255,255,0.6);
+    }
+
+    /* Button */
+    button {
+        width: 100%;
+        padding: 13px;
+        background: linear-gradient(to right, #ff7b00, #d10000);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: .3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    button:hover {
+        transform: scale(1.05);
+        background: linear-gradient(to right, #ff9c51, #b60000);
+    }
+
+    /* Links */
+    .links {
+        margin-top: 15px;
+        font-size: 0.9rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .links a {
+        color: #ffe3d9;
+        text-decoration: none;
+    }
+
+    .links a:hover {
+        text-decoration: underline;
+    }
+
+    /* Responsive: stack vertically on small screens */
+    @media (max-width: 900px) {
+        .container { flex-direction: column; gap: 30px; }
+        .floating-img { width: 80%; max-width: 400px; }
+        .card { width: 90%; padding: 35px; }
+    }
+
+</style>
 </head>
+
 <body>
+    <!-- Background layers -->
+    <div class="bg-animation"></div>
+    <div class="bg-overlay"></div>
 
-    <!-- Header -->
-    <header>
-        <h1>Join <span>MedLink</span> Today</h1>
-        <p>Empowering users with accessible healthcare support</p>
-    </header>
-
+    <!-- Main Content -->
     <div class="container">
-        <!-- Floating Illustration -->
-        <img src="{% static 'main/img/person.png' %}" alt="Person Illustration" class="floating-img">
+        <!-- Left: Floating image -->
+        <img src="{% static 'main/img/consult.png' %}" class="floating-img" alt="Person">
 
-
-        <!-- Registration Card -->
+        <!-- Right: Registration Card -->
         <div class="card">
-            <div class="logo" style="margin-bottom: 20px;">
-                <img src="{% static 'main/img/logo.png' %}" alt="MedLink Logo">
+            <div class="logo">
+                <img src="{% static 'main/img/medlink.png' %}" alt="MedLink Logo">
             </div>
 
-            <h2>User Registration</h2>
-            <p>Fill out all fields to create your account</p>
+            <div class="title">Create Account</div>
 
             <form method="POST" action="/register/">
                 {% csrf_token %}
-                <div style="margin-bottom: 15px; display: flex; gap: 10px;">
-                    <div style="flex: 1;">
-                        <label for="first_name" style="display:block; text-align:left; color:#333;">First Name</label>
-                        <input type="text" id="first_name" name="first_name" placeholder="First Name" required>
-                    </div>
-                    <div style="flex: 1;">
-                        <label for="last_name" style="display:block; text-align:left; color:#333;">Last Name</label>
-                        <input type="text" id="last_name" name="last_name" placeholder="Last Name" required>
-                    </div>
+
+                <div class="input-group">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" placeholder="Enter first name" required>
                 </div>
 
-                <div style="margin-bottom: 15px; text-align:left;">
-                    <label for="email" style="display:block; margin-bottom:5px; color:#333;">Email</label>
-                    <input type="email" id="email" name="email" placeholder="Email" required>
+                <div class="input-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" placeholder="Enter last name" required>
                 </div>
 
-                <div style="margin-bottom: 15px; text-align:left;">
-                    <label for="password" style="display:block; margin-bottom:5px; color:#333;">Password</label>
-                    <input type="password" id="password" name="password" placeholder="Password" required>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="Enter email" required>
                 </div>
 
-                <div style="margin-bottom: 20px; text-align:left;">
-                    <label for="confirm_password" style="display:block; margin-bottom:5px; color:#333;">Confirm Password</label>
-                    <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm Password" required>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Create password" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Confirm Password</label>
+                    <input type="password" name="confirm_password" placeholder="Confirm password" required>
                 </div>
 
                 <button type="submit">Sign Up</button>
             </form>
 
-            <div style="margin-top: 15px; font-size: 14px;">
-                Already have an account? <a href="{% url 'login' %}">Login</a>
+            <div class="links">
+                Already have an account? <a href="{% url 'login' %}">Sign In</a>
             </div>
         </div>
     </div>
-
-    <!-- Footer -->
-    <footer>
-        <p>© 2025 MedLink. All Rights Reserved.</p>
-    </footer>
-
 </body>
 </html>
