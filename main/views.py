@@ -14,6 +14,7 @@ from .supabase_client import supabase
 from supabase import create_client, Client
 from .email_utils import send_appointment_confirmation_email
 today = date.today().isoformat()
+from django.core.paginator import Paginator
 
 
 # ============================================================
@@ -163,53 +164,62 @@ def register_admin_page(request):
         email = request.POST.get("email")
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
-        role = request.POST.get("role")  # NEW: Get the selected role
-        
-        # Basic Validation
+        role = request.POST.get("role")
+        specialization = request.POST.get("specialization")  # NEW FIELD
+
+        # Basic validation
         if password != confirm_password:
             messages.error(request, "Passwords do not match!")
             return render(request, "register-admin.html")
-        
+
         if not all([first_name, last_name, email, password, role]):
-            messages.error(request, "All fields (including Staff Role) are required!")
+            messages.error(request, "All fields are required!")
             return render(request, "register-admin.html")
 
-        # Determine Boolean Flags based on Role
+        # Specialization required only if doctor selected
+        if role == "doctor" and not specialization:
+            messages.error(request, "Please enter a specialization for the doctor.")
+            return render(request, "register-admin.html")
+
         is_doctor_flag = (role == "doctor")
         is_admin_flag = (role == "staff")
-        
-        table_name = "users"
 
         try:
-            # Check for existing email
-            response = supabase.table(table_name).select("email").eq("email", email).execute()
-            
-            if response.data and len(response.data) > 0:
+            # Check if email exists
+            response = supabase.table("users").select("email").eq("email", email).execute()
+            if response.data:
                 messages.error(request, "Email already registered!")
                 return render(request, "register-admin.html")
 
             hashed_password = make_password(password)
 
-            # Insert new user with calculated role flags
-            supabase.table(table_name).insert({
+            # Insert into users table
+            user_insert = supabase.table("users").insert({
                 "first_name": first_name,
                 "last_name": last_name,
                 "email": email,
                 "password": hashed_password,
                 "is_admin": is_admin_flag,
                 "is_doctor": is_doctor_flag,
-                "is_superadmin": False  # IMPORTANT: never create new superadmins from here
+                "is_superadmin": False
             }).execute()
 
-            messages.success(
-                request,
-                f"New {role.capitalize()} {first_name} added successfully! They can now log in."
-            )
+            # Get newly inserted user ID
+            user_id = user_insert.data[0]["id"]
+
+            # If doctor → insert into doctors table
+            if is_doctor_flag:
+                supabase.table("doctors").insert({
+                    "doctor_id": user_id,
+                    "specialization": specialization
+                }).execute()
+
+            messages.success(request, f"{role.capitalize()} {first_name} added successfully!")
             return redirect("admin_dashboard")
 
         except Exception as e:
-            print(f"DEBUG: Critical error during admin registration: {str(e)}")
-            messages.error(request, "Unexpected error: " + str(e))
+            print("DEBUG ERROR:", e)
+            messages.error(request, f"Unexpected error: {e}")
             return render(request, "register-admin.html")
 
     return render(request, "register-admin.html")
@@ -1229,3 +1239,51 @@ def appointment_history(request):
     except Exception as e:
         print(f"Error: {e}")
         return redirect("user_dashboard")
+    
+def home(request):
+    return render(request, "home.html")
+
+def about(request):
+    return render(request, "about.html")
+
+def all_doctors(request):
+    specialty = request.GET.get("specialty")
+
+    try:
+        # Fetch from doctors table AND join user info including is_in
+        query = (
+            supabase.table("doctors")
+            .select("doctor_id, specialization, users!inner(first_name, last_name, email, is_in)")
+        )
+
+        if specialty and specialty.lower() != "all":
+            query = query.eq("specialization", specialty)
+
+        response = query.execute()
+        doctors = response.data
+
+        # Format output for template
+        formatted_doctors = []
+        for d in doctors:
+            user = d.get("users", {})
+            formatted_doctors.append({
+                "doctor_id": d.get("doctor_id"),
+                "first_name": user.get("first_name"),
+                "last_name": user.get("last_name"),
+                "email": user.get("email"),
+                "specialization": d.get("specialization"),
+                "is_in": user.get("is_in", False),  # status from users table
+            })
+
+    except Exception as e:
+        print("Error fetching doctors:", e)
+        formatted_doctors = []
+
+    paginator = Paginator(formatted_doctors, 12)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "all_doctors.html", {
+        "doctors": page_obj,
+        "selected_specialty": specialty,
+    })

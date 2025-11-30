@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}All Doctors{% endblock %}
+
+{% block content %}
+
+<style>
+.doctor-page {
+    display: flex;
+    gap: 20px;
+    margin: 20px;
+}
+
+/* Sidebar styling */
+.filter-sidebar {
+    width: 200px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    height: fit-content;
+}
+
+.filter-sidebar h3 {
+    margin-bottom: 10px;
+}
+
+.filter-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.filter-sidebar li {
+    margin-bottom: 8px;
+}
+
+.filter-sidebar a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.filter-sidebar a:hover {
+    text-decoration: underline;
+}
+
+/* Doctor list styling */
+.doctor-list {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.doctor-card {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.doctor-card h2 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    font-size: 1.2em;
+}
+
+.doctor-card p {
+    margin: 4px 0;
+}
+</style>
+
+<div class="doctor-page">
+
+    <!-- SIDEBAR FILTER -->
+    <aside class="filter-sidebar">
+        <h3>Specialties</h3>
+        <ul>
+            <li><a href="?specialty=all">All</a></li>
+            <li><a href="?specialty=General Physician">General Physician</a></li>
+            <li><a href="?specialty=Dentist">Dentist</a></li>
+            <li><a href="?specialty=Pediatrician">Pediatrician</a></li>
+            <li><a href="?specialty=Cardiologist">Cardiologist</a></li>
+            <li><a href="?specialty=Dermatologist">Dermatologist</a></li>
+            <li><a href="?specialty=Gynecologist">Gynecologist</a></li>
+            <li><a href="?specialty=Neurologist">Neurologist</a></li>
+            <li><a href="?specialty=Orthopedic">Orthopedic</a></li>
+            <li><a href="?specialty=Ophthalmologist">Ophthalmologist</a></li>
+            <li><a href="?specialty=ENT Specialist">ENT Specialist</a></li>
+            <li><a href="?specialty=Psychiatrist">Psychiatrist</a></li>
+        </ul>
+    </aside>
+
+    <!-- DOCTOR LIST -->
+    <div class="doctor-list">
+        <h1>All Doctors</h1>
+
+        {% if doctors %}
+          {% for doc in doctors %}
+    <div class="doctor-card">
+        <h2>{{ doc.first_name }} {{ doc.last_name }}</h2>
+        <p><strong>Specialty:</strong> {{ doc.specialization }}</p>
+        <p><strong>Status:</strong> {{ doc.is_in|yesno:"Available,Not Available" }}</p>
+    </div>
+{% endfor %}
+        {% else %}
+            <p>No doctors found.</p>
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

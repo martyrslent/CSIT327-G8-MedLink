@@ -1,12 +1,41 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Home</title>
-</head>
+{% block title %}Home - MedLink{% endblock %}
 
-<body>
-    <h1>Welcome to Django 🚀</h1>
-</body>
+{% block content %}
 
-</html>
+<!-- HERO BANNER -->
+<div class="hero-banner">
+    <div class="hero-text">
+        <h1>Welcome to MedLink</h1>
+        <p>Your health, our priority.</p>
+
+        <a href="{% url 'login' %}" class="book-btn">
+            Book Appointment
+        </a>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-section">
+        <h3>MedLink</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec non risus vel leo pretium aliquet.</p>
+    </div>
+
+    <div class="footer-section">
+        <h4>Navigation</h4>
+        <p>Home</p>
+        <p>About Us</p>
+        <p>Delivery</p>
+        <p>Privacy Policy</p>
+    </div>
+
+    <div class="footer-section">
+        <h4>Info</h4>
+        <p>support@medlink.com</p>
+        <p>+63 123 456 7890</p>
+    </div>
+</footer>
+
+{% endblock %}

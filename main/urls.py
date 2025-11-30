@@ -3,14 +3,17 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('hello/', views.hello_page, name='hello'),
-    path('login/', views.login_page, name='login'),
-    path('register/', views.register_page, name='register'),
-    path("admin-dashboard/", views.admin_dashboard, name="admin_dashboard"),
-    path('forgot-password/', views.forgot_password_page, name='forgot_password'),
-    path('', views.register_page, name='register'),
+     # Home + Landing Page
+    path("", views.home, name="home"),
+    path("hello/", views.hello_page, name="hello"),
+    # Authentication
+    path("login/", views.login_page, name="login"),
+    path("register/", views.register_page, name="register"),
+    path("forgot-password/", views.forgot_password_page, name="forgot_password"),
     path("logout/", views.logout_page, name="logout"),
-    
+    path("admin-dashboard/", views.admin_dashboard, name="admin_dashboard"),
+    path("all-doctors/", views.all_doctors, name="all_doctors"),
+    path("about/", views.about, name="about"),
     # --- User Side ---
     path("user-dashboard/", views.user_dashboard, name="user_dashboard"),
     path("history/", views.appointment_history, name="appointment_history"), # <--- NEW

@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MedLink{% endblock %}</title>
+
+    <!-- Correct CSS path -->
+    <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
+</head>
+
+<body>
+
+<!-- TOP NAVBAR -->
+<nav class="navbar">
+    <div class="nav-left">
+        <a class="nav-logo" href="{% url 'home' %}">MedLink</a>
+    </div>
+
+    <div class="nav-right">
+        <a class="nav-btn" href="{% url 'home' %}">Home</a>
+        <a class="nav-btn" href="{% url 'all_doctors' %}">All Doctors</a>
+        <a class="nav-btn" href="{% url 'about' %}">About</a>
+        <a class="nav-btn highlight" href="{% url 'register' %}">Create Account</a>
+    </div>
+</nav>
+
+<!-- PAGE CONTENT -->
+<div class="page-content">
+    {% block content %}
+    {% endblock %}
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <p>MedLink © 2025 · All Rights Reserved</p>
+    <p>Home · About Us · Privacy Policy · Delivery</p>
+</footer>
+
+</body>
+</html>
