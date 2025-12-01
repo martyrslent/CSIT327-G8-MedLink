@@ -1052,23 +1052,44 @@ def patient_records_list_page(request):
 @admin_required
 def admin_dashboard(request):
     try:
-        # Get Total Patients
-        user_response = supabase.table("users").select("id", count='exact').eq("is_admin", False).execute()
-        total_patients = user_response.count or 0
+        # 1. Total Patients
+        patient_res = supabase.table("users").select("id", count='exact').eq("is_doctor", False).eq("is_admin", False).execute()
+        total_patients = patient_res.count or 0
         
-        # Get Total Appointments
-        appt_response = supabase.table("appointment").select("id", count='exact').execute()
-        total_appointments = appt_response.count or 0
+        # 2. Total Doctors
+        doc_res = supabase.table("users").select("id", count='exact').eq("is_doctor", True).execute()
+        total_doctors = doc_res.count or 0
 
-        # Get recent patients
-        recent_users_response = supabase.table("users").select("*").eq("is_admin", False).order("id", desc=True).limit(5).execute()
-        recent_activity = recent_users_response.data or []
+        # 3. Active Doctors
+        active_doc_res = supabase.table("users").select("id", count='exact').eq("is_doctor", True).eq("is_in", True).execute()
+        active_doctors = active_doc_res.count or 0
+        
+        # 4. Total Appointments
+        appt_res = supabase.table("appointment").select("id", count='exact').execute()
+        total_appointments = appt_res.count or 0
+
+        # 5. Pending Appointments
+        pending_res = supabase.table("appointment").select("id", count='exact').eq("status", "Pending").execute()
+        pending_appointments = pending_res.count or 0
+
+        # 6. Recent Activity (New Users)
+        # FIX: Changed "created_at" to "id" because your table doesn't have a timestamp
+        recent_users_res = supabase.table("users").select("*").eq("is_admin", False).order("id", desc=True).limit(5).execute()
+        recent_activity = recent_users_res.data or []
+
+        # 7. Recent Appointments
+        # FIX: Ensure we use "appointment_date" (your DB column name), not "date"
+        appointments_res = supabase.table("appointment").select("*").order("appointment_date", desc=True).limit(5).execute()
+        appointments = appointments_res.data or []
 
         context = {
             "total_patients": total_patients,
-            "total_appointments": total_appointments, 
+            "total_doctors": total_doctors,
+            "active_doctors": active_doctors,
+            "total_appointments": total_appointments,
+            "pending_appointments": pending_appointments,
             "recent_activity": recent_activity, 
-            "new_registrations": total_patients,
+            "appointments": appointments, 
         }
         return render(request, "admin_dashboard.html", context)
 
@@ -1076,24 +1097,10 @@ def admin_dashboard(request):
         print(f"CRITICAL ERROR IN ADMIN DASHBOARD: {e}")
         messages.error(request, f"Could not load dashboard data: {e}")
         return render(request, "admin_dashboard.html", {
-            "total_patients": 0,
-            "total_appointments": 0,
-            "recent_activity": [],
-            "new_registrations": 0,
+            "total_patients": 0, "total_doctors": 0, "active_doctors": 0,
+            "total_appointments": 0, "pending_appointments": 0, 
+            "recent_activity": [], "appointments": []
         })
-@admin_required
-def appointment_list_page(request):
-    """Displays all active appointments (hides Completed)."""
-    try:
-        # Filter OUT 'Completed' items
-        response = supabase.table("appointment").select("*").neq("status", "Completed").order("appointment_date", desc=False).execute()
-        appointments = response.data or []
-        context = {"appointments": appointments}
-        return render(request, "appointments.html", context)
-    except Exception as e:
-        print(f"DEBUG: Error fetching appointments: {str(e)}")
-        messages.error(request, f"An error occurred: {str(e)}")
-        return render(request, "appointments.html", {"appointments": []})
     
 @admin_required
 def complete_appointment(request, appointment_id):
