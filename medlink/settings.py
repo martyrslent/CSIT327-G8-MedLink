@@ -5,6 +5,9 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ------------------------------------------------------------------------------------
+# SECURITY SETTINGS
+# ------------------------------------------------------------------------------------
 SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
@@ -12,43 +15,46 @@ ALLOWED_HOSTS = [
     "medlink-fnd7.onrender.com",
     "localhost",
     "127.0.0.1",
-    ".onrender.com",  # Wildcard for robust domain handling
+    ".onrender.com",
 ]
 
+# ------------------------------------------------------------------------------------
+# SUPABASE CONFIG
+# ------------------------------------------------------------------------------------
 SUPABASE_URL = config("SUPABASE_URL")
 SUPABASE_ANON_KEY = config("SUPABASE_ANON_KEY")
 
+# ------------------------------------------------------------------------------------
+# DATABASE
+# ------------------------------------------------------------------------------------
 DATABASES = {
     "default": dj_database_url.parse(
         config("DATABASE_URL"),
         conn_max_age=600,
-        ssl_require=True,
-        # IMPORTANT: Removed host_chars=4 and conn_health_checks=True
-        # host_chars is now in the DATABASE_URL env var itself.
+        ssl_require=True
     )
 }
 
-# Add the CACHES and SESSION_ENGINE settings back for stability
+# ------------------------------------------------------------------------------------
+# CACHING + SESSION ENGINE
+# ------------------------------------------------------------------------------------
 CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'medlink-cache-key',
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "medlink-cache",
     }
 }
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cached_db" 
+# Cached DB sessions = FAST + STABLE
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 SESSION_CACHE_ALIAS = "default"
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-# 🚀 FINAL FIX: Use the CACHE-BACKED DATABASE SESSION ENGINE
-# This uses the fast, non-crashing in-memory cache for session reads,
-# and falls back to the database for writes, resolving both previous crash points.
-SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
-SESSION_CACHE_ALIAS = "default" # Tells the session engine to use the 'default' cache defined above
-# ---------------------------------------------------------------------------------------------
-
+# ------------------------------------------------------------------------------------
+# APPS
+# ------------------------------------------------------------------------------------
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -59,6 +65,9 @@ INSTALLED_APPS = [
     "main",
 ]
 
+# ------------------------------------------------------------------------------------
+# MIDDLEWARE
+# ------------------------------------------------------------------------------------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -72,6 +81,9 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "medlink.urls"
 
+# ------------------------------------------------------------------------------------
+# TEMPLATES
+# ------------------------------------------------------------------------------------
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -89,6 +101,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "medlink.wsgi.application"
 
+# ------------------------------------------------------------------------------------
+# PASSWORD VALIDATION
+# ------------------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -96,26 +111,32 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-
-EMAIL_HOST_USER = config("EMAIL_HOST_USER")  # your Gmail
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")  # your App Password
-
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# ------------------------------------------------------------------------------------
+# EMAIL (GMAIL SMTP)
+# ------------------------------------------------------------------------------------
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_API_KEY = config("SENDGRID_API_KEY")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
+# ------------------------------------------------------------------------------------
+# LOCALIZATION
+# ------------------------------------------------------------------------------------
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+# ------------------------------------------------------------------------------------
+# STATIC & MEDIA
+# ------------------------------------------------------------------------------------
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = BASE_DIR / "media"
 
+# ------------------------------------------------------------------------------------
+# AUTO FIELD
+# ------------------------------------------------------------------------------------
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
