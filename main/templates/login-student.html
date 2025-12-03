@@ -2,6 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MedLink - User Login</title>
@@ -193,7 +194,7 @@
     }
 
     .links a {
-        color: #ffe3d9;
+        color: #030303;
         text-decoration: none;
         transition: 0.3s;
     }
@@ -236,10 +237,19 @@
                     <input type="email" name="email" placeholder="Enter your email" required>
                 </div>
 
-                <div class="input-group">
-                    <label>Password</label>
-                    <input type="password" name="password" placeholder="Enter password" required>
-                </div>
+                <div class="input-group" style="position: relative;">
+    <label>Password</label>
+    <input type="password" name="password" id="passwordInput" placeholder="Enter password" required>
+    
+    <span onclick="togglePassword()" style="
+    position: absolute; 
+    right: 15px; 
+    top: 38px; 
+    cursor: pointer; 
+    color: #333;">
+    <i id="eyeIcon" class="fa fa-eye"></i>
+</span>
+</div>
 
                 <button type="submit">Sign In</button>
             </form>
@@ -250,5 +260,19 @@
             </div>
         </div>
     </div>
+    <script>
+    function togglePassword() {
+        var input = document.getElementById("passwordInput");
+        var btn = event.target; // The text that was clicked
+        
+        if (input.type === "password") {
+            input.type = "text";
+            btn.innerText = "";
+        } else {
+            input.type = "password";
+            btn.innerText = "";
+        }
+    }
+</script>
 </body>
 </html>

@@ -227,7 +227,11 @@
           <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
           <li><a href="{% url 'user_profile' %}">Profile</a></li>
           <li><a href="{% url 'appointment_history' %}">History</a></li> 
-          <li><a href="{% url 'logout' %}">Logout</a></li>
+          <li>
+    <a href="{% url 'logout' %}" onclick="return confirm('Are you sure you want to log out?');">
+        Logout
+    </a>
+</li>
         </ul>
       </nav>
     </aside>
@@ -314,27 +318,66 @@
       <section class="bottom-row">
         <h2>Your Upcoming Appointments</h2>
         <div class="appointment-cards">
-          {% if appointments %}
-            {% for appt in appointments %}
-            <div class="appointment-card">
-              <div>
-                <span><strong>Doctor:</strong> {{ appt.doctor_name }}</span>
-                <span class="status-badge
-                  {% if appt.status == 'Pending' %}status-pending{% endif %}
-                  {% if appt.status == 'Approved' %}status-approved{% endif %}
-                  {% if appt.status == 'Cancelled' %}status-cancelled{% endif %}
-                ">{{ appt.status }}</span>
+  {% if appointments %}
+    {% for appt in appointments %}
+    <div class="appointment-card">
+      
+      <div>
+        <span><strong>Doctor:</strong> {{ appt.doctor_name }}</span>
+        <span class="status-badge
+          {% if appt.status == 'Pending' %}status-pending{% endif %}
+          {% if appt.status == 'Approved' %}status-approved{% endif %}
+          {% if appt.status == 'Cancelled' %}status-cancelled{% endif %}
+        ">{{ appt.status }}</span>
+      </div>
+      <div>
+        <span><strong>Date:</strong> {{ appt.appointment_date }}</span>
+        <span><strong>Time:</strong> {{ appt.appointment_time }}</span>
+      </div>
+
+      {% if appt.status == 'Pending' or appt.status == 'Approved' %}
+      <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+          
+          <button type="button" 
+                  class="small-btn" 
+                  style="background-color: #dc3545; border: none; cursor: pointer;"
+                  onclick="document.getElementById('cancel-form-{{ appt.id }}').style.display = 'block'; this.style.display = 'none';">
+              Cancel Appointment
+          </button>
+
+          <form id="cancel-form-{{ appt.id }}" method="POST" action="{% url 'cancel_appointment' appt.id %}" style="display: none; margin-top: 10px;">
+              {% csrf_token %}
+              
+              <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                  <label style="font-size: 0.9rem; color: #555;">Reason:</label>
+                  <select name="reason" required style="padding: 6px; border-radius: 4px; border: 1px solid #ccc;">
+                      <option value="" disabled selected>Select a reason...</option>
+                      <option value="Schedule Conflict">Schedule Conflict</option>
+                      <option value="Feeling Better">Feeling Better</option>
+                      <option value="Emergency">Emergency</option>
+                      <option value="Found Another Doctor">Found Another Doctor</option>
+                      <option value="Other">Other</option>
+                  </select>
+
+                  <button type="submit" class="small-btn" style="background-color: #dc3545; border: none;">
+                      Confirm
+                  </button>
+                  
+                  <button type="button" 
+                          style="background: none; border: none; color: #666; cursor: pointer; text-decoration: underline; font-size: 0.85rem;"
+                          onclick="document.getElementById('cancel-form-{{ appt.id }}').style.display = 'none'; this.closest('div').parentElement.previousElementSibling.style.display = 'inline-block';">
+                      Keep Appointment
+                  </button>
               </div>
-              <div>
-                <span><strong>Date:</strong> {{ appt.appointment_date }}</span>
-                <span><strong>Time:</strong> {{ appt.appointment_time }}</span>
-              </div>
-            </div>
-            {% endfor %}
-          {% else %}
-            <p class="no-appointments">You have no upcoming appointments.</p>
-          {% endif %}
-        </div>
+          </form>
+      </div>
+      {% endif %}
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="no-appointments">You have no upcoming appointments.</p>
+  {% endif %}
+</div>
       </section>
 
     </main>
