@@ -1169,6 +1169,8 @@ def complete_appointment(request, appointment_id):
     return redirect("appointment_list")
 
 
+# ... existing imports ...
+
 def user_dashboard(request):
     if not request.session.get("user_id"):
         return redirect("login")
@@ -1197,15 +1199,16 @@ def user_dashboard(request):
             try:
                 appt_date = datetime.strptime(appt['appointment_date'], '%Y-%m-%d').date()
                 
-                # Show Future or Today
-                if appt_date >= today and appt.get('status') != 'Completed':
+                # --- UPDATED DASHBOARD LOGIC ---
+                # Show Future or Today, BUT EXCLUDE Completed AND Cancelled
+                if appt_date >= today and appt.get('status') not in ['Completed', 'Cancelled']:
                     upcoming_appointments.append(appt)
                     
                     # Create Reminder if Approved AND within 3 days
                     if appt_date <= reminder_threshold and appt.get('status') == 'Approved':
                         reminders.append(appt)
 
-                # Collect notifications for status changes (excluding future completed appointments)
+                # Collect notifications for status changes
                 if appt.get('status') in ['Pending', 'Approved', 'Declined', 'Cancelled', 'Reinstated']:
                     status_notifications.append(appt)
 
@@ -1224,7 +1227,7 @@ def user_dashboard(request):
             status_notifications, 
             key=lambda x: x.get('updated_at', x['appointment_date']), 
             reverse=True
-        )[:5]  # last 5 notifications
+        )[:5]
 
         context = {
             "user_email": user_email,
@@ -1240,20 +1243,42 @@ def user_dashboard(request):
 
     except Exception as e:
         print(f"Error: {e}")
-        return render(
-            request, 
-            "user-dashboard.html", 
-            {
-                "first_name": "User",
-                "appointments": [],
-                "reminders": [],
-                "status_notifications": [],
-                "total_count": 0,
-                "pending_count": 0,
-                "completed_count": 0,
-            }
-        )
+        return render(request, "user-dashboard.html", {"appointments": [], "total_count": 0})
+
+
+def appointment_history(request):
+    if not request.session.get("user_id"):
+        return redirect("login")
         
+    try:
+        user_email = request.session.get("user_email")
+        
+        # Fetch all appointments
+        response = supabase.table("appointment").select("*").eq("user_email", user_email).order("appointment_date", desc=True).execute()
+        all_appointments = response.data or []
+        
+        today = datetime.now().date()
+        past_appointments = []
+
+        for appt in all_appointments:
+            try:
+                appt_date = datetime.strptime(appt['appointment_date'], '%Y-%m-%d').date()
+                
+                # --- UPDATED LOGIC HERE ---
+                # Show in history if:
+                # 1. Date is in the past
+                # 2. Status is 'Completed'
+                # 3. Status is 'Cancelled' (This was missing!)
+                if appt_date < today or appt.get('status') in ['Completed', 'Cancelled']:
+                    past_appointments.append(appt)
+            except ValueError:
+                continue
+
+        return render(request, "appointment_history.html", {"history": past_appointments})
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return redirect("user_dashboard")
 
     
 @admin_required
