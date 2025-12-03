@@ -1126,8 +1126,8 @@ def complete_appointment(request, appointment_id):
         messages.error(request, f"Failed to complete appointment: {str(e)}")
             
     return redirect("appointment_list")
-    
-    
+
+
 def user_dashboard(request):
     if not request.session.get("user_id"):
         return redirect("login")
@@ -1145,6 +1145,12 @@ def user_dashboard(request):
 
         upcoming_appointments = []
         reminders = []
+        status_notifications = []
+
+        # Counters
+        total_count = 0
+        pending_count = 0
+        completed_count = 0
 
         for appt in all_appointments:
             try:
@@ -1157,21 +1163,57 @@ def user_dashboard(request):
                     # Create Reminder if Approved AND within 3 days
                     if appt_date <= reminder_threshold and appt.get('status') == 'Approved':
                         reminders.append(appt)
-                        
+
+                # Collect notifications for status changes (excluding future completed appointments)
+                if appt.get('status') in ['Pending', 'Approved', 'Declined', 'Cancelled', 'Reinstated']:
+                    status_notifications.append(appt)
+
+                # Increment counters
+                total_count += 1
+                if appt.get('status') == 'Pending':
+                    pending_count += 1
+                elif appt.get('status') == 'Completed':
+                    completed_count += 1
+
             except ValueError:
                 continue
+
+        # Sort notifications by most recent date
+        status_notifications = sorted(
+            status_notifications, 
+            key=lambda x: x.get('updated_at', x['appointment_date']), 
+            reverse=True
+        )[:5]  # last 5 notifications
 
         context = {
             "user_email": user_email,
             "first_name": first_name,
             "appointments": upcoming_appointments,
             "reminders": reminders, 
+            "status_notifications": status_notifications,
+            "total_count": total_count,
+            "pending_count": pending_count,
+            "completed_count": completed_count,
         }
         return render(request, "user-dashboard.html", context)
 
     except Exception as e:
         print(f"Error: {e}")
-        return render(request, "user-dashboard.html", {"first_name": "User", "appointments": [], "reminders": []})
+        return render(
+            request, 
+            "user-dashboard.html", 
+            {
+                "first_name": "User",
+                "appointments": [],
+                "reminders": [],
+                "status_notifications": [],
+                "total_count": 0,
+                "pending_count": 0,
+                "completed_count": 0,
+            }
+        )
+
+    
 @admin_required
 def patient_records_list_page(request):
     """Displays only COMPLETED patient records."""

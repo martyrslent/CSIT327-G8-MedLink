@@ -7,22 +7,11 @@
   <title>User Dashboard</title>
   
   <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
-  
+
   <style>
     .card.full { display: block; }
-    .appointment-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    .appointment-table th, .appointment-table td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
-    .appointment-table th { background-color: #f2f2f2; color: #333; font-weight: bold; }
-    .appointment-table tr:hover { background-color: #f5f5f5; }
-    
-    /* Status Badges */
-    .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 0.8em; color: white; }
-    .status-pending { background-color: #ffc107; color: #333; }
-    .status-approved { background-color: #28a745; }
-    .status-cancelled { background-color: #dc3545; }
-    .no-appointments { padding: 20px; text-align: center; color: #777; }
 
-    /* --- NEW: Reminder Styles --- */
+    /* ===== Reminders ===== */
     .reminder-alert {
         background-color: #fff3cd;
         border: 1px solid #ffeeba;
@@ -36,7 +25,197 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
     .reminder-icon { font-size: 1.5rem; }
+
+    /* ===== Fake Top Nav Bar ===== */
+    .fake-topbar {
+        width: 100%;
+        background: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 25px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        border-radius: 8px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+    }
+    .fake-topbar-left h2 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #444;
+    }
+    .fake-topbar-left p {
+        margin: 0;
+        font-size: 0.85rem;
+        color: #666;
+    }
+    .fake-topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-size: 1rem;
+        color: #555;
+        font-weight: 500;
+    }
+    .book-btn {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 6px;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    /* ===== Small Stat Cards ===== */
+    .stat-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    .stat-card {
+        background: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    .stat-card h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #444;
+    }
+    .stat-card p {
+        margin: 5px 0 0 0;
+        font-size: 0.85rem;
+        color: #666;
+    }
+    .small-btn {
+        background-color: #28a745;
+        color: white;
+        padding: 6px 10px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    /* ===== Appointment Cards ===== */
+    .appointment-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .appointment-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        padding: 15px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .appointment-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+    .appointment-card div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: white;
+    }
+    .status-pending { background-color: #ffc107; color: #333; }
+    .status-approved { background-color: #28a745; }
+    .status-cancelled { background-color: #dc3545; }
+
+    /* ===== Notifications ===== */
+    .notif-btn {
+        position: relative;
+        background: none;
+        border: none;
+        font-size: 1.4rem;
+        cursor: pointer;
+    }
+    .notif-dot {
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        width: 10px;
+        height: 10px;
+        background: red;
+        border-radius: 50%;
+    }
+    .notif-dropdown {
+        position: absolute;
+        right: 0;
+        top: 35px;
+        width: 260px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 10px;
+        display: none;
+        z-index: 100;
+    }
+    .notif-dropdown ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .notif-dropdown li {
+        padding: 10px;
+        border-bottom: 1px solid #eaeaea;
+        font-size: 0.9rem;
+        color: #333;
+    }
+    .notif-dropdown li:last-child {
+        border-bottom: none;
+    }
+
+    /* ===== Messages ===== */
+    .message-box {
+        padding: 10px;
+        background: #f8d7da;
+        color: #721c24;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+
+    .no-appointments {
+        padding: 20px;
+        text-align: center;
+        color: #777;
+    }
   </style>
+
+  <script>
+    function toggleNotif() {
+        const menu = document.getElementById("notif-menu");
+        menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    }
+    document.addEventListener("click", function(e){
+        const button = document.getElementById("notif-btn");
+        const menu = document.getElementById("notif-menu");
+        if (!button.contains(e.target) && !menu.contains(e.target)) {
+            menu.style.display = "none";
+        }
+    });
+  </script>
 </head>
 <body>
   <div class="dashboard-wrap">
@@ -54,8 +233,64 @@
     </aside>
 
     <main class="content">
-      <h1 class="page-title">Welcome, {{ first_name|default:"User" }}!</h1>
 
+      <!-- Fake Top Bar -->
+      <div class="fake-topbar">
+          <div class="fake-topbar-left">
+              <h2>Hello, {{ first_name|default:"User" }}!</h2>
+              <p>Here's what's happening with your health today</p>
+          </div>
+          <div class="fake-topbar-right">
+              <div style="position: relative;">
+                  <button id="notif-btn" class="notif-btn" onclick="toggleNotif()">
+                      🔔
+                      {% if status_notifications %}<span class="notif-dot"></span>{% endif %}
+                  </button>
+                  <div class="notif-dropdown" id="notif-menu">
+                      {% if status_notifications %}
+                          <ul>
+                              {% for note in status_notifications %}
+                                  <li>
+                                      Appointment with <strong>{{ note.doctor_name }}</strong><br>
+                                      Status: <strong>{{ note.status }}</strong>
+                                  </li>
+                              {% endfor %}
+                          </ul>
+                      {% else %}
+                          <div style="padding:10px;">No notifications</div>
+                      {% endif %}
+                  </div>
+              </div>
+              <a href="{% url 'book_appointment' %}" class="book-btn">+ Book Appointment</a>
+          </div>
+      </div>
+
+      <!-- Small Stat Cards -->
+      <div class="stat-cards">
+          <div class="stat-card">
+              <div>
+                  <h3>Total Appointments</h3>
+                  <p>{{ total_count }}</p>
+              </div>
+              <a href="{% url 'appointment_history' %}" class="small-btn">View</a>
+          </div>
+          <div class="stat-card">
+              <div>
+                  <h3>Pending Appointments</h3>
+                  <p>{{ pending_count }}</p>
+              </div>
+              <a href="{% url 'appointment_history' %}?status=Pending" class="small-btn">View</a>
+          </div>
+          <div class="stat-card">
+              <div>
+                  <h3>Completed Appointments</h3>
+                  <p>{{ completed_count }}</p>
+              </div>
+              <a href="{% url 'appointment_history' %}?status=Completed" class="small-btn">View</a>
+          </div>
+      </div>
+
+      <!-- Reminders -->
       {% if reminders %}
         {% for reminder in reminders %}
         <div class="reminder-alert">
@@ -68,61 +303,41 @@
         </div>
         {% endfor %}
       {% endif %}
+
+      <!-- Messages -->
       {% if messages %}
         {% for message in messages %}
-            <p style="padding: 10px; background: #f8d7da; color: #721c24; border-radius: 5px; margin-bottom: 15px;">{{ message }}</p>
+            <div class="message-box">{{ message }}</div>
         {% endfor %}
       {% endif %}
 
-      <div style="margin-bottom: 20px; text-align: right;">
-          <a href="{% url 'book_appointment' %}" class="btn" style="background-color: #28a745; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
-              + Book New Appointment
-          </a>
-      </div>
-
       <section class="bottom-row">
-        <div class="card full">
-          <h3>Your Upcoming Appointments</h3>
-          
+        <h2>Your Upcoming Appointments</h2>
+        <div class="appointment-cards">
           {% if appointments %}
-            <table class="appointment-table">
-                <thead>
-                    <tr>
-                        <th>Doctor</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for appt in appointments %}
-                        <tr>
-                            <td>{{ appt.doctor_name }}</td>
-                            <td>{{ appt.appointment_date }}</td>
-                            <td>{{ appt.appointment_time }}</td>
-                            <td>
-                                {% if appt.status == "Pending" %}
-                                    <span class="status-badge status-pending">{{ appt.status }}</span>
-                                {% elif appt.status == "Approved" %}
-                                    <span class="status-badge status-approved">{{ appt.status }}</span>
-                                {% elif appt.status == "Cancelled" %}
-                                    <span class="status-badge status-cancelled">{{ appt.status }}</span>
-                                {% else %}
-                                    <span class="status-badge">{{ appt.status }}</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            {% for appt in appointments %}
+            <div class="appointment-card">
+              <div>
+                <span><strong>Doctor:</strong> {{ appt.doctor_name }}</span>
+                <span class="status-badge
+                  {% if appt.status == 'Pending' %}status-pending{% endif %}
+                  {% if appt.status == 'Approved' %}status-approved{% endif %}
+                  {% if appt.status == 'Cancelled' %}status-cancelled{% endif %}
+                ">{{ appt.status }}</span>
+              </div>
+              <div>
+                <span><strong>Date:</strong> {{ appt.appointment_date }}</span>
+                <span><strong>Time:</strong> {{ appt.appointment_time }}</span>
+              </div>
+            </div>
+            {% endfor %}
           {% else %}
             <p class="no-appointments">You have no upcoming appointments.</p>
           {% endif %}
-
         </div>
       </section>
-    </main>
 
+    </main>
   </div>
 </body>
 </html>
