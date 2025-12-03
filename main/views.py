@@ -526,6 +526,47 @@ def book_appointment(request):
 
     return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
 
+def user_cancel_appointment(request, appointment_id):
+    # 1. Check if user is logged in
+    if not request.session.get("user_id"):
+        return redirect("login")
+
+    if request.method == "POST":
+        reason = request.POST.get("reason") # Get the reason from the dropdown
+        
+        try:
+            # 2. Fetch the appointment
+            response = supabase.table("appointment").select("*").eq("id", appointment_id).single().execute()
+            if not response.data:
+                messages.error(request, "Appointment not found.")
+                return redirect("user_dashboard")
+            
+            appointment = response.data
+            
+            # 3. SECURITY: Verify the logged-in user owns this appointment
+            # We compare the session email with the appointment email
+            if appointment["user_email"] != request.session.get("user_email"):
+                 messages.error(request, "Unauthorized action. You can only cancel your own appointments.")
+                 return redirect("user_dashboard")
+
+            # 4. Update the status and (optionally) the reason
+            # Note: Make sure your Supabase 'appointment' table has a 'reason' or 'cancellation_reason' column if you want to save the text.
+            # If you don't have that column yet, just removing 'reason' from this dictionary will fix potential errors.
+            update_data = {
+                "status": "Cancelled",
+                "reason_for_visit": f"CANCELLED: {reason} | Original: {appointment.get('reason_for_visit', '')}" 
+                # ^ Since we might not have a 'cancellation_reason' column, we can append it to the visit reason or notes
+            }
+            
+            supabase.table("appointment").update(update_data).eq("id", appointment_id).execute()
+            
+            messages.success(request, "Appointment cancelled successfully.")
+            
+        except Exception as e:
+            print(f"Error cancelling appointment: {e}")
+            messages.error(request, "Failed to cancel appointment. Please try again.")
+            
+    return redirect("user_dashboard")
 
 
 # --- APPOINTMENT REGISTRATION ---@admin_required
@@ -1212,6 +1253,7 @@ def user_dashboard(request):
                 "completed_count": 0,
             }
         )
+        
 
     
 @admin_required

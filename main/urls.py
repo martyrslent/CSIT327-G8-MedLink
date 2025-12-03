@@ -16,11 +16,13 @@ urlpatterns = [
     path("about/", views.about, name="about"),
     # --- User Side ---
     path("user-dashboard/", views.user_dashboard, name="user_dashboard"),
-    path("history/", views.appointment_history, name="appointment_history"), # <--- NEW
+    path('user/cancel/<int:appointment_id>/', views.user_cancel_appointment, name='user_cancel_appointment'),
+    path("history/", views.appointment_history, name="appointment_history"), 
     path('book-appointment/', views.book_appointment, name='book_appointment'),
     path('profile/', views.profile_page, name='user_profile'),
     path('profile/upload-image/', views.update_profile_picture, name='update_profile_picture'),
     path('profile/update-info/', views.update_personal_info, name='update_personal_info'),
+    
     
     # --- Admin / Staff Side ---
     path('register-appointment/', views.register_appointment, name='register_appointment'),
