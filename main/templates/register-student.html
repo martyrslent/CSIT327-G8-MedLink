@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MedLink - User Registration</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
     body {
@@ -145,6 +146,9 @@
     .input-group input {
         width: 100%;
         padding: 12px;
+        /* Added padding-right to prevent text overlapping the eye icon */
+        padding-right: 40px; 
+        box-sizing: border-box; /* Ensures padding stays inside width */
         font-size: 1rem;
         background: rgba(255,255,255,0.18);
         color: white;
@@ -161,6 +165,21 @@
     .input-group input:focus {
         border-color: #ff9c7a;
         box-shadow: 0 0 10px rgba(255,255,255,0.6);
+    }
+
+    /* --- NEW CSS FOR SHOW PASSWORD ICON --- */
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        bottom: 12px; /* Aligns with input padding */
+        color: #ffe1d1;
+        cursor: pointer;
+        z-index: 10;
+        transition: color 0.3s;
+    }
+    
+    .toggle-password:hover {
+        color: white;
     }
 
     /* Button */
@@ -212,16 +231,12 @@
 </head>
 
 <body>
-    <!-- Background layers -->
     <div class="bg-animation"></div>
     <div class="bg-overlay"></div>
 
-    <!-- Main Content -->
     <div class="container">
-        <!-- Left: Floating image -->
         <img src="{% static 'main/img/consult.png' %}" class="floating-img" alt="Person">
 
-        <!-- Right: Registration Card -->
         <div class="card">
             <div class="logo">
                 <img src="{% static 'main/img/medlink.png' %}" alt="MedLink Logo">
@@ -249,12 +264,14 @@
 
                 <div class="input-group">
                     <label>Password</label>
-                    <input type="password" name="password" placeholder="Create password" required>
+                    <input type="password" name="password" id="password" placeholder="Create password" required>
+                    <i class="fas fa-eye toggle-password" onclick="togglePassword('password', this)"></i>
                 </div>
 
                 <div class="input-group">
                     <label>Confirm Password</label>
-                    <input type="password" name="confirm_password" placeholder="Confirm password" required>
+                    <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" required>
+                    <i class="fas fa-eye toggle-password" onclick="togglePassword('confirm_password', this)"></i>
                 </div>
 
                 <button type="submit">Sign Up</button>
@@ -265,5 +282,21 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function togglePassword(fieldId, icon) {
+            const input = document.getElementById(fieldId);
+            
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
+    </script>
 </body>
 </html>
