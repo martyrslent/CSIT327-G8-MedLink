@@ -263,14 +263,16 @@
     <script>
     function togglePassword() {
         var input = document.getElementById("passwordInput");
-        var btn = event.target; // The text that was clicked
+        var icon = document.getElementById("eyeIcon");
         
         if (input.type === "password") {
             input.type = "text";
-            btn.innerText = "";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
         } else {
             input.type = "password";
-            btn.innerText = "";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
         }
     }
 </script>

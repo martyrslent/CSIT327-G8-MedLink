@@ -2,76 +2,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Appointment History</title>
-  <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
-  <style>
-    .history-card { background: rgb(248, 246, 246); padding: 25px; border-radius: 10px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-    th, td { padding: 12px; border-bottom: 1px solid #030101; text-align: left; }
-    th { background: #eeecec; color: #333; }
-    .status-completed { color: green; font-weight: bold; }
-    .status-cancelled { color: #dc3545; font-weight: bold; }
-    .back-link { display: inline-block; margin-bottom: 15px; color: #f01111; text-decoration: none; font-weight: bold; }
-    .back-link:hover { text-decoration: underline; }
-  </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Appointment History</title>
+    <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <style>
+        /* --- Shared Video UI Styles --- */
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .dashboard-wrap { display: flex; min-height: 100vh; }
+        .content { flex: 1; padding: 30px; }
+        .sidebar { background: #dc3545; }
+        .nav a { color: rgba(255,255,255,0.8); }
+        .nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+
+        /* 1. TOP NAV BAR */
+        .top-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+        }
+        .welcome-section h2 { margin: 0; font-size: 1.6rem; color: #2c3e50; }
+        .welcome-section p { margin: 5px 0 0; color: #7f8c8d; font-size: 0.95rem; }
+        
+        .header-actions { display: flex; align-items: center; gap: 25px; }
+
+        /* Bell Icon */
+        .notif-wrapper { position: relative; }
+        .notif-btn {
+            background: none; border: none; font-size: 1.4rem; cursor: pointer;
+            color: #555; transition: color 0.3s;
+        }
+        .notif-btn:hover { color: #007bff; }
+        
+        /* Dropdown (Simple version for pages without live feed context) */
+        .notif-dropdown {
+            display: none;
+            position: absolute; right: 0; top: 45px;
+            width: 250px; background: white;
+            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            z-index: 1000; border: 1px solid #eee; padding: 15px; text-align: center; color: #777; font-size: 0.9rem;
+        }
+
+        /* Button */
+        .btn-book-new {
+            background-color: #007bff; color: white; padding: 12px 24px;
+            border-radius: 8px; text-decoration: none; font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); transition: transform 0.2s;
+        }
+        .btn-book-new:hover { transform: translateY(-2px); background-color: #0069d9; }
+
+        /* --- History Specific Styles --- */
+        .history-list { display: flex; flex-direction: column; gap: 20px; }
+
+        .history-card {
+            background: white; padding: 25px; border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border-left: 5px solid #ccc; /* Default Gray */
+            transition: transform 0.2s;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
+        }
+        .history-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+
+        /* Status Colors */
+        .card-completed { border-left-color: #28a745; }
+        .card-cancelled { border-left-color: #dc3545; }
+
+        .info-main h3 { margin: 0 0 5px; color: #2c3e50; font-size: 1.2rem; }
+        .info-sub { color: #7f8c8d; font-size: 0.9rem; display: flex; gap: 15px; align-items: center; }
+        .info-sub i { color: #007bff; width: 15px; }
+
+        .status-pill {
+            padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase;
+        }
+        .pill-completed { background-color: #d4edda; color: #155724; }
+        .pill-cancelled { background-color: #f8d7da; color: #721c24; }
+
+        .empty-state {
+            text-align: center; padding: 50px; color: #999;
+        }
+        .empty-state i { font-size: 3rem; margin-bottom: 15px; color: #ddd; }
+
+    </style>
+
+    <script>
+        function toggleNotifications() {
+            const menu = document.getElementById("notificationMenu");
+            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+        }
+        window.onclick = function(event) {
+            if (!event.target.closest('#notifBtn') && !event.target.closest('#notificationMenu')) {
+                document.getElementById("notificationMenu").style.display = "none";
+            }
+        }
+    </script>
 </head>
 <body>
-  <div class="dashboard-wrap">
+
+<div class="dashboard-wrap">
+    
     <aside class="sidebar">
       <div class="logo">MedLink</div>
       <nav class="nav">
         <ul>
           <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
           <li><a href="{% url 'user_profile' %}">Profile</a></li>
-          <li><a href="{% url 'appointment_history' %}">History</a></li>
-          <li><a href="{% url 'logout' %}">Logout</a></li>
+          <li><a href="{% url 'appointment_history' %}" style="color:white; font-weight:bold;">History</a></li> 
+          <li>
+            <a href="{% url 'logout' %}" onclick="return confirm('Are you sure you want to log out?');">
+                Logout
+            </a>
+          </li>
         </ul>
       </nav>
     </aside>
 
     <main class="content">
-      <a href="{% url 'user_dashboard' %}" class="back-link">← Back to Dashboard</a>
-      <h1 class="page-title">📜 Past Appointment History</h1>
 
-      <div class="card full history-card">
-        {% if history %}
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Doctor</th>
-                        <th>Reason</th>
-                        <th>Final Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for appt in history %}
-                    <tr>
-                        <td>{{ appt.appointment_date }}</td>
-                        <td>{{ appt.appointment_time }}</td>
-                        <td>{{ appt.doctor_name }}</td>
-                        <td>{{ appt.reason_for_visit }}</td>
-                        <td>
-                            {% if appt.status == 'Approved' %}
-                                <span class="status-completed">Completed</span>
-                            {% elif appt.status == 'Cancelled' %}
-                                <span class="status-cancelled">Cancelled</span>
-                            {% else %}
-                                <span style="color: #777;">{{ appt.status }}</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% else %}
-            <p style="text-align: center; color: #666; padding: 20px;">No past appointment history found.</p>
-        {% endif %}
-      </div>
+        <div class="top-header">
+            <div class="welcome-section">
+                <h2>Appointment History 📜</h2>
+                <p>View your past records and status.</p>
+            </div>
+
+            <div class="header-actions">
+                <div class="notif-wrapper">
+                    <button id="notifBtn" class="notif-btn" onclick="toggleNotifications()">
+                        <i class="fa fa-bell"></i>
+                    </button>
+                    <div id="notificationMenu" class="notif-dropdown">
+                        Check Dashboard for latest updates.
+                    </div>
+                </div>
+                <a href="{% url 'book_appointment' %}" class="btn-book-new">+ Book Appointment</a>
+            </div>
+        </div>
+
+        <div class="history-list">
+            {% if history %}
+                {% for appt in history %}
+                <div class="history-card {% if appt.status == 'Completed' %}card-completed{% elif appt.status == 'Cancelled' %}card-cancelled{% endif %}">
+                    
+                    <div class="info-main">
+                        <h3>Dr. {{ appt.doctor_name }}</h3>
+                        <div class="info-sub">
+                            <span><i class="fa fa-calendar"></i> {{ appt.appointment_date }}</span>
+                            <span><i class="fa fa-clock"></i> {{ appt.appointment_time }}</span>
+                        </div>
+                        {% if appt.status == 'Cancelled' and 'CANCELLED:' in appt.reason_for_visit %}
+                            <div style="margin-top:8px; font-size:0.85rem; color:#dc3545; font-style:italic;">
+                                Reason: {{ appt.reason_for_visit }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="status-section">
+                        <span class="status-pill 
+                            {% if appt.status == 'Completed' %}pill-completed{% endif %}
+                            {% if appt.status == 'Cancelled' %}pill-cancelled{% endif %}">
+                            {{ appt.status }}
+                        </span>
+                    </div>
+
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="fa fa-history"></i>
+                    <p>No past appointments found.</p>
+                </div>
+            {% endif %}
+        </div>
+
     </main>
-  </div>
+</div>
+
 </body>
 </html>
