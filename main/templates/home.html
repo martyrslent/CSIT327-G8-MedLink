@@ -1,41 +1,253 @@
-{% extends "base.html" %}
-
-{% block title %}Home - MedLink{% endblock %}
+{% load static %}
 
 {% block content %}
 
-<!-- HERO BANNER -->
-<div class="hero-banner">
-    <div class="hero-text">
-        <h1>Welcome to MedLink</h1>
-        <p>Your health, our priority.</p>
+<!-- Hero Fullscreen Section -->
+<section class="hero-fullscreen">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="#" class="nav-link">Home</a>
+        <a href="#" class="nav-link">About Us</a>
+        <a href="{% url 'register' %}" class="nav-link">Account</a>
+        <a href="#" class="nav-link">Privacy Policy</a>
+    </nav>
 
-        <a href="{% url 'login' %}" class="book-btn">
-            Book Appointment
-        </a>
+    <!-- Hero Content -->
+    <div class="hero-content">
+        <div class="hero-logo">
+            <img src="{% static 'main/img/medlink.png' %}" alt="MedLink Logo">
+        </div>
+        <div class="hero-text">
+            <h1>Your Health, Our Priority</h1>
+            <p>Trusted medical care delivered with compassion and expertise. Experience personalized healthcare services designed for your wellness journey.</p>
+            <a href="{% url 'login' %}" class="btn-appointment">Book Appointment</a>
+        </div>
     </div>
-</div>
+</section>
 
-<!-- FOOTER -->
+<!-- Features Section -->
+<section class="features">
+    <div class="feature-card">
+        <div class="feature-image doctor-bg"></div>
+        <h3>Expert Doctors</h3>
+        <p>Board-certified professionals dedicated to your health and wellbeing.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-image appointment-bg"></div>
+        <h3>Easy Appointments</h3>
+        <p>Schedule visits hassle-free with our intuitive online booking system.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-image patient-bg"></div>
+        <h3>Patient Care</h3>
+        <p>Personalized attention ensuring your comfort and complete safety.</p>
+    </div>
+</section>
+
+<!-- Footer -->
 <footer class="footer">
-    <div class="footer-section">
-        <h3>MedLink</h3>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec non risus vel leo pretium aliquet.</p>
-    </div>
-
-    <div class="footer-section">
-        <h4>Navigation</h4>
-        <p>Home</p>
-        <p>About Us</p>
-        <p>Delivery</p>
-        <p>Privacy Policy</p>
-    </div>
-
-    <div class="footer-section">
-        <h4>Info</h4>
-        <p>support@medlink.com</p>
-        <p>+63 123 456 7890</p>
+    <div class="footer-content">
+        <p>&copy; 2025 MedLink. All rights reserved. | Providing healthcare excellence.</p>
     </div>
 </footer>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; background: #fff; }
+
+/* --- Hero Section --- */
+.hero-fullscreen {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Navbar */
+.navbar {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 25px;
+    background: rgba(255,255,255,0.85);
+    padding: 10px 30px;
+    border-radius: 50px;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+    z-index: 10;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #d10000;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #ff5500;
+    transform: translateY(-2px);
+}
+
+/* Hero Content */
+.hero-content { z-index: 5; }
+.hero-logo img {
+    width: 300px;
+    margin-bottom: 40px;
+    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.3));
+}
+
+.hero-text h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #d10000;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.25);
+    margin-bottom: 20px;
+}
+
+.hero-text p {
+    font-size: 1.2rem;
+    color: #700000;
+    max-width: 650px;
+    margin: 0 auto 30px;
+    opacity: 0.9;
+    text-shadow: 1px 1px 5px rgba(0,0,0,0.15);
+}
+
+/* Book Appointment Button */
+.btn-appointment {
+    display: inline-block;
+    padding: 18px 40px;
+    background: linear-gradient(135deg, #ff5500, #d13a00);
+    color: #fff;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(255,85,0,0.4);
+    transition: all 0.3s ease;
+}
+
+.btn-appointment::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -75%;
+    width: 50%;
+    height: 100%;
+    background: rgba(255,255,255,0.3);
+    transform: skewX(-25deg);
+    transition: all 0.5s ease;
+}
+
+.btn-appointment:hover::before {
+    left: 125%;
+}
+
+.btn-appointment:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 35px rgba(255,85,0,0.5);
+}
+
+/* --- Features --- */
+.features {
+    padding: 100px 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background: rgba(255,255,255,0.9);
+    border-radius: 24px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(209,0,0,0.08);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    position: relative;
+}
+
+.feature-card:hover {
+    transform: translateY(-12px) rotateX(2deg);
+    box-shadow: 0 25px 60px rgba(209,0,0,0.2);
+}
+
+.feature-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 20px;
+    margin: 0 auto 20px;
+    animation: pulse 2s infinite;
+}
+
+.doctor-bg { background: linear-gradient(135deg, #d10000, #ff5500); box-shadow: 0 0 20px rgba(255,85,0,0.4); }
+.appointment-bg { background: linear-gradient(135deg, #ff5500, #d13a00); box-shadow: 0 0 20px rgba(209,0,0,0.4); }
+.patient-bg { background: linear-gradient(135deg, #900000, #d10000); box-shadow: 0 0 20px rgba(255,85,0,0.3); }
+
+@keyframes pulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.feature-card h3 { font-size: 1.5rem; font-weight: 600; color: #d10000; margin-bottom: 15px; }
+.feature-card p { font-size: 1rem; color: #700000; opacity: 0.9; }
+
+/* Footer */
+.footer {
+    background: linear-gradient(135deg, #f7f7f7 0%, #ffeded 100%);
+    padding: 30px 20px;
+    text-align: center;
+    border-top: 4px solid #d10000;
+}
+
+.footer-content p { color: #900000; font-size: 0.95rem; }
+
+/* Responsive */
+@media (max-width: 900px) {
+    .hero-text h1 { font-size: 2.5rem; }
+    .hero-text p { font-size: 1rem; }
+    .features { grid-template-columns: 1fr; padding: 60px 20px; }
+}
+</style>
+
+<script>
+// --- Sliding Hero Background Right-to-Left ---
+const hero = document.querySelector('.hero-fullscreen');
+const bgImages = [
+    "{% static 'main/img/hospital.png' %}",
+    "{% static 'main/img/hospital2.png' %}",
+    "{% static 'main/img/hospital4.png' %}"
+];
+let index = 0;
+let posX = 0;
+hero.style.backgroundImage = `url('${bgImages[0]}')`;
+hero.style.backgroundSize = 'cover';
+hero.style.backgroundPosition = '0% center';
+hero.style.transition = 'background-position 0.1s linear';
+
+function slideBackground() {
+    posX -= 0.1; // speed of sliding
+    if(posX <= -100) {
+        posX = 0;
+        index = (index + 1) % bgImages.length;
+        hero.style.backgroundImage = `url('${bgImages[index]}')`;
+    }
+    hero.style.backgroundPosition = `${posX}% center`;
+    requestAnimationFrame(slideBackground);
+}
+slideBackground();
+</script>
 
 {% endblock %}

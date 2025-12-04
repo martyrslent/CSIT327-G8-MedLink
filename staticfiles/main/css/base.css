@@ -1,0 +1,54 @@
+/* ===== NAVBAR ===== */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background-color: #0c5adb;
+    color: white;
+}
+
+.nav-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+}
+
+.nav-right {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-btn {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 6px 12px;
+    border-radius: 5px;
+    transition: 0.2s;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.highlight {
+    background: white;
+    color: #0c5adb !important;
+}
+
+/* ===== PAGE CONTENT ===== */
+.page-content {
+    padding: 40px;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    margin-top: 60px;
+    background: #f3f3f3;
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+    color: #555;
+}
