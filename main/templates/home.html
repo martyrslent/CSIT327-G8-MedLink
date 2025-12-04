@@ -1,25 +1,45 @@
 {% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedLink</title>
 
-{% block content %}
+    <!-- Global stylesheet from your base.html -->
+    <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
+</head>
+
+<body>
 
 <!-- Hero Fullscreen Section -->
 <section class="hero-fullscreen">
-    <!-- Navbar -->
+
+    <!-- MERGED NAVBAR -->
     <nav class="navbar">
-        <a href="#" class="nav-link">Home</a>
-        <a href="#" class="nav-link">About Us</a>
-        <a href="{% url 'register' %}" class="nav-link">Account</a>
+        <!-- From base.html -->
+        <a href="{% url 'home' %}" class="nav-link">Home</a>
+        <a href="{% url 'all_doctors' %}" class="nav-link">All Doctors</a>
+        <a href="{% url 'about' %}" class="nav-link">About</a>
+
+        <!-- From friend’s design -->
         <a href="#" class="nav-link">Privacy Policy</a>
+
+        <!-- Highlight button from base.html -->
+        <a href="{% url 'register' %}" class="nav-link highlight">Create Account</a>
     </nav>
 
-    <!-- Hero Content -->
+    <!-- HERO CONTENT -->
     <div class="hero-content">
         <div class="hero-logo">
             <img src="{% static 'main/img/medlink.png' %}" alt="MedLink Logo">
         </div>
+
         <div class="hero-text">
             <h1>Your Health, Our Priority</h1>
-            <p>Trusted medical care delivered with compassion and expertise. Experience personalized healthcare services designed for your wellness journey.</p>
+            <p>Trusted medical care delivered with compassion and expertise. Experience personalized
+               healthcare services designed for your wellness journey.</p>
+
             <a href="{% url 'login' %}" class="btn-appointment">Book Appointment</a>
         </div>
     </div>
@@ -51,6 +71,7 @@
     </div>
 </footer>
 
+<!-- FULL CSS FROM YOUR FRIEND (UNCHANGED) -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
@@ -96,6 +117,19 @@ body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; backg
 .nav-link:hover {
     color: #ff5500;
     transform: translateY(-2px);
+}
+
+/* Highlight button */
+.highlight {
+    background: #d10000;
+    color: white !important;
+    padding: 8px 18px;
+    border-radius: 25px;
+    transition: all .3s ease;
+}
+
+.highlight:hover {
+    background: #ff5500;
 }
 
 /* Hero Content */
@@ -214,7 +248,6 @@ body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; backg
 
 .footer-content p { color: #900000; font-size: 0.95rem; }
 
-/* Responsive */
 @media (max-width: 900px) {
     .hero-text h1 { font-size: 2.5rem; }
     .hero-text p { font-size: 1rem; }
@@ -222,8 +255,8 @@ body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; backg
 }
 </style>
 
+<!-- JS (kept exactly as original) -->
 <script>
-// --- Sliding Hero Background Right-to-Left ---
 const hero = document.querySelector('.hero-fullscreen');
 const bgImages = [
     "{% static 'main/img/hospital.png' %}",
@@ -238,7 +271,7 @@ hero.style.backgroundPosition = '0% center';
 hero.style.transition = 'background-position 0.1s linear';
 
 function slideBackground() {
-    posX -= 0.1; // speed of sliding
+    posX -= 0.1;
     if(posX <= -100) {
         posX = 0;
         index = (index + 1) % bgImages.length;
@@ -250,4 +283,5 @@ function slideBackground() {
 slideBackground();
 </script>
 
-{% endblock %}
+</body>
+</html>

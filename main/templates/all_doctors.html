@@ -6,24 +6,27 @@
 {% block content %}
 
 <style>
+/* Page Layout */
 .doctor-page {
     display: flex;
     gap: 20px;
-    margin: 20px;
+    padding: 40px 0;
 }
 
 /* Sidebar styling */
 .filter-sidebar {
-    width: 200px;
+    width: 220px;
     padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f9f9f9;
+    border-radius: 12px;
+    background-color: #fff;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
     height: fit-content;
 }
 
 .filter-sidebar h3 {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    color: #d10000;
 }
 
 .filter-sidebar ul {
@@ -32,16 +35,18 @@
 }
 
 .filter-sidebar li {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .filter-sidebar a {
     text-decoration: none;
     color: #007bff;
+    font-weight: 500;
+    transition: color 0.3s ease;
 }
 
 .filter-sidebar a:hover {
-    text-decoration: underline;
+    color: #ff5500;
 }
 
 /* Doctor list styling */
@@ -52,22 +57,46 @@
     gap: 20px;
 }
 
+.doctor-list h1 {
+    grid-column: 1 / -1;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    color: #d10000;
+}
+
 .doctor-card {
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    padding: 20px;
+    border-radius: 12px;
     background-color: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.doctor-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 
 .doctor-card h2 {
-    margin-top: 0;
-    margin-bottom: 8px;
-    font-size: 1.2em;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+    color: #900000;
 }
 
 .doctor-card p {
-    margin: 4px 0;
+    margin: 6px 0;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.status-available { color: #155724; font-weight: 600; }
+.status-unavailable { color: #856404; font-weight: 600; }
+
+/* Responsive */
+@media (max-width: 900px) {
+    .doctor-page { flex-direction: column; padding: 20px 0; }
+    .filter-sidebar { width: 100%; margin-bottom: 20px; }
+    .doctor-list { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -97,13 +126,19 @@
         <h1>All Doctors</h1>
 
         {% if doctors %}
-          {% for doc in doctors %}
-    <div class="doctor-card">
-        <h2>{{ doc.first_name }} {{ doc.last_name }}</h2>
-        <p><strong>Specialty:</strong> {{ doc.specialization }}</p>
-        <p><strong>Status:</strong> {{ doc.is_in|yesno:"Available,Not Available" }}</p>
-    </div>
-{% endfor %}
+            {% for doc in doctors %}
+                <div class="doctor-card">
+                    <h2>{{ doc.first_name }} {{ doc.last_name }}</h2>
+                    <p><strong>Specialty:</strong> {{ doc.specialization }}</p>
+                    <p><strong>Status:</strong>
+                        {% if doc.is_in %}
+                            <span class="status-available">Available</span>
+                        {% else %}
+                            <span class="status-unavailable">Not Available</span>
+                        {% endif %}
+                    </p>
+                </div>
+            {% endfor %}
         {% else %}
             <p>No doctors found.</p>
         {% endif %}

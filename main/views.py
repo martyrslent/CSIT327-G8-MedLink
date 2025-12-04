@@ -1403,3 +1403,6 @@ def all_doctors(request):
         "doctors": page_obj,
         "selected_specialty": specialty,
     })
+
+def privacy_page(request):
+    return render(request, "privacy.html")

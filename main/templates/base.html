@@ -6,24 +6,91 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}MedLink{% endblock %}</title>
 
-    <!-- Correct CSS path -->
+    <!-- Global CSS -->
     <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
-</head>
 
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #333; background: #f7f7f7; }
+
+    /* --- Navbar --- */
+   .navbar {
+    position: absolute; /* centers it like home.html */
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 25px;
+    background: rgba(255,255,255,0.85);
+    padding: 10px 30px;
+    border-radius: 50px;
+    box-shadow: 0 6px 25px rgba(0,0,0,0.15);
+    z-index: 1000;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #d10000;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #ff5500;
+    transform: translateY(-2px);
+}
+
+.highlight {
+    background: #d10000;
+    color: white !important;
+    padding: 8px 18px;
+    border-radius: 25px;
+    transition: all .3s ease;
+}
+
+.highlight:hover {
+    background: #ff5500;
+}
+
+    /* Page content wrapper */
+    .page-content {
+        max-width: 1200px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+
+    /* Footer */
+    .footer {
+        background: #fff;
+        padding: 25px 20px;
+        text-align: center;
+        border-top: 4px solid #d10000;
+        margin-top: 60px;
+        font-size: 0.95rem;
+        color: #900000;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+        .navbar {
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+    </style>
+</head>
 <body>
 
-<!-- TOP NAVBAR -->
+<!-- NAVBAR -->
 <nav class="navbar">
-    <div class="nav-left">
-        <a class="nav-logo" href="{% url 'home' %}">MedLink</a>
-    </div>
-
-    <div class="nav-right">
-        <a class="nav-btn" href="{% url 'home' %}">Home</a>
-        <a class="nav-btn" href="{% url 'all_doctors' %}">All Doctors</a>
-        <a class="nav-btn" href="{% url 'about' %}">About</a>
-        <a class="nav-btn highlight" href="{% url 'register' %}">Create Account</a>
-    </div>
+    <a class="nav-link" href="{% url 'home' %}">Home</a>
+    <a class="nav-link" href="{% url 'all_doctors' %}">All Doctors</a>
+    <a class="nav-link" href="{% url 'about' %}">About</a>
+    <a class="nav-link" href="{% url 'privacy' %}">Privacy Policy</a>
+    <a class="nav-link highlight" href="{% url 'register' %}">Create Account</a>
 </nav>
 
 <!-- PAGE CONTENT -->
@@ -35,7 +102,6 @@
 <!-- FOOTER -->
 <footer class="footer">
     <p>MedLink © 2025 · All Rights Reserved</p>
-    <p>Home · About Us · Privacy Policy · Delivery</p>
 </footer>
 
 </body>

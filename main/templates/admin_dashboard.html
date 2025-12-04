@@ -1,12 +1,10 @@
+{% extends "admin_base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin Dashboard</title>
-  
-  <style>
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block style %}
+<style>
     body {
         margin: 0;
         font-family: "Segoe UI", sans-serif;
@@ -24,7 +22,6 @@
         100% { background-position: 0% 50%; }
     }
 
-    /* Full-page transparent overlay image */
     .bg-overlay {
         position: fixed;
         top: 0; left: 0;
@@ -36,9 +33,8 @@
         z-index: 0;
     }
 
-    /* Sidebar */
     .sidebar {
-        position: fixed; /* Required for overlay pseudo-element */
+        position: fixed;
         top: 0; left: 0;
         height: 100%;
         width: 220px;
@@ -52,7 +48,6 @@
         z-index: 2;
     }
 
-    /* Sidebar transparent overlay placeholder */
     .sidebar::before {
         content: "";
         position: absolute;
@@ -61,9 +56,9 @@
         height: 100%;
         background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
         background-size: cover;
-        opacity: 0.3; /* adjust transparency */
+        opacity: 0.3;
         pointer-events: none;
-        z-index: 0; /* behind sidebar content */
+        z-index: 0;
     }
 
     .sidebar .logo img {
@@ -71,7 +66,7 @@
         display: block;
         margin: 0 auto 30px auto;
         position: relative;
-        z-index: 1; /* above overlay */
+        z-index: 1;
     }
 
     .sidebar nav ul {
@@ -94,18 +89,16 @@
         font-weight: 600;
         transition: 0.3s ease, box-shadow 0.3s ease;
         background: #ad0505;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25); /* added shadow */
-}
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+    }
 
     .sidebar nav ul li a:hover {
         background: linear-gradient(to right, #ff7b00, #d10000);
         color: white;
         transform: scale(1.05);
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35); /* stronger shadow on hover */
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.35);
     }
 
-
-    /* Main content */
     .content {
         margin-left: 240px;
         padding: 40px 30px;
@@ -119,7 +112,6 @@
         margin-bottom: 30px;
     }
 
-    /* Stat Cards */
     .top-row {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -135,7 +127,6 @@
         box-shadow: 0 8px 20px rgba(0,0,0,0.3);
         text-align: center;
         transition: transform 0.3s ease;
-        position: relative;
         color: #ad0505;
     }
 
@@ -143,24 +134,11 @@
         transform: translateY(-5px);
     }
 
-    .stat-card h3 {
-        font-size: 14px;
-        opacity: 0.9;
-        margin-bottom: 10px;
-    }
-
     .stat-number {
         font-size: 32px;
         font-weight: bold;
     }
 
-    .stat-desc {
-        font-size: 12px;
-        opacity: 0.8;
-        margin-top: 5px;
-    }
-
-    /* Placeholder icon inside stat cards with shadow */
     .stat-card img.icon {
         width: 60px;
         height: 60px;
@@ -170,19 +148,11 @@
         margin-right: auto;
         box-shadow: 0 4px 12px rgba(0,0,0,0.4);
         border-radius: 15px;
-        background: rgba(255, 255, 255, 1);
+        background: #fff;
     }
 
-    /* Monochromatic Red/Orange/White Cards */
-    .card-red { background:  rgba(255, 255, 255, 1); }
-    .card-orange { background:  rgba(255, 255, 255, 1); }
-    .card-white { background:  rgba(255, 255, 255, 1); }
-    .card-red2 { background:  rgba(255, 255, 255, 1); }
-
-    /* Wide Card (tables) */
     .wide-card {
-        background: rgba(255, 255, 255, 1);
-        backdrop-filter: blur(15px);
+        background: #fff;
         border-radius: 20px;
         padding: 25px;
         margin-bottom: 30px;
@@ -190,7 +160,6 @@
         color: #c50000ff;
     }
 
-    /* Divider under wide card titles */
     .wide-card > div:first-child {
         border-bottom: 2px solid #ff7b00;
         padding-bottom: 10px;
@@ -211,14 +180,12 @@
     table tr {
         border-bottom: 1px solid rgba(223, 0, 0, 1);
         transition: background 0.3s ease;
-        border-radius: 10px;
     }
 
     table tr:hover {
         background: rgba(255,255,255,0.1);
     }
 
-    /* Buttons: slightly bigger */
     .btn, .btn-complete {
         display: inline-block;
         padding: 10px 16px;
@@ -235,133 +202,131 @@
         transform: scale(1.05);
     }
 
-    /* Responsive */
     @media (max-width: 900px) {
         .content { margin-left: 0; padding: 20px; }
         .top-row { grid-template-columns: 1fr; }
     }
-  </style>
-</head>
+</style>
+{% endblock %}
 
-<body>
-  <div class="bg-overlay"></div>
+{% block content %}
+<div class="bg-overlay"></div>
 
-  <aside class="sidebar">
+<aside class="sidebar">
     <div class="logo">
         <img src="{% static 'main/img/medlink.png' %}" alt="MedLink Logo">
     </div>
-    <nav class="nav">
-      <ul>
-        <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
-        <li><a href="{% url 'user_management' %}">Users</a></li>
-        <li><a href="{% url 'patient_records_list' %}">Record Logs</a></li>
-        <li><a href="{% url 'appointment_list' %}">Appointments</a></li>
-        <li><a href="{% url 'logout' %}">Logout</a></li>
-      </ul>
+    <nav>
+        <ul>
+            <li><a href="{% url 'admin_dashboard' %}">Dashboard</a></li>
+            <li><a href="{% url 'user_management' %}">Users</a></li>
+            <li><a href="{% url 'patient_records_list' %}">Record Logs</a></li>
+            <li><a href="{% url 'appointment_list' %}">Appointments</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
     </nav>
-  </aside>
+</aside>
 
-  <main class="content">
+<main class="content">
     <h1 class="page-title">Dashboard Overview</h1>
 
     <section class="top-row">
-      <div class="stat-card card-red">
-        <img class="icon" src="{% static 'main/img/stet.png' %}" alt="Icon">
-        <h3>Doctors Online</h3>
-        <div class="stat-number">{{ active_doctors }} / {{ total_doctors }}</div>
-        <p class="stat-desc">Currently marked "Is In"</p>
-      </div>
+        <div class="stat-card card-red">
+            <img class="icon" src="{% static 'main/img/stet.png' %}" alt="Icon">
+            <h3>Doctors Online</h3>
+            <div class="stat-number">{{ active_doctors }} / {{ total_doctors }}</div>
+            <p class="stat-desc">Currently marked "Is In"</p>
+        </div>
 
-      <div class="stat-card card-orange">
-        <img class="icon" src="{% static 'main/img/request.png' %}" alt="Icon">
-        <h3>Pending Requests</h3>
-        <div class="stat-number">{{ pending_appointments }}</div>
-        <p class="stat-desc">Awaiting your approval</p>
-      </div>
+        <div class="stat-card card-orange">
+            <img class="icon" src="{% static 'main/img/request.png' %}" alt="Icon">
+            <h3>Pending Requests</h3>
+            <div class="stat-number">{{ pending_appointments }}</div>
+            <p class="stat-desc">Awaiting your approval</p>
+        </div>
 
-      <div class="stat-card card-white">
-        <img class="icon" src="{% static 'main/img/patient.png' %}" alt="Icon">
-        <h3>Total Patients</h3>
-        <div class="stat-number">{{ total_patients }}</div>
-        <p class="stat-desc">Registered users</p>
-      </div>
+        <div class="stat-card card-white">
+            <img class="icon" src="{% static 'main/img/patient.png' %}" alt="Icon">
+            <h3>Total Patients</h3>
+            <div class="stat-number">{{ total_patients }}</div>
+            <p class="stat-desc">Registered users</p>
+        </div>
 
-      <div class="stat-card card-red2">
-        <img class="icon" src="{% static 'main/img/appointment.png' %}" alt="Icon">
-        <h3>Total Appointments</h3>
-        <div class="stat-number">{{ total_appointments }}</div>
-        <p class="stat-desc">All time history</p>
-      </div>
+        <div class="stat-card card-red2">
+            <img class="icon" src="{% static 'main/img/appointment.png' %}" alt="Icon">
+            <h3>Total Appointments</h3>
+            <div class="stat-number">{{ total_appointments }}</div>
+            <p class="stat-desc">All time history</p>
+        </div>
     </section>
 
     <section class="wide-card">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3>Newest Registrations</h3>
-        <a href="{% url 'user_management' %}" class="btn">Manage Users</a>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for user in recent_activity %}
-          <tr>
-            <td>{{ user.first_name }} {{ user.last_name }}</td>
-            <td>{{ user.email }}</td>
-            <td>{% if user.is_doctor %}Doctor{% else %}Patient{% endif %}</td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="3" style="text-align:center;">No recent activity found.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Newest Registrations</h3>
+            <a href="{% url 'user_management' %}" class="btn">Manage Users</a>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in recent_activity %}
+                <tr>
+                    <td>{{ user.first_name }} {{ user.last_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{% if user.is_doctor %}Doctor{% else %}Patient{% endif %}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="3" style="text-align:center;">No recent activity found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </section>
 
     <section class="wide-card">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3>Recent Appointments</h3>
-        <a href="{% url 'appointment_list' %}" class="btn">View All</a>
-      </div>
-      <table>
-        <tr>
-          <th>Patient</th>
-          <th>Doctor</th>
-          <th>Date</th>
-          <th>Status</th>
-          <th>Action</th>
-        </tr>
-        {% for appt in appointments %}
-        <tr>
-          <td>{{ appt.first_name }} {{ appt.last_name }}</td>
-          <td>Dr. {{ appt.doctor_name }}</td>
-          <td>{{ appt.appointment_date }}</td>
-          <td>
-            {% if appt.status == 'Pending' %}
-              <span style="background:#fff3cd; color:#856404; padding:2px 6px; border-radius:4px; font-size:0.9em;">Pending</span>
-            {% elif appt.status == 'Approved' %}
-              <span style="background:#d4edda; color:#155724; padding:2px 6px; border-radius:4px; font-size:0.9em;">Approved</span>
-            {% else %}
-              {{ appt.status }}
-            {% endif %}
-          </td>
-          <td>
-            {% if appt.status == 'Approved' %}
-              <a href="{% url 'complete_appointment' appt.id %}" class="btn-complete">✓ Finish</a>
-            {% elif appt.status == 'Pending' %}
-              <a href="{% url 'approve_appointment' appt.id %}" style="color: #ff7b00; font-weight:bold;">Approve</a>
-            {% endif %}
-          </td>
-        </tr>
-        {% empty %}
-          <tr><td colspan="5" style="text-align:center;">No upcoming appointments.</td></tr>
-        {% endfor %}
-      </table>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3>Recent Appointments</h3>
+            <a href="{% url 'appointment_list' %}" class="btn">View All</a>
+        </div>
+        <table>
+            <tr>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            {% for appt in appointments %}
+            <tr>
+                <td>{{ appt.first_name }} {{ appt.last_name }}</td>
+                <td>Dr. {{ appt.doctor_name }}</td>
+                <td>{{ appt.appointment_date }}</td>
+                <td>
+                    {% if appt.status == 'Pending' %}
+                        <span style="background:#fff3cd; color:#856404; padding:2px 6px; border-radius:4px; font-size:0.9em;">Pending</span>
+                    {% elif appt.status == 'Approved' %}
+                        <span style="background:#d4edda; color:#155724; padding:2px 6px; border-radius:4px; font-size:0.9em;">Approved</span>
+                    {% else %}
+                        {{ appt.status }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if appt.status == 'Approved' %}
+                        <a href="{% url 'complete_appointment' appt.id %}" class="btn-complete">✓ Finish</a>
+                    {% elif appt.status == 'Pending' %}
+                        <a href="{% url 'approve_appointment' appt.id %}" style="color: #ff7b00; font-weight:bold;">Approve</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align:center;">No upcoming appointments.</td></tr>
+            {% endfor %}
+        </table>
     </section>
 
-  </main>
-</body>
-</html>
+</main>
+{% endblock %}

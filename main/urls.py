@@ -6,6 +6,7 @@ urlpatterns = [
      # Home + Landing Page
     path("", views.home, name="home"),
     path("hello/", views.hello_page, name="hello"),
+    path('privacy/', views.privacy_page, name='privacy'),
     # Authentication
     path("login/", views.login_page, name="login"),
     path("register/", views.register_page, name="register"),
