@@ -39,7 +39,7 @@ urlpatterns = [
     path('appointments/approve/<int:appointment_id>/', views.approve_appointment, name='approve_appointment'),
     path('appointments/decline/<int:appointment_id>/', views.decline_appointment, name='decline_appointment'),
     path("appointments/reinstate/<int:appointment_id>/", views.reinstate_appointment, name="reinstate_appointment"),
-    
+    path('delete-user/<int:user_id>/', views.delete_user, name='delete_user'),
     # --- Settings ---
     path('settings/change-password/', views.change_password, name='change_password'),
     path('settings/delete-account/', views.delete_account, name='delete_account'),

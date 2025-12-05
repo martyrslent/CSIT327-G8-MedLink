@@ -52,23 +52,34 @@
                 <input type="text" id="last_name" name="last_name" required>
             </div>
 
-          <div class="form-group">
-    <label for="doctor_name">Select Doctor</label>
-    <select id="doctor_name" name="doctor_name" required>
-        <option value="">-- Choose Doctor --</option>
-        {% for doctor in doctors %}
-            {% if doctor.is_in %}
-                <option value="{{ doctor.first_name }} {{ doctor.last_name }}">
-                    {{ doctor.first_name }} {{ doctor.last_name }}
-                </option>
-            {% else %}
-                <option value="{{ doctor.first_name }} {{ doctor.last_name }}" disabled>
-                    {{ doctor.first_name }} {{ doctor.last_name }} (Not In)
-                </option>
-            {% endif %}
-        {% endfor %}
-    </select>
-</div>
+            <!-- Specialization Filter -->
+            <div class="form-group">
+                <label for="specialization">Filter by Specialization</label>
+                <select id="specialization" name="specialization" onchange="filterDoctors()" required>
+                    {% for spec in specializations %}
+                        <option value="{{ spec }}">{{ spec }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Doctor Selection -->
+            <div class="form-group">
+                <label for="doctor_name">Select Doctor</label>
+                <select id="doctor_name" name="doctor_name" required>
+                    <option value="">-- Choose Doctor --</option>
+                    {% for doctor in doctors %}
+                        {% if doctor.is_in %}
+                            <option value="{{ doctor.first_name }} {{ doctor.last_name }}" data-specialization="{{ doctor.specialization }}">
+                                {{ doctor.first_name }} {{ doctor.last_name }} ({{ doctor.specialization }})
+                            </option>
+                        {% else %}
+                            <option value="{{ doctor.first_name }} {{ doctor.last_name }}" disabled data-specialization="{{ doctor.specialization }}">
+                                {{ doctor.first_name }} {{ doctor.last_name }} ({{ doctor.specialization }} - Not In)
+                            </option>
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
             
             <div class="form-group">
                 <label for="user_email">Patient's Email</label>
@@ -81,30 +92,30 @@
             </div>
 
             <div class="form-group">
-    <label for="appointment_time">Appointment Time</label>
-    <select id="appointment_time" name="appointment_time" required>
-        <option value="" disabled selected>-- Choose Time --</option>
-        <option value="08:00 AM">08:00 AM</option>
-        <option value="08:30 AM">08:30 AM</option>
-        <option value="09:00 AM">09:00 AM</option>
-        <option value="09:30 AM">09:30 AM</option>
-        <option value="10:00 AM">10:00 AM</option>
-        <option value="10:30 AM">10:30 AM</option>
-        <option value="11:00 AM">11:00 AM</option>
-        <option value="11:30 AM">11:30 AM</option>
-        <option value="12:00 PM">12:00 PM</option>
-        <option value="12:30 PM">12:30 PM</option>
-        <option value="01:00 PM">01:00 PM</option>
-        <option value="01:30 PM">01:30 PM</option>
-        <option value="02:00 PM">02:00 PM</option>
-        <option value="02:30 PM">02:30 PM</option>
-        <option value="03:00 PM">03:00 PM</option>
-        <option value="03:30 PM">03:30 PM</option>
-        <option value="04:00 PM">04:00 PM</option>
-        <option value="04:30 PM">04:30 PM</option>
-        <option value="05:00 PM">05:00 PM</option>
-    </select>
-</div>
+                <label for="appointment_time">Appointment Time</label>
+                <select id="appointment_time" name="appointment_time" required>
+                    <option value="" disabled selected>-- Choose Time --</option>
+                    <option value="08:00 AM">08:00 AM</option>
+                    <option value="08:30 AM">08:30 AM</option>
+                    <option value="09:00 AM">09:00 AM</option>
+                    <option value="09:30 AM">09:30 AM</option>
+                    <option value="10:00 AM">10:00 AM</option>
+                    <option value="10:30 AM">10:30 AM</option>
+                    <option value="11:00 AM">11:00 AM</option>
+                    <option value="11:30 AM">11:30 AM</option>
+                    <option value="12:00 PM">12:00 PM</option>
+                    <option value="12:30 PM">12:30 PM</option>
+                    <option value="01:00 PM">01:00 PM</option>
+                    <option value="01:30 PM">01:30 PM</option>
+                    <option value="02:00 PM">02:00 PM</option>
+                    <option value="02:30 PM">02:30 PM</option>
+                    <option value="03:00 PM">03:00 PM</option>
+                    <option value="03:30 PM">03:30 PM</option>
+                    <option value="04:00 PM">04:00 PM</option>
+                    <option value="04:30 PM">04:30 PM</option>
+                    <option value="05:00 PM">05:00 PM</option>
+                </select>
+            </div>
 
             <div class="form-group">
                 <label for="reason_for_visit">Reason for Visit</label>
@@ -123,5 +134,27 @@
 
         <a href="{% url 'appointment_list' %}" class="back-link">← Back to Dashboard</a>
     </div>
+
+    <!-- Specialization Filter Script -->
+    <script>
+    function filterDoctors() {
+        const specSelect = document.getElementById("specialization");
+        const doctorSelect = document.getElementById("doctor_name");
+        const selectedSpec = specSelect.value;
+
+        for (let i = 0; i < doctorSelect.options.length; i++) {
+            const option = doctorSelect.options[i];
+            const doctorSpec = option.getAttribute("data-specialization");
+            if (selectedSpec === "All" || doctorSpec === selectedSpec) {
+                option.style.display = "";
+            } else {
+                option.style.display = "none";
+            }
+        }
+
+        // Reset doctor selection when filtering
+        doctorSelect.value = "";
+    }
+    </script>
 </body>
 </html>

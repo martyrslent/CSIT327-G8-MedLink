@@ -113,15 +113,65 @@
     </style>
 
     <script>
+        // 1. Store the full list of doctors data from the Django context
+        const ALL_DOCTORS = [
+            {% for doctor in doctors %}
+                // Pass a JSON object for each doctor including their specialization
+                {
+                    name: "Dr. {{ doctor.first_name }} {{ doctor.last_name }}",
+                    value: "{{ doctor.first_name }} {{ doctor.last_name }}",
+                    specialization: "{{ doctor.specialization }}",
+                    // The is_in field determines if they are currently available
+                    is_in: {% if doctor.is_in %}true{% else %}false{% endif %} 
+                },
+            {% endfor %}
+        ];
+
+        /**
+         * Filters the doctor dropdown based on the selected specialization.
+         */
+        function filterDoctors() {
+            const specializationSelect = document.getElementById('specialization_filter');
+            const doctorSelect = document.getElementById('doctor_name_select');
+            const selectedSpecialization = specializationSelect.value;
+
+            // Clear existing doctor options and reset to default
+            doctorSelect.innerHTML = '<option value="" disabled selected>-- Choose a Doctor --</option>';
+
+            // Filter doctors based on the selected specialization
+            const filteredDoctors = ALL_DOCTORS.filter(doctor => {
+                // IMPORTANT: The doctor.specialization must exactly match the hardcoded option values below.
+                const matchesSpecialization = selectedSpecialization === 'All' || doctor.specialization === selectedSpecialization;
+                // Only show doctors that are 'in' and match the specialization
+                return matchesSpecialization && doctor.is_in; 
+            });
+
+            // Populate the doctor dropdown with filtered doctors
+            filteredDoctors.forEach(doctor => {
+                const option = document.createElement('option');
+                option.value = doctor.value;
+                option.textContent = doctor.name;
+                doctorSelect.appendChild(option);
+            });
+        }
+
         function toggleNotifications() {
             const menu = document.getElementById("notificationMenu");
             menu.style.display = (menu.style.display === "block") ? "none" : "block";
         }
-        // Date validation: Prevent selecting past dates
+
+        // Date validation: Prevent selecting past dates and initialize doctor list
         window.onload = function() {
             var today = new Date().toISOString().split('T')[0];
             document.getElementsByName("appointment_date")[0].setAttribute('min', today);
+
+            // 2. Attach the filter function to the specialization dropdown
+            document.getElementById('specialization_filter').addEventListener('change', filterDoctors);
+            
+            // 3. Run the filter initially to populate the doctor list with 'All' specialists
+            filterDoctors();
         }
+
         window.onclick = function(event) {
             if (!event.target.closest('#notifBtn') && !event.target.closest('#notificationMenu')) {
                 document.getElementById("notificationMenu").style.display = "none";
@@ -185,19 +235,29 @@
                 <div class="form-section-title">
                     <i class="fa fa-user-md"></i> Doctor & Schedule
                 </div>
-
+                
+                <div class="form-group">
+                    <label class="form-label">Filter by Specialization</label>
+                    <select id="specialization_filter" class="form-input">
+                        <option value="All">All</option>
+                        <option value="General Physician">General Physician</option>
+                        <option value="Dentist">Dentist</option>
+                        <option value="Pediatrician">Pediatrician</option>
+                        <option value="Cardiologist">Cardiologist</option>
+                        <option value="Dermatologist">Dermatologist</option>
+                        <option value="Gynecologist">Gynecologist</option>
+                        <option value="Neurologist">Neurologist</option>
+                        <option value="Orthopedic">Orthopedic</option>
+                        <option value="Ophthalmologist">Ophthalmologist</option>
+                        <option value="ENT Specialist">ENT Specialist</option>
+                        <option value="Psychiatrist">Psychiatrist</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label class="form-label">Select Doctor</label>
-                    <select name="doctor_name" class="form-input" required>
-                        <option value="" disabled selected>-- Choose a Specialist --</option>
-                        {% for doctor in doctors %}
-                            {% if doctor.is_in %}
-                                <option value="{{ doctor.first_name }} {{ doctor.last_name }}">
-                                    Dr. {{ doctor.first_name }} {{ doctor.last_name }}
-                                </option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
+                    <select name="doctor_name" id="doctor_name_select" class="form-input" required>
+                        <option value="" disabled selected>-- Choose a Doctor --</option>
+                        </select>
                 </div>
 
                 <div class="form-grid">

@@ -68,6 +68,16 @@
     .toggle-btn:hover {
         background-color: #e0a800;
     }
+    
+    /* NEW: Delete Button Style */
+    .delete-btn {
+        background: #dc3545; /* Red color for danger */
+        color: white;
+        margin-left: 5px;
+    }
+    .delete-btn:hover {
+        background-color: #c82333;
+    }
 
     .actions { margin-bottom: 15px; }
     .actions .btn.block {
@@ -92,7 +102,7 @@
 {% if messages %}
     <div class="messages-container">
         {% for message in messages %}
-            <p style="padding: 10px; background: #f8d7da; color: #721c24; border-radius: 5px; margin-bottom: 15px;">
+            <p style="padding: 10px; background: {% if 'error' in message.tags %}#f8d7da{% else %}#d4edda{% endif %}; color: {% if 'error' in message.tags %}#721c24{% else %}#155724{% endif %}; border-radius: 5px; margin-bottom: 15px;">
                 {{ message }}
             </p>
         {% endfor %}
@@ -101,7 +111,6 @@
 
 <div class="user-management-grid">
     
-    <!-- Doctors Section -->
     <div class="card full">
         <div class="actions">
             <a class="btn block" href="{% url 'register_admin' %}">+ Add New Staff Member</a>
@@ -142,6 +151,10 @@
                                             <button type="submit" class="action-btn toggle-btn">Set In</button>
                                         {% endif %}
                                     </form>
+                                    <form method="POST" action="{% url 'delete_user' doctor.id %}" style="display:inline;" onsubmit="return confirm('Are you absolutely sure you want to permanently delete Dr. {{ doctor.last_name }}?');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="action-btn delete-btn">Delete</button>
+                                    </form>
                                 {% endif %}
                             </td>
                         </tr>
@@ -153,7 +166,6 @@
         {% endif %}
     </div>
 
-    <!-- Patients Section -->
     <div class="card full">
         <h3>Registered Patients ({{ patients|length }})</h3>
         
@@ -176,6 +188,12 @@
                             <td>
                                 {% if request.session.role == "superadmin" or request.session.role == "admin" %}
                                     <a href="{% url 'edit_user' patient.id %}" class="action-btn">Edit</a>
+                                {% endif %}
+                                {% if request.session.role == "superadmin" %}
+                                    <form method="POST" action="{% url 'delete_user' patient.id %}" style="display:inline;" onsubmit="return confirm('Are you absolutely sure you want to permanently delete {{ patient.first_name }} {{ patient.last_name }}? This action cannot be undone.');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="action-btn delete-btn">Delete</button>
+                                    </form>
                                 {% endif %}
                             </td>
                         </tr>

@@ -215,7 +215,7 @@ def register_admin_page(request):
                 }).execute()
 
             messages.success(request, f"{role.capitalize()} {first_name} added successfully!")
-            return redirect("admin_dashboard")
+            return redirect("user_management")
 
         except Exception as e:
             print("DEBUG ERROR:", e)
@@ -445,13 +445,47 @@ def book_appointment(request):
     today = date.today().isoformat()
 
     try:
+        # Fetching doctors and their specialization using an implicit join/reference
+        # Supabase syntax: select("*", "doctors(*)") will fetch all user fields 
+        # and all fields from the *related* doctor row (where users.id = doctors.doctor_id)
         doctors_response = supabase.table("users").select(
-            "id, first_name, last_name, is_in"
+            "id, first_name, last_name, is_in, doctors(specialization)" # Request specialization
         ).eq("is_doctor", True).execute()
-        doctors = doctors_response.data or []
+        
+        # Structure the data to be easier to use in the template/logic:
+        # [{"id": 1, "first_name": "Dr", "last_name": "One", "is_in": True, "specialization": "Cardiologist"}, ...]
+        all_doctors_data = []
+        for d in doctors_response.data or []:
+            if d.get("doctors") and isinstance(d["doctors"], list) and d["doctors"]:
+                specialization = d["doctors"][0].get("specialization") # Assuming one specialization per doctor
+            elif d.get("doctors") and isinstance(d["doctors"], dict):
+                specialization = d["doctors"].get("specialization")
+            else:
+                specialization = None
+
+            # Only include doctors who have a specialization defined in the 'doctors' table
+            if specialization:
+                 all_doctors_data.append({
+                    "id": d["id"],
+                    "first_name": d["first_name"],
+                    "last_name": d["last_name"],
+                    "is_in": d.get("is_in", True),
+                    "specialization": specialization
+                })
+        
     except Exception as e:
         print(f"Error fetching doctors: {e}")
-        doctors = []
+        all_doctors_data = []
+
+    # Get the unique list of specializations for the dropdown
+    specializations = sorted(list(set(d["specialization"] for d in all_doctors_data)))
+    
+    # Pass all structured doctor data to the template
+    context = {
+        "doctors": all_doctors_data,
+        "specializations": ["All"] + specializations, # Add "All" option
+        "today": today
+    }
 
     if request.method == "POST":
         appointment_date = request.POST.get("appointment_date")
@@ -461,7 +495,7 @@ def book_appointment(request):
 
         if not all([appointment_date, appointment_time, doctor_name, reason_for_visit]):
             messages.error(request, "Please fill in all fields.")
-            return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
+            return render(request, "book_appointment.html", context)
 
         try:
             user_id = request.session.get("user_id")
@@ -472,15 +506,19 @@ def book_appointment(request):
                 messages.error(request, "User not found.")
                 return redirect("login")
 
-            active_doctors = [
+            # Update doctor availability check to use the structured data
+            active_doctors = {
                 f"{d['first_name']} {d['last_name']}"
-                for d in doctors if d.get("is_in", True)
-            ]
+                for d in all_doctors_data if d.get("is_in", True)
+            }
 
             if doctor_name not in active_doctors:
-                messages.error(request, f"'{doctor_name}' is currently not available for booking.")
-                return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
-
+                messages.error(request, f"'{doctor_name}' is currently not available for booking or does not exist.")
+                return render(request, "book_appointment.html", context)
+            
+            # ... (rest of the POST logic remains mostly the same)
+            # The rest of the logic inside the POST request should be placed here (omitted for brevity)
+            
             existing_response = supabase.table("appointment").select("*") \
                 .eq("doctor_name", doctor_name) \
                 .eq("appointment_date", appointment_date) \
@@ -489,7 +527,7 @@ def book_appointment(request):
 
             if existing_response.data:
                 messages.error(request, "This doctor is already booked for the selected date and time.")
-                return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
+                return render(request, "book_appointment.html", context)
 
             # Save appointment as Pending (no email sent yet)
             appointment_data = {
@@ -519,12 +557,13 @@ def book_appointment(request):
 
             messages.success(request, "Appointment request submitted. Awaiting approval.")
             return redirect("user_dashboard")
+            # ... (end of rest of the POST logic)
 
         except Exception as e:
             print(f"Error booking appointment: {e}")
             messages.error(request, "An unexpected error occurred. Please try again.")
 
-    return render(request, "book_appointment.html", {"doctors": doctors, "today": today})
+    return render(request, "book_appointment.html", context)
 
 def user_cancel_appointment(request, appointment_id):
     # 1. Check if user is logged in
@@ -569,20 +608,50 @@ def user_cancel_appointment(request, appointment_id):
     return redirect("user_dashboard")
 
 
-# --- APPOINTMENT REGISTRATION ---@admin_required
+
+# --- APPOINTMENT REGISTRATION --- @admin_required
 def register_appointment(request):
+    today = date.today().isoformat()
+
+    # Fetch doctors with specialization
     try:
         doctors_response = supabase.table("users").select(
-            "id, first_name, last_name, is_in"
+            "id, first_name, last_name, is_in, doctors(specialization)"
         ).eq("is_doctor", True).execute()
-        doctors = doctors_response.data or []
+
+        all_doctors_data = []
+        for d in doctors_response.data or []:
+            # Extract specialization
+            specialization = None
+            if d.get("doctors"):
+                if isinstance(d["doctors"], list) and d["doctors"]:
+                    specialization = d["doctors"][0].get("specialization")
+                elif isinstance(d["doctors"], dict):
+                    specialization = d["doctors"].get("specialization")
+
+            if specialization:
+                all_doctors_data.append({
+                    "id": d["id"],
+                    "first_name": d["first_name"],
+                    "last_name": d["last_name"],
+                    "is_in": d.get("is_in", True),
+                    "specialization": specialization
+                })
+
+        # List of unique specializations for filter dropdown
+        specializations = sorted(list({d["specialization"] for d in all_doctors_data}))
+        
     except Exception as e:
-        print("Doctor load error:", e)
-        doctors = []
+        print(f"Error fetching doctors: {e}")
+        all_doctors_data = []
+        specializations = []
         messages.error(request, "Could not load doctor list.")
 
-    today = date.today().isoformat()
-    context = {"doctors": doctors, "today": today}
+    context = {
+        "doctors": all_doctors_data,
+        "specializations": ["All"] + specializations,
+        "today": today
+    }
 
     if request.method == "POST":
         first_name = request.POST.get("first_name")
@@ -593,15 +662,13 @@ def register_appointment(request):
         appointment_time = request.POST.get("appointment_time")
         reason_for_visit = request.POST.get("reason_for_visit")
 
-        if not all([first_name, last_name, appointment_date, appointment_time,
-                    doctor_name, user_email, reason_for_visit]):
+        # Basic validation
+        if not all([first_name, last_name, doctor_name, user_email, appointment_date, appointment_time, reason_for_visit]):
             messages.error(request, "All fields are required.")
             return render(request, "appointment_form.html", context)
 
-        # Only allow active doctors
-        active_doctors = [
-            f"{d['first_name']} {d['last_name']}" for d in doctors if d.get("is_in", True)
-        ]
+        # Check doctor availability
+        active_doctors = {f"{d['first_name']} {d['last_name']}" for d in all_doctors_data if d["is_in"]}
         if doctor_name not in active_doctors:
             messages.error(request, f"{doctor_name} is not available for booking.")
             return render(request, "appointment_form.html", context)
@@ -627,26 +694,22 @@ def register_appointment(request):
             messages.error(request, "Error finding user by email.")
             return render(request, "appointment_form.html", context)
 
-        # Double booking check
+        # Check for double booking
         try:
             existing = supabase.table("appointment").select("*") \
                 .eq("doctor_name", doctor_name) \
                 .eq("appointment_date", appointment_date) \
                 .eq("appointment_time", appointment_time) \
                 .execute()
-
             if existing.data:
-                messages.error(
-                    request,
-                    f"{doctor_name} is already booked at {appointment_time} on {appointment_date}."
-                )
+                messages.error(request, f"{doctor_name} is already booked at {appointment_time} on {appointment_date}.")
                 return render(request, "appointment_form.html", context)
         except Exception as e:
             print("Error checking existing appointments:", e)
             messages.error(request, "Could not check existing appointments.")
             return render(request, "appointment_form.html", context)
 
-        # Insert appointment with Pending status
+        # Insert appointment
         try:
             appointment_data = {
                 "patient_id": patient_id,
@@ -657,9 +720,8 @@ def register_appointment(request):
                 "appointment_date": appointment_date,
                 "appointment_time": appointment_time,
                 "reason_for_visit": reason_for_visit,
-                "status": "Pending",  # <-- Pending, email not sent yet
+                "status": "Pending"
             }
-
             insert_res = supabase.table("appointment").insert(appointment_data).execute()
             new_app_id = insert_res.data[0]["id"]
 
@@ -671,16 +733,12 @@ def register_appointment(request):
                 "successful_appointment_visit": False,
                 "doctor_notes": "Appointment scheduled."
             }).execute()
-
         except Exception as e:
             print("Error saving appointment:", e)
             messages.error(request, "Could not save appointment due to server error.")
             return render(request, "appointment_form.html", context)
 
-        messages.success(
-            request,
-            f"Appointment for {first_name} {last_name} successfully registered! Awaiting approval."
-        )
+        messages.success(request, f"Appointment for {first_name} {last_name} successfully registered! Awaiting approval.")
         return redirect("appointment_list")
 
     return render(request, "appointment_form.html", context)
@@ -947,13 +1005,16 @@ def delete_appointment(request, appointment_id):
 # ============================================================
 @admin_required
 def user_management_page(request):
-    """Fetches all users, separates them into Doctors and Patients."""
+    """Fetches all users, separates them into Doctors and Patients, excluding admins."""
     try:
         response = supabase.table("users").select("*").order("last_name", desc=False).execute()
         all_users = response.data or []
 
-        doctors = [u for u in all_users if u.get('is_doctor') == True]
-        patients = [u for u in all_users if u.get('is_doctor') == False]
+        # Doctors: only users where is_doctor=True (admins are excluded)
+        doctors = [u for u in all_users if u.get('is_doctor') == True and not u.get('is_admin')]
+
+        # Patients: users who are not doctors AND not admins
+        patients = [u for u in all_users if not u.get('is_doctor') and not u.get('is_admin')]
 
         context = {
             "doctors": doctors,
@@ -961,10 +1022,12 @@ def user_management_page(request):
             "total_users": len(all_users)
         }
         return render(request, "user_management.html", context)
+
     except Exception as e:
         print(f"DEBUG: Error loading user management data: {e}")
         messages.error(request, f"Error loading user data: {e}")
         return render(request, "user_management.html", {"doctors": [], "patients": []})
+
 
 
 @admin_required
@@ -1406,3 +1469,19 @@ def all_doctors(request):
 
 def privacy_page(request):
     return render(request, "privacy.html")
+
+def delete_user(request, user_id):
+    if request.method == "POST":
+        if request.session.get("role") != "superadmin":
+            messages.error(request, "You do not have permission to delete this user.")
+            return redirect("user_management")
+
+        try:
+            # Delete user from the users table
+            supabase.table("users").delete().eq("id", user_id).execute()
+            messages.success(request, "User deleted successfully.")
+        except Exception as e:
+            print(f"Error deleting user: {e}")
+            messages.error(request, "Failed to delete the user.")
+
+    return redirect("user_management")
