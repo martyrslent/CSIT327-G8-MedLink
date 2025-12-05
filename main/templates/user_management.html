@@ -5,94 +5,193 @@
 
 {% block style %}
 <style>
+
+    /* Sidebar (cleaned & robust) */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 220px;
+    background: #ffffff;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    box-sizing: border-box;
+    border-right: 1px solid rgba(0,0,0,0.08);
+    z-index: 2;
+    overflow: hidden;
+}
+
+.sidebar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
+    background-size: cover;
+    opacity: 0.28;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.sidebar .logo img {
+    width: 150px;
+    display: block;
+    margin: 0 auto 30px auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* Nav list */
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Links */
+.sidebar nav ul li a {
+    color: #fff; /* reliable white */
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    display: block;
+    font-weight: 600;
+    transition: background 0.25s ease, transform 0.22s ease, box-shadow 0.25s ease;
+    background: #ad0505; /* base red */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    position: relative;
+    z-index: 1;
+}
+
+/* Hover / focus state: subtle slide + gradient + lift */
+.sidebar nav ul li a:hover,
+.sidebar nav ul li a:focus {
+    background: linear-gradient(to right, #ff7b00, #d10000);
+    color: #fff;
+    transform: translateX(6px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    outline: none;
+}
+
+/* Active state (optional) */
+.sidebar nav ul li a.active {
+    background: linear-gradient(to right, #d10000, #a30000);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.20);
+    transform: translateX(3px);
+}
+
+    /* Match Admin Dashboard UI: white cards, shadows, button system, table striping */
     .user-management-grid {
         display: grid;
         grid-template-columns: 1fr;
         gap: 20px;
+        align-items: start; /* ensure both cards align at the top */
     }
     @media (min-width: 768px) {
         .user-management-grid {
             grid-template-columns: 1fr 1fr;
         }
     }
-    
+
+
+    .card.full {
+        background: #ffffff;
+        border-radius: 14px;
+        padding: 18px;
+        box-shadow: 0 10px 26px rgba(0,0,0,0.18);
+        color: #222;
+    }
+
+    h1.page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin-left: 4px; /* keep alignment consistent with dashboard */
+        margin-bottom: 12px;
+    }
+
+    /* Tables: matching admin dashboard style */
     .user-table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 10px;
+        font-size: 0.95rem;
     }
-    .user-table th, 
-    .user-table td {
-        padding: 10px 12px;
+    .user-table thead th {
+        padding: 12px 10px;
         text-align: left;
-        border-bottom: 1px solid #eee;
-        font-size: 0.9em;
+        font-weight: 700;
+        border-bottom: 2px solid rgba(200,0,0,0.08);
+        background: rgba(255, 255, 255, 1);
     }
-    .user-table th {
-        background-color: #f7f7f7;
-        color: #333;
-        font-weight: bold;
+    .user-table th, .user-table td {
+        padding: 12px 10px;
+        text-align: left;
+        vertical-align: middle;
     }
-    .user-table tr:hover {
-        background-color: #f9f9f9;
-    }
-    .status-badge {
-        display: inline-block;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-weight: 600;
-        font-size: 0.8em;
-    }
-    .doctor-badge { background-color: #d4edda; color: #155724; }
-    .doctor-notin-badge { background-color: #f8d7da; color: #721c24; }
-    .patient-badge { background-color: #fff3cd; color: #856404; }
 
-    .action-btn {
-        background: #007bff; 
+    /* Row striping */
+    .user-table tbody tr:nth-child(odd) { background: rgba(245, 245, 245, 0.92); }
+    .user-table tbody tr:nth-child(even) { background: rgba(255, 250, 250, 0.96); }
+    .user-table tbody tr:hover { background: rgba(255, 238, 238, 0.96); }
+
+    /* Badges tuned to dashboard palette */
+    .status-badge { display:inline-block; padding:6px 8px; border-radius:6px; font-weight:700; font-size:0.85rem; }
+    .doctor-badge { background:#d4edda; color:#155724; }
+    .doctor-notin-badge { background:#f8d7da; color:#721c24; }
+    .patient-badge { background:#fff3cd; color:#856404; }
+
+    /* Reuse admin-dashboard button system: .btn-action and variants */
+    .action-btn, .btn-action {
+        display: inline-block;
+        padding: 8px 12px;
+        border-radius: 10px;
+        color: #fff !important;
+        text-decoration: none !important;
+        font-size: 0.9rem;
+        font-weight: 700;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        vertical-align: middle;
         border: none;
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
         cursor: pointer;
-        transition: background-color 0.2s;
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
     }
-    .action-btn:hover { background-color: #0056b3; }
+    .action-btn:hover, .btn-action:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,0.14); }
 
-    .toggle-btn {
-        background-color: #ffc107;
-        color: #212529;
-    }
-    .toggle-btn:hover {
-        background-color: #e0a800;
-    }
-    
-    /* NEW: Delete Button Style */
-    .delete-btn {
-        background: #dc3545; /* Red color for danger */
-        color: white;
-        margin-left: 5px;
-    }
-    .delete-btn:hover {
-        background-color: #c82333;
+    .btn-approve { background: linear-gradient(90deg, #ff9a3d, #ff7b00); }
+    .btn-complete { background: linear-gradient(90deg, #34c38f, #0bb07a); }
+    .btn-manage { background: linear-gradient(90deg, #6c7cff, #4a5dd6); }
+    .btn-addstaff { background: linear-gradient(90deg, #ff5100ff, #af0000ff); }
+    .delete-btn { background: linear-gradient(90deg, #dc3545, #c82333); }
+    .toggle-btn { background: linear-gradient(90deg, #fdbd5cff, #ee9b00ff); color: #ffffffff !important; }
+
+    /* Place the Add New Staff button below the doctors table to align both tables at top */
+    .add-staff-container { margin-top: 14px; margin-right: 30px;}
+    .add-staff-container .btn-action { width: 100%; display: block; text-align:center; }
+
+    /* Messages styling to match cards */
+    .messages-container p {
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        box-shadow: 0 6px 14px rgba(0,0,0,0.06);
     }
 
-    .actions { margin-bottom: 15px; }
-    .actions .btn.block {
-        display: block;
-        width: 100%;
-        text-align: center;
-        background: #28a745;
-        color: white;
-        padding: 10px 0;
-        border-radius: 5px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: background-color 0.2s;
+    @media (max-width: 767px) {
+        .add-staff-container .btn-action { width: 100%; }
+
     }
-    .actions .btn.block:hover { background-color: #218838; }
+
 </style>
 {% endblock %}
 
@@ -102,7 +201,7 @@
 {% if messages %}
     <div class="messages-container">
         {% for message in messages %}
-            <p style="padding: 10px; background: {% if 'error' in message.tags %}#f8d7da{% else %}#d4edda{% endif %}; color: {% if 'error' in message.tags %}#721c24{% else %}#155724{% endif %}; border-radius: 5px; margin-bottom: 15px;">
+            <p style="background: {% if 'error' in message.tags %}#f8d7da{% else %}#d4edda{% endif %}; color: {% if 'error' in message.tags %}#721c24{% else %}#155724{% endif %};">
                 {{ message }}
             </p>
         {% endfor %}
@@ -112,10 +211,6 @@
 <div class="user-management-grid">
     
     <div class="card full">
-        <div class="actions">
-            <a class="btn block" href="{% url 'register_admin' %}">+ Add New Staff Member</a>
-        </div>
-
         <h3>Medical Staff (Doctors: {{ doctors|length }})</h3>
         
         {% if doctors %}
@@ -142,7 +237,7 @@
                             </td>
                             <td>
                                 {% if request.session.role == "superadmin" %}
-                                    <a href="{% url 'edit_user' doctor.id %}" class="action-btn">Edit</a>
+                                    <a href="{% url 'edit_user' doctor.id %}" class="action-btn btn-action btn-manage">Edit</a>
                                     <form method="POST" action="{% url 'toggle_is_in' doctor.id %}" style="display:inline;">
                                         {% csrf_token %}
                                         {% if doctor.is_in %}
@@ -161,8 +256,18 @@
                     {% endfor %}
                 </tbody>
             </table>
+
+            <!-- moved Add New Staff button here so both columns align at top -->
+            <div class="add-staff-container">
+                <a class="btn-action btn-addstaff" href="{% url 'register_admin' %}">+ Add New Staff Member</a>
+            </div>
+
         {% else %}
             <p>No doctors currently registered.</p>
+            <!-- still show the add button when no doctors -->
+            <div class="add-staff-container">
+                <a class="btn-action btn-manage" href="{% url 'register_admin' %}">+ Add New Staff Member</a>
+            </div>
         {% endif %}
     </div>
 
@@ -187,7 +292,7 @@
                             <td><span class="status-badge patient-badge">Patient</span></td>
                             <td>
                                 {% if request.session.role == "superadmin" or request.session.role == "admin" %}
-                                    <a href="{% url 'edit_user' patient.id %}" class="action-btn">Edit</a>
+                                    <a href="{% url 'edit_user' patient.id %}" class="action-btn btn-action btn-manage">Edit</a>
                                 {% endif %}
                                 {% if request.session.role == "superadmin" %}
                                     <form method="POST" action="{% url 'delete_user' patient.id %}" style="display:inline;" onsubmit="return confirm('Are you absolutely sure you want to permanently delete {{ patient.first_name }} {{ patient.last_name }}? This action cannot be undone.');">
