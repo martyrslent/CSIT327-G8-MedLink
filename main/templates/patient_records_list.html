@@ -3,68 +3,258 @@
 
 {% block title %}Patient Visit Records{% endblock %}
 
+{% block style %}
+<style>
+/* Move content away from sidebar */
+.content-wrapper {
+    margin-left: -20px; /* same as admin dashboard sidebar width */
+    padding: 20px 30px 40px 30px;
+    min-height: 80vh;
+}
+
+/* Page title */
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+/* Search bar container */
+form input[type="text"] {
+    padding: 10px 12px;
+    width: 250px;
+    border: 3px solid #ff7b00; /* orange accent */
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+form input[type="text"]:focus {
+    outline: none;
+    border-color: #ad0505; /* primary red */
+    box-shadow: 0 0 8px rgba(173,5,5,0.4);
+}
+
+/* Search button */
+form button {
+    padding: 12px 20px;
+    margin-left: 8px;
+    background: linear-gradient(90deg, #ff7b00, #ad0505);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(173,5,5,0.3);
+}
+
+/* Table card */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff; /* white card background */
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* Table headers */
+table thead th {
+    background-color: #ffffff; /* white */
+    color: #000000d5;
+    font-weight: 700;
+    text-align: left;
+    padding: 12px 10px;
+    border-bottom: 2px solid rgba(173,5,5,0.1);
+}
+
+/* Table rows */
+table tbody tr {
+    transition: background 0.25s ease;
+}
+table tbody tr:nth-child(odd) {
+    background-color: rgba(245, 245, 245, 0.92);
+}
+table tbody tr:nth-child(even) {
+    background-color: rgba(255, 250, 250, 0.96);
+}
+table tbody tr:hover {
+    background-color: rgba(255, 238, 238, 0.95);
+}
+
+/* Table cells */
+table td {
+    padding: 12px 10px;
+    vertical-align: middle;
+    color: #222;
+    font-size: 0.95rem;
+}
+
+/* Completed status */
+.status-completed {
+    color: #155724;
+    background-color: #d4edda;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85em;
+    display: inline-block;
+}
+
+/* Sidebar (cleaned & robust) */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 220px;
+    background: #ffffff;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    box-sizing: border-box;
+    border-right: 1px solid rgba(0,0,0,0.08);
+    z-index: 2;
+    overflow: hidden;
+}
+
+.sidebar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
+    background-size: cover;
+    opacity: 0.28;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.sidebar .logo img {
+    width: 150px;
+    display: block;
+    margin: 0 auto 30px auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* Nav list */
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Links */
+.sidebar nav ul li a {
+    color: #fff; /* reliable white */
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    display: block;
+    font-weight: 600;
+    transition: background 0.25s ease, transform 0.22s ease, box-shadow 0.25s ease;
+    background: #ad0505; /* base red */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    position: relative;
+    z-index: 1;
+}
+
+/* Hover / focus state: subtle slide + gradient + lift */
+.sidebar nav ul li a:hover,
+.sidebar nav ul li a:focus {
+    background: linear-gradient(to right, #ff7b00, #d10000);
+    color: #fff;
+    transform: translateX(6px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    outline: none;
+}
+
+/* Active state (optional) */
+.sidebar nav ul li a.active {
+    background: linear-gradient(to right, #d10000, #a30000);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.20);
+    transform: translateX(3px);
+}
+.table-container {
+    background: #ffffff;
+    padding: 20px 25px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    margin-top: 20px;
+}
+
+.table-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #222;
+    margin-bottom: 15px;
+}
+
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="content-wrapper">
 
-    <h1 class="page-title">📂 Patient Visit Records (Completed)</h1>
+    <h1 class="page-title">Patient Consultation Records </h1>
 
     <!-- 🔎 SEARCH BAR -->
-    <form method="get" style="margin-bottom: 20px;">
+    <form method="get" style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
         <input 
             type="text" 
             name="search" 
             placeholder="Search patient name..." 
-            value="{{ search }}" 
-            style="padding: 10px; width: 250px; border: 1px solid #ccc; border-radius: 6px;"
+            value="{{ search }}"
         >
-        <button 
-            type="submit" 
-            style="padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;"
-        >
-            Search
-        </button>
+        <button type="submit">Search</button>
     </form>
 
     <!-- 📋 COMPLETED RECORDS TABLE -->
-    <table class="table" style="width: 100%; border-collapse: collapse;">
+<div class="table-container">
+    <h3 class="table-title">Patient Visitor Log</h3>
+
+    <table>
+
         <thead>
-            <tr style="border-bottom: 2px solid #ddd;">
-                <th style="padding: 10px; text-align: left;">Patient</th>
-                <th style="padding: 10px; text-align: left;">Doctor</th>
-                <th style="padding: 10px; text-align: left;">Date</th>
-                <th style="padding: 10px; text-align: left;">Status</th>
-                <th style="padding: 10px; text-align: left;">Notes</th>
+
+            <tr>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Notes</th>
             </tr>
         </thead>
 
         <tbody>
             {% for record in records %}
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 10px;">
-                    {{ record.user_id.first_name }} {{ record.user_id.last_name }}
-                </td>
-                <td style="padding: 10px;">
-                    {{ record.appointment_id.doctor_name|default:"N/A" }}
-                </td>
-                <td style="padding: 10px;">
-                    {{ record.appointment_id.appointment_date }}
-                </td>
-                <td style="padding: 10px;">
-                    <span style="color: green; font-weight: bold;">Completed ✅</span>
-                </td>
-                <td style="padding: 10px;">
-                    {{ record.doctor_notes|default:"—"|truncatechars:80 }}
-                </td>
+            <tr>
+                <td>{{ record.user_id.first_name }} {{ record.user_id.last_name }}</td>
+                <td>{{ record.appointment_id.doctor_name|default:"N/A" }}</td>
+                <td>{{ record.appointment_id.appointment_date }}</td>
+                <td><span class="status-completed">✔ Completed</span></td>
+                <td>{{ record.doctor_notes|default:"—"|truncatechars:80 }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="5" style="padding: 15px; text-align: center;">
-                    No completed records found.
-                </td>
+                <td colspan="5" style="text-align:center; padding:15px;">No completed records found.</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+</div>
 
 </div>
 {% endblock %}
