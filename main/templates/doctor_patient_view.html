@@ -1,0 +1,76 @@
+{% extends 'admin_base.html' %}
+
+{% block content %}
+<div class="main-content">
+    <div class="header-wrapper">    
+        <div class="header-title">
+            <h2>Patient Medical Profile</h2>
+
+    <div class="stats-container" style="display: block; margin-top: 20px;">
+        <div class="card" style="background: rgba(245, 242, 242, 0.171); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 20px;">
+                {% if patient.profile_image %}
+                    <img src="{{ patient.profile_image }}" alt="Profile" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                {% else %}
+                    <div style="width: 100px; height: 100px; background: #0e0b0b33; border-radius: 50%; display: flex; align-items: center; justify-content: center;">No Img</div>
+                {% endif %}
+                <div>
+                    <h3 style="margin: 0; color: #f0f2f5e1;">{{ patient.first_name }} {{ patient.last_name }}</h3>
+                    <p style="margin: 5px 0; color: #f0f6f7;">{{ patient.email }}</p>
+                    <p style="margin: 5px 0;"><strong>Age:</strong> {{ patient.age|default:"N/A" }} | <strong>Gender:</strong> {{ patient.gender|default:"N/A" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="background: #fffdfd49; padding: 25px; border-radius: 10px; border-left: 5px solid #e74c3c;">
+            <h3 style="color: #ee1f08; margin-top: 0;">⚠️ Medical Alert Information</h3>
+            
+            <div style="margin-top: 15px;">
+                <h4 style="margin-bottom: 5px; color: #f7f1f1ee;">Allergies</h4>
+                <div style="background: rgba(48, 39, 39, 0.349); padding: 10px; border-radius: 5px; border: 1px solid #0e0b0b;">
+                    {% if patient.allergies %}
+                        {{ patient.allergies }}
+                    {% else %}
+                        <em>No known allergies listed.</em>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <h4 style="margin-bottom: 5px; color: #fcfafadc;">Medical Conditions</h4>
+                <div style="background: rgba(48, 37, 37, 0.404); padding: 10px; border-radius: 5px; border: 1px solid #0c0909;">
+                    {% if patient.medical_conditions %}
+                        {{ patient.medical_conditions }}
+                    {% else %}
+                        <em>No medical conditions listed.</em>
+                    {% endif %}
+                </div>
+            </div>  
+        </div>
+
+        <div class="card" style="background: rgba(114, 102, 102, 0.363); padding: 20px; border-radius: 10px; margin-top: 20px;">
+            <h3>Medical History</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #eee;">
+                        <th style="text-align: left; padding: 10px;">Date</th>
+                        <th style="text-align: left; padding: 10px;">Doctor Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in medical_history %}
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="padding: 10px;">{{ record.record_date }}</td>
+                        <td style="padding: 10px;">{{ record.doctor_notes }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="2" style="padding: 20px; text-align: center; color: #7f8c8d;">No previous records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

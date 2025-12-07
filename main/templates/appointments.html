@@ -5,90 +5,89 @@
 
 {% block style %}
 <style>
+    /* ... (Your existing CSS remains exactly the same) ... */
 
     /* Sidebar (cleaned & robust) */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 220px;
-    background: #ffffff;
-    padding: 30px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    box-sizing: border-box;
-    border-right: 1px solid rgba(0,0,0,0.08);
-    z-index: 2;
-    overflow: hidden;
-}
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 220px;
+        background: #ffffff;
+        padding: 30px 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        box-sizing: border-box;
+        border-right: 1px solid rgba(0,0,0,0.08);
+        z-index: 2;
+        overflow: hidden;
+    }
 
-.sidebar::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
-    background-size: cover;
-    opacity: 0.28;
-    pointer-events: none;
-    z-index: 0;
-}
+    .sidebar::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
+        background-size: cover;
+        opacity: 0.28;
+        pointer-events: none;
+        z-index: 0;
+    }
 
-.sidebar .logo img {
-    width: 150px;
-    display: block;
-    margin: 0 auto 30px auto;
-    position: relative;
-    z-index: 1;
-}
+    .sidebar .logo img {
+        width: 150px;
+        display: block;
+        margin: 0 auto 30px auto;
+        position: relative;
+        z-index: 1;
+    }
 
-/* Nav list */
-.sidebar nav ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    position: relative;
-    z-index: 1;
-}
+    /* Nav list */
+    .sidebar nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        position: relative;
+        z-index: 1;
+    }
 
-/* Links */
-.sidebar nav ul li a {
-    color: #fff; /* reliable white */
-    text-decoration: none;
-    padding: 10px 14px;
-    border-radius: 10px;
-    display: block;
-    font-weight: 600;
-    transition: background 0.25s ease, transform 0.22s ease, box-shadow 0.25s ease;
-    background: #ad0505; /* base red */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-    position: relative;
-    z-index: 1;
-}
+    /* Links */
+    .sidebar nav ul li a {
+        color: #fff; /* reliable white */
+        text-decoration: none;
+        padding: 10px 14px;
+        border-radius: 10px;
+        display: block;
+        font-weight: 600;
+        transition: background 0.25s ease, transform 0.22s ease, box-shadow 0.25s ease;
+        background: #ad0505; /* base red */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+        position: relative;
+        z-index: 1;
+    }
 
-/* Hover / focus state: subtle slide + gradient + lift */
-.sidebar nav ul li a:hover,
-.sidebar nav ul li a:focus {
-    background: linear-gradient(to right, #ff7b00, #d10000);
-    color: #fff;
-    transform: translateX(6px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
-    outline: none;
-}
+    .sidebar nav ul li a:hover,
+    .sidebar nav ul li a:focus {
+        background: linear-gradient(to right, #ff7b00, #d10000);
+        color: #fff;
+        transform: translateX(6px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+        outline: none;
+    }
 
-/* Active state (optional) */
-.sidebar nav ul li a.active {
-    background: linear-gradient(to right, #d10000, #a30000);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.20);
-    transform: translateX(3px);
-}
+    .sidebar nav ul li a.active {
+        background: linear-gradient(to right, #d10000, #a30000);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.20);
+        transform: translateX(3px);
+    }
 
     .appointment-table-container { 
         background-color: white; 
@@ -96,7 +95,7 @@
         border-radius: 8px; 
         box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
         margin-bottom: 30px;
-        color: #222; /* uniform font color */
+        color: #222; 
     }
 
     h1.page-title {
@@ -109,7 +108,7 @@
         width: 100%; 
         border-collapse: collapse; 
         margin-top: 20px; 
-        color: #222; /* uniform table text color */
+        color: #222; 
         font-size: 0.95rem;
     }
 
@@ -120,23 +119,20 @@
     }
 
     th { 
-        background-color: #fff; /* headers white */
-        color: #222; /* header font color */
+        background-color: #fff; 
+        color: #222; 
         font-weight: bold; 
     }
 
-    /* Optional: different font color for #ID column */
     th:first-child, td:first-child { 
         color: #d10000; 
         font-weight: 600; 
     }
 
-    /* Row striping like admin dashboard tables */
     tbody tr:nth-child(odd) { background: rgba(245,245,245,0.92); }
     tbody tr:nth-child(even) { background: rgba(255,250,250,0.96); }
     tbody tr:hover { background: rgba(255,238,238,0.96); }
 
-    /* Admin dashboard style action buttons */
     .action-buttons a, .action-buttons button { 
         display: inline-block;
         padding: 6px 12px;
@@ -162,6 +158,9 @@
     .complete-btn { background: linear-gradient(90deg,#2ecc71,#27ae60); }
     .approve-btn { background: linear-gradient(90deg,#ff9a3d,#ff7b00); }
     .reinstate-btn { background: linear-gradient(90deg, #5437d6d8, #2f04a7c9);}
+    
+    /* [NEW] Style for the Doctor View Button */
+    .view-btn { background: linear-gradient(90deg, #1abc9c, #16a085); }
 
     .status-completed {
         color: #155724;
@@ -183,7 +182,6 @@
         display: inline-block;
     }
 
-    /* Book Appointment button below pending table */
     .book-appointment-btn {
         display: inline-block;
         background: linear-gradient(90deg,#ff7b00,#d10000);
@@ -205,7 +203,6 @@
 
 <h1 class="page-title">Manage Appointments</h1>
 
-<!-- Pending Appointments -->
 <div class="appointment-table-container">
     <h3>Pending Appointment Approval</h3>
     {% if appointments %}
@@ -232,6 +229,11 @@
                     <td>{{ appointment.appointment_date }}</td>
                     <td><span class="status-pending">Pending</span></td>
                     <td class="action-buttons">
+                        
+                        {% if request.session.is_doctor %}
+                            <a href="{% url 'view_patient_health' appointment.patient_id %}" class="view-btn">View Profile</a>
+                        {% endif %}
+
                         <form action="{% url 'approve_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Approve this appointment?');">
                             {% csrf_token %}
                             <button type="submit" class="approve-btn">Approve</button>
@@ -248,7 +250,6 @@
         </tbody>
     </table>
 
-    <!-- Book Appointment Button -->
     <a href="{% url 'register_appointment' %}" class="book-appointment-btn">+ Book Appointment</a>
 
     {% else %}
@@ -256,7 +257,6 @@
     {% endif %}
 </div>
 
-<!-- Approved / Cancelled Appointments -->
 <div class="appointment-table-container">
     <h3>Approved / Cancelled Appointments</h3>
     {% if appointments %}
@@ -289,6 +289,10 @@
                         {% endif %}
                     </td>
                     <td class="action-buttons">
+
+                        {% if request.session.is_doctor %}
+                            <a href="{% url 'view_patient_health' appointment.patient_id %}" class="view-btn">View Profile</a>
+                        {% endif %}
 
                         {% if appointment.status == "Cancelled" %}
                             <form action="{% url 'reinstate_appointment' appointment.id %}" method="post" style="display:inline;">

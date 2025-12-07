@@ -23,7 +23,8 @@ from django.core.paginator import Paginator
 def admin_required(view_func):
     @wraps(view_func)
     def _wrapped_view(request, *args, **kwargs):
-        if request.session.get("role") not in ["admin", "superadmin"]:
+        # [FIX] Added "doctor" to the allowed list
+        if request.session.get("role") not in ["admin", "superadmin", "doctor"]:
             messages.error(request, "Access denied. Please log in as an administrator.")
             return redirect("login")
         return view_func(request, *args, **kwargs)
@@ -37,6 +38,44 @@ def superadmin_required(view_func):
             return redirect("admin_dashboard")  # Or "login"
         return view_func(request, *args, **kwargs)
     return _wrapped_view
+
+# [NEW] DOCTOR AUTHENTICATION DECORATOR
+def doctor_required(view_func):
+    @wraps(view_func)
+    def _wrapped_view(request, *args, **kwargs):
+        # We check the session flag we set during login
+        if not request.session.get("is_doctor"):
+            messages.error(request, "Access denied. Only doctors can view this patient data.")
+            return redirect("user_dashboard") 
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+# [NEW] THE VIEW
+@doctor_required
+def view_patient_health(request, patient_id):
+    try:
+        # Fetch patient data
+        response = supabase.table("users").select("*").eq("id", patient_id).single().execute()
+        patient = response.data
+        
+        if not patient:
+            messages.error(request, "Patient not found.")
+            return redirect("appointment_list")
+
+        # Fetch their medical records (history)
+        records_response = supabase.table("patient_records").select("*").eq("user_id", patient_id).order("record_date", desc=True).execute()
+        medical_history = records_response.data or []
+
+        context = {
+            "patient": patient,
+            "medical_history": medical_history
+        }
+        return render(request, "doctor_patient_view.html", context)
+
+    except Exception as e:
+        print(f"Error fetching patient health view: {e}")
+        messages.error(request, "Could not load patient details.")
+        return redirect("appointment_list")
 
 
 # ============================================================
@@ -55,7 +94,7 @@ def forgot_password_page(request):
 # ============================================================
 # AUTHENTICATION PAGES (LOGIN / LOGOUT)
 # ============================================================
-# --- LOGIN PAGE (Now complete with check_password) ---
+# --- LOGIN PAGE ---
 def login_page(request):
     if request.method == "POST":
         email = request.POST.get("email")
@@ -82,25 +121,32 @@ def login_page(request):
             request.session["user_id"] = user["id"]
             request.session["user_email"] = user["email"]
             request.session["first_name"] = user.get("first_name", "User")
+            request.session["is_doctor"] = user.get("is_doctor", False)
 
-            # Only one role per user
+            # [FIXED] Redirect Logic - Distinguish Superadmin from Admin
             if user.get("is_superadmin", False):
-                request.session["role"] = "superadmin"
+                request.session["role"] = "superadmin"  # <--- Crucial Fix!
                 return redirect("admin_dashboard")
+            
             elif user.get("is_admin", False):
                 request.session["role"] = "admin"
                 return redirect("admin_dashboard")
+            
+            elif user.get("is_doctor", False):
+                request.session["role"] = "doctor"
+                return redirect("admin_dashboard") 
+            
             else:
                 request.session["role"] = "user"
                 return redirect("user_dashboard")
 
+        # [FIX] Added the missing except block here
         except Exception as e:
             print(f"DEBUG: Exception occurred: {str(e)}")
             messages.error(request, f"Unexpected error: {str(e)}")
             return render(request, "login-student.html")
 
     return render(request, "login-student.html")
-
 
 def logout_page(request):
     request.session.flush()
@@ -409,6 +455,10 @@ def update_personal_info(request):
         gender = request.POST.get("gender")
         bio = request.POST.get("bio")
 
+        # NEW FIELDS
+        allergies = request.POST.get("allergies")
+        medical_conditions = request.POST.get("medical_conditions")
+
         # Validate Age (Optional but good practice)
         if age and not age.isdigit():
             messages.error(request, "Age must be a valid number.")
@@ -421,12 +471,14 @@ def update_personal_info(request):
                 "last_name": last_name,
                 "age": int(age) if age else None,
                 "gender": gender,
-                "bio": bio
+                "bio": bio,
+                "allergies": allergies,                 # NEW
+                "medical_conditions": medical_conditions # NEW
             }
             
             supabase.table("users").update(update_data).eq("id", user_id).execute()
             
-            # Update Session data if name changed
+            # Update session if name changed
             request.session["first_name"] = first_name
             
             messages.success(request, "Profile updated successfully!")
@@ -438,67 +490,74 @@ def update_personal_info(request):
     return redirect("user_profile")
 
 
+# ... (imports and other views remain same)
+
 def book_appointment(request):
     if not request.session.get("user_id"):
         return redirect("login")
 
     today = date.today().isoformat()
 
+    # ======================================================
+    # FETCH DOCTORS + SPECIALIZATION
+    # ======================================================
     try:
-        # Fetching doctors and their specialization using an implicit join/reference
-        # Supabase syntax: select("*", "doctors(*)") will fetch all user fields 
-        # and all fields from the *related* doctor row (where users.id = doctors.doctor_id)
         doctors_response = supabase.table("users").select(
-            "id, first_name, last_name, is_in, doctors(specialization)" # Request specialization
+            "id, first_name, last_name, is_in, doctors(specialization)"
         ).eq("is_doctor", True).execute()
-        
-        # Structure the data to be easier to use in the template/logic:
-        # [{"id": 1, "first_name": "Dr", "last_name": "One", "is_in": True, "specialization": "Cardiologist"}, ...]
+
         all_doctors_data = []
+
         for d in doctors_response.data or []:
             if d.get("doctors") and isinstance(d["doctors"], list) and d["doctors"]:
-                specialization = d["doctors"][0].get("specialization") # Assuming one specialization per doctor
+                specialization = d["doctors"][0].get("specialization")
             elif d.get("doctors") and isinstance(d["doctors"], dict):
                 specialization = d["doctors"].get("specialization")
             else:
                 specialization = None
 
-            # Only include doctors who have a specialization defined in the 'doctors' table
             if specialization:
-                 all_doctors_data.append({
+                all_doctors_data.append({
                     "id": d["id"],
                     "first_name": d["first_name"],
                     "last_name": d["last_name"],
                     "is_in": d.get("is_in", True),
                     "specialization": specialization
                 })
-        
+
     except Exception as e:
         print(f"Error fetching doctors: {e}")
         all_doctors_data = []
 
-    # Get the unique list of specializations for the dropdown
     specializations = sorted(list(set(d["specialization"] for d in all_doctors_data)))
-    
-    # Pass all structured doctor data to the template
+
     context = {
         "doctors": all_doctors_data,
-        "specializations": ["All"] + specializations, # Add "All" option
+        "specializations": ["All"] + specializations,
         "today": today
     }
 
+    # ======================================================
+    # POST: BOOK APPOINTMENT
+    # ======================================================
     if request.method == "POST":
         appointment_date = request.POST.get("appointment_date")
         appointment_time = request.POST.get("appointment_time")
         doctor_name = request.POST.get("doctor_name")
         reason_for_visit = request.POST.get("reason_for_visit")
+        
+        # [NEW] Get health info from the form
+        form_allergies = request.POST.get("allergies")
+        form_conditions = request.POST.get("medical_conditions")
 
         if not all([appointment_date, appointment_time, doctor_name, reason_for_visit]):
-            messages.error(request, "Please fill in all fields.")
+            messages.error(request, "Please fill in all required fields.")
             return render(request, "book_appointment.html", context)
 
         try:
             user_id = request.session.get("user_id")
+
+            # Fetch user record
             user_response = supabase.table("users").select("*").eq("id", user_id).single().execute()
             user = user_response.data
 
@@ -506,19 +565,16 @@ def book_appointment(request):
                 messages.error(request, "User not found.")
                 return redirect("login")
 
-            # Update doctor availability check to use the structured data
+            # Check availability
             active_doctors = {
                 f"{d['first_name']} {d['last_name']}"
                 for d in all_doctors_data if d.get("is_in", True)
             }
 
             if doctor_name not in active_doctors:
-                messages.error(request, f"'{doctor_name}' is currently not available for booking or does not exist.")
+                messages.error(request, f"'{doctor_name}' is currently unavailable or does not exist.")
                 return render(request, "book_appointment.html", context)
-            
-            # ... (rest of the POST logic remains mostly the same)
-            # The rest of the logic inside the POST request should be placed here (omitted for brevity)
-            
+
             existing_response = supabase.table("appointment").select("*") \
                 .eq("doctor_name", doctor_name) \
                 .eq("appointment_date", appointment_date) \
@@ -526,10 +582,38 @@ def book_appointment(request):
                 .execute()
 
             if existing_response.data:
-                messages.error(request, "This doctor is already booked for the selected date and time.")
+                messages.error(request, "This timeslot is already booked for this doctor.")
                 return render(request, "book_appointment.html", context)
 
-            # Save appointment as Pending (no email sent yet)
+            # ==========================================================
+            # [UPDATED] UPDATE USER PROFILE & MERGE INTO REASON
+            # ==========================================================
+            # 1. Update the user's profile with the new/confirmed health info
+            # Only update if the user provided something in the form
+            update_data = {}
+            if form_allergies:
+                update_data["allergies"] = form_allergies
+            if form_conditions:
+                update_data["medical_conditions"] = form_conditions
+            
+            if update_data:
+                supabase.table("users").update(update_data).eq("id", user_id).execute()
+                # Update our local 'user' variable so the next step uses current data
+                if "allergies" in update_data: user["allergies"] = form_allergies
+                if "medical_conditions" in update_data: user["medical_conditions"] = form_conditions
+
+            # 2. Use the data (either new from form or existing from DB) for the appointment note
+            final_allergies = form_allergies if form_allergies else user.get("allergies", "None")
+            final_conditions = form_conditions if form_conditions else user.get("medical_conditions", "None")
+
+            full_reason = (
+                f"{reason_for_visit}\n\n"
+                f"[HEALTH INFO]\n"
+                f"Allergies: {final_allergies}\n"
+                f"Conditions: {final_conditions}"
+            )
+            # ==========================================================
+
             appointment_data = {
                 "patient_id": user_id,
                 "first_name": user.get("first_name"),
@@ -538,7 +622,7 @@ def book_appointment(request):
                 "appointment_date": appointment_date,
                 "appointment_time": appointment_time,
                 "doctor_name": doctor_name,
-                "reason_for_visit": reason_for_visit,
+                "reason_for_visit": full_reason,
                 "status": "Pending",
             }
 
@@ -557,7 +641,6 @@ def book_appointment(request):
 
             messages.success(request, "Appointment request submitted. Awaiting approval.")
             return redirect("user_dashboard")
-            # ... (end of rest of the POST logic)
 
         except Exception as e:
             print(f"Error booking appointment: {e}")
@@ -752,12 +835,33 @@ def register_appointment(request):
 # --- APPOINTMENT LIST ---
 @admin_required
 def appointment_list_page(request):
-    """Displays all appointments."""
+    """Displays appointments. If user is a doctor, shows ONLY their appointments."""
     try:
-        response = supabase.table("appointment").select("*").order("appointment_date", desc=False).execute()
+        # 1. Start the base query
+        query = supabase.table("appointment").select("*").order("appointment_date", desc=False)
+
+        # 2. Check if the user is a doctor
+        if request.session.get("is_doctor"):
+            user_id = request.session.get("user_id")
+            
+            # Fetch the doctor's name from the users table to match the appointment record
+            user_info = supabase.table("users").select("first_name, last_name").eq("id", user_id).single().execute()
+            
+            if user_info.data:
+                # Construct the name exactly as it is stored in the appointment table
+                # (Assuming you store it as "First Last" in book_appointment)
+                full_doctor_name = f"{user_info.data['first_name']} {user_info.data['last_name']}"
+                
+                # 3. Apply the filter
+                query = query.eq("doctor_name", full_doctor_name)
+
+        # 4. Execute the query (filtered or unfiltered)
+        response = query.execute()
         appointments = response.data or []
+        
         context = {"appointments": appointments}
         return render(request, "appointments.html", context)
+
     except Exception as e:
         print(f"DEBUG: Error fetching appointments: {str(e)}")
         messages.error(request, f"An error occurred: {str(e)}")
@@ -1154,37 +1258,54 @@ def patient_records_list_page(request):
 # ADMIN DASHBOARD
 # ============================================================
 @admin_required
+# main/views.py
+
+@admin_required
 def admin_dashboard(request):
     try:
-        # 1. Total Patients
+        user_id = request.session.get("user_id")
+        is_doctor = request.session.get("is_doctor", False)
+
+        # 1. Base counts (same as before)
         patient_res = supabase.table("users").select("id", count='exact').eq("is_doctor", False).eq("is_admin", False).execute()
         total_patients = patient_res.count or 0
         
-        # 2. Total Doctors
         doc_res = supabase.table("users").select("id", count='exact').eq("is_doctor", True).execute()
         total_doctors = doc_res.count or 0
 
-        # 3. Active Doctors
         active_doc_res = supabase.table("users").select("id", count='exact').eq("is_doctor", True).eq("is_in", True).execute()
         active_doctors = active_doc_res.count or 0
         
-        # 4. Total Appointments
         appt_res = supabase.table("appointment").select("id", count='exact').execute()
         total_appointments = appt_res.count or 0
 
-        # 5. Pending Appointments
-        pending_res = supabase.table("appointment").select("id", count='exact').eq("status", "Pending").execute()
+        # --- [NEW] DOCTOR FILTERING LOGIC ---
+        pending_query = supabase.table("appointment").select("id", count='exact').eq("status", "Pending")
+        recent_appt_query = supabase.table("appointment").select("*").order("appointment_date", desc=True).limit(5)
+
+        if is_doctor:
+            # Fetch doctor's full name to match the 'doctor_name' column in appointments
+            # (Ideally, we would match by ID, but your system currently uses names)
+            user_info = supabase.table("users").select("first_name, last_name").eq("id", user_id).single().execute()
+            if user_info.data:
+                full_doctor_name = f"{user_info.data['first_name']} {user_info.data['last_name']}"
+                
+                # Filter Pending Count
+                pending_query = pending_query.eq("doctor_name", full_doctor_name)
+                
+                # Filter Recent List
+                recent_appt_query = recent_appt_query.eq("doctor_name", full_doctor_name)
+
+        # Execute the (potentially filtered) queries
+        pending_res = pending_query.execute()
         pending_appointments = pending_res.count or 0
 
-        # 6. Recent Activity (New Users)
-        # FIX: Changed "created_at" to "id" because your table doesn't have a timestamp
+        appointments_res = recent_appt_query.execute()
+        appointments = appointments_res.data or []
+        # ------------------------------------
+
         recent_users_res = supabase.table("users").select("*").eq("is_admin", False).order("id", desc=True).limit(5).execute()
         recent_activity = recent_users_res.data or []
-
-        # 7. Recent Appointments
-        # FIX: Ensure we use "appointment_date" (your DB column name), not "date"
-        appointments_res = supabase.table("appointment").select("*").order("appointment_date", desc=True).limit(5).execute()
-        appointments = appointments_res.data or []
 
         context = {
             "total_patients": total_patients,
@@ -1194,6 +1315,7 @@ def admin_dashboard(request):
             "pending_appointments": pending_appointments,
             "recent_activity": recent_activity, 
             "appointments": appointments, 
+            "is_doctor": is_doctor, # Pass this so template can hide "Total Doctors" etc. if you want
         }
         return render(request, "admin_dashboard.html", context)
 
@@ -1344,50 +1466,6 @@ def appointment_history(request):
         return redirect("user_dashboard")
 
     
-@admin_required
-def patient_records_list_page(request):
-    """Displays only COMPLETED patient records."""
-    if request.session.get("role") not in ["admin", "superadmin"]:
-        return redirect("login")
-
-    try:
-        search_query = request.GET.get("search", "").strip()
-
-        # Fetch patient records. 
-        # Ideally, we join with the appointment table or check the status if it's stored here.
-        # Based on your structure, we can verify the status via the appointment link if needed, 
-        # or rely on 'successful_appointment_visit' being True.
-        
-        response = (
-            supabase.table("patient_records")
-            .select("*, user_id(first_name, last_name), appointment_id(doctor_name, appointment_date)")
-            .eq("successful_appointment_visit", True) # Fetch only successful/completed visits
-            .order("record_date", desc=True)
-            .execute()
-        )
-
-        records = response.data or []
-
-        # Local search filter
-        if search_query:
-            query = search_query.lower()
-            records = [
-                r for r in records
-                if query in r["user_id"]["first_name"].lower()
-                or query in r["user_id"]["last_name"].lower()
-            ]
-
-        context = {
-            "records": records,
-            "search": search_query,
-        }
-
-        return render(request, "patient_records_list.html", context)
-
-    except Exception as e:
-        print(f"DEBUG: Error fetching records: {e}")
-        messages.error(request, "Could not load patient records.")
-        return render(request, "patient_records_list.html", {"records": []})
 
 def appointment_history(request):
     if not request.session.get("user_id"):
