@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* --- Shared Video UI Styles --- */
+        /* ... (Your existing CSS remains exactly the same) ... */
+        /* Shared Video UI Styles */
         body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .dashboard-wrap { display: flex; min-height: 100vh; }
         .content { flex: 1; padding: 30px; }
@@ -113,40 +114,29 @@
     </style>
 
     <script>
-        // 1. Store the full list of doctors data from the Django context
         const ALL_DOCTORS = [
             {% for doctor in doctors %}
-                // Pass a JSON object for each doctor including their specialization
                 {
                     name: "Dr. {{ doctor.first_name }} {{ doctor.last_name }}",
                     value: "{{ doctor.first_name }} {{ doctor.last_name }}",
                     specialization: "{{ doctor.specialization }}",
-                    // The is_in field determines if they are currently available
                     is_in: {% if doctor.is_in %}true{% else %}false{% endif %} 
                 },
             {% endfor %}
         ];
 
-        /**
-         * Filters the doctor dropdown based on the selected specialization.
-         */
         function filterDoctors() {
             const specializationSelect = document.getElementById('specialization_filter');
             const doctorSelect = document.getElementById('doctor_name_select');
             const selectedSpecialization = specializationSelect.value;
 
-            // Clear existing doctor options and reset to default
             doctorSelect.innerHTML = '<option value="" disabled selected>-- Choose a Doctor --</option>';
 
-            // Filter doctors based on the selected specialization
             const filteredDoctors = ALL_DOCTORS.filter(doctor => {
-                // IMPORTANT: The doctor.specialization must exactly match the hardcoded option values below.
                 const matchesSpecialization = selectedSpecialization === 'All' || doctor.specialization === selectedSpecialization;
-                // Only show doctors that are 'in' and match the specialization
                 return matchesSpecialization && doctor.is_in; 
             });
 
-            // Populate the doctor dropdown with filtered doctors
             filteredDoctors.forEach(doctor => {
                 const option = document.createElement('option');
                 option.value = doctor.value;
@@ -160,15 +150,10 @@
             menu.style.display = (menu.style.display === "block") ? "none" : "block";
         }
 
-        // Date validation: Prevent selecting past dates and initialize doctor list
         window.onload = function() {
             var today = new Date().toISOString().split('T')[0];
             document.getElementsByName("appointment_date")[0].setAttribute('min', today);
-
-            // 2. Attach the filter function to the specialization dropdown
             document.getElementById('specialization_filter').addEventListener('change', filterDoctors);
-            
-            // 3. Run the filter initially to populate the doctor list with 'All' specialists
             filterDoctors();
         }
 
@@ -182,7 +167,6 @@
 <body>
 
 <div class="dashboard-wrap">
-    
     <aside class="sidebar">
       <div class="logo">MedLink</div>
       <nav class="nav">
@@ -200,13 +184,11 @@
     </aside>
 
     <main class="content">
-
         <div class="top-header">
             <div class="welcome-section">
                 <h2>New Appointment 📅</h2>
                 <p>Schedule a consultation with our specialists.</p>
             </div>
-
             <div class="header-actions">
                 <div class="notif-wrapper">
                     <button id="notifBtn" class="notif-btn" onclick="toggleNotifications()">
@@ -220,7 +202,6 @@
         </div>
 
         <div class="booking-card">
-            
             {% if messages %}
                 {% for message in messages %}
                     <div class="message-box {% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
@@ -257,7 +238,7 @@
                     <label class="form-label">Select Doctor</label>
                     <select name="doctor_name" id="doctor_name_select" class="form-input" required>
                         <option value="" disabled selected>-- Choose a Doctor --</option>
-                        </select>
+                    </select>
                 </div>
 
                 <div class="form-grid">
@@ -278,6 +259,18 @@
                             <option value="04:00 PM">04:00 PM</option>
                         </select>
                     </div>
+                </div>
+
+                <div class="form-section-title" style="margin-top: 30px;">
+                    <i class="fa fa-notes-medical"></i> Medical Information
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Allergies (if any)</label>
+                    <input type="text" name="allergies" class="form-input" placeholder="e.g. Peanuts, Penicillin, None">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Existing Medical Conditions</label>
+                    <input type="text" name="medical_conditions" class="form-input" placeholder="e.g. Asthma, Diabetes, None">
                 </div>
 
                 <div class="form-section-title" style="margin-top: 30px;">
@@ -303,9 +296,7 @@
 
             </form>
         </div>
-
     </main>
 </div>
-
 </body>
 </html>

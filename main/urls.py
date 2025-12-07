@@ -7,6 +7,7 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("hello/", views.hello_page, name="hello"),
     path('privacy/', views.privacy_page, name='privacy'),
+    
     # Authentication
     path("login/", views.login_page, name="login"),
     path("register/", views.register_page, name="register"),
@@ -15,6 +16,7 @@ urlpatterns = [
     path("admin-dashboard/", views.admin_dashboard, name="admin_dashboard"),
     path("all-doctors/", views.all_doctors, name="all_doctors"),
     path("about/", views.about, name="about"),
+    
     # --- User Side ---
     path("user-dashboard/", views.user_dashboard, name="user_dashboard"),
     path('user/cancel/<int:appointment_id>/', views.user_cancel_appointment, name='user_cancel_appointment'),
@@ -23,7 +25,6 @@ urlpatterns = [
     path('profile/', views.profile_page, name='user_profile'),
     path('profile/upload-image/', views.update_profile_picture, name='update_profile_picture'),
     path('profile/update-info/', views.update_personal_info, name='update_personal_info'),
-    
     
     # --- Admin / Staff Side ---
     path('register-appointment/', views.register_appointment, name='register_appointment'),
@@ -40,6 +41,10 @@ urlpatterns = [
     path('appointments/decline/<int:appointment_id>/', views.decline_appointment, name='decline_appointment'),
     path("appointments/reinstate/<int:appointment_id>/", views.reinstate_appointment, name="reinstate_appointment"),
     path('delete-user/<int:user_id>/', views.delete_user, name='delete_user'),
+    
+    # [FIXED] Changed int: to str: to handle UUIDs or IDs with characters
+    path('doctor/view-patient/<str:patient_id>/', views.view_patient_health, name='view_patient_health'),
+    
     # --- Settings ---
     path('settings/change-password/', views.change_password, name='change_password'),
     path('settings/delete-account/', views.delete_account, name='delete_account'),
