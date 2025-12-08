@@ -43,9 +43,8 @@ body {
     background: rgba(255,255,255,0.9);
     border-radius: 14px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.20);
-    z-index: 10;
-    transition: all 0.2s ease;
-    flex-direction: row-reverse; /* profile circle on the right */
+    z-index: 100;
+    /* flex-direction: row is the default, so we don't need to write it! */
 }
 .top-right-profile .role-text {
     font-size: 0.95rem;
@@ -231,8 +230,9 @@ table tbody tr:hover { background: rgba(255,238,238,0.96); }
     <div class="role-text">
         {{ request.session.role|default:"User"|title }}
     </div>
+
     <div class="profile-circle">
-        {{ request.user.first_name|default:"X"|slice:":1" }}{{ request.user.last_name|default:"X"|slice:":1" }}
+        {{ request.session.first_name|default:"X"|slice:":1" }}
     </div>
 </div>
 
