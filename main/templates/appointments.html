@@ -155,6 +155,14 @@
 
     .edit-btn { background: linear-gradient(90deg,#3498db,#2980b9); }
     .delete-btn { background: linear-gradient(90deg,#e74c3c,#c0392b); }
+    /* [NEW] Style for disabled delete button */
+    .delete-btn.disabled {
+        background: #7f8c8d;
+        cursor: not-allowed;
+        pointer-events: none;
+        opacity: 0.5;
+    }
+
     .complete-btn { background: linear-gradient(90deg,#2ecc71,#27ae60); }
     .approve-btn { background: linear-gradient(90deg,#ff9a3d,#ff7b00); }
     .reinstate-btn { background: linear-gradient(90deg, #5437d6d8, #2f04a7c9);}
@@ -231,15 +239,17 @@
                     <td class="action-buttons">
                         
                         {% if request.session.is_doctor %}
-                            <a href="{% url 'view_patient_health' appointment.patient_id %}" class="view-btn">View Profile</a>
+                            <a href="{% url 'view_patient_health' appointment.patient_id %}?appt_id={{ appointment.id }}" class="view-btn">View Profile</a>
                         {% endif %}
 
-                        <form action="{% url 'approve_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Approve this appointment?');">
+                        <form action="{% url 'approve_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to APPROVE this appointment?');">
                             {% csrf_token %}
                             <button type="submit" class="approve-btn">Approve</button>
                         </form>
+                        
                         <a href="{% url 'edit_appointment' appointment.id %}" class="edit-btn">Edit</a>
-                        <form action="{% url 'delete_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Delete this appointment?');">
+                        
+                        <form action="{% url 'delete_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to DELETE this appointment? This action cannot be undone.');">
                             {% csrf_token %}
                             <button type="submit" class="delete-btn">Delete</button>
                         </form>
@@ -250,7 +260,9 @@
         </tbody>
     </table>
 
-    <a href="{% url 'register_appointment' %}" class="book-appointment-btn">+ Book Appointment</a>
+    {% if not request.session.is_doctor %}
+        <a href="{% url 'register_appointment' %}" class="book-appointment-btn">+ Book Appointment</a>
+    {% endif %}
 
     {% else %}
     <p>No pending appointments.</p>
@@ -291,22 +303,22 @@
                     <td class="action-buttons">
 
                         {% if request.session.is_doctor %}
-                            <a href="{% url 'view_patient_health' appointment.patient_id %}" class="view-btn">View Profile</a>
+                            <a href="{% url 'view_patient_health' appointment.patient_id %}?appt_id={{ appointment.id }}" class="view-btn">View Profile</a>
                         {% endif %}
 
                         {% if appointment.status == "Cancelled" %}
-                            <form action="{% url 'reinstate_appointment' appointment.id %}" method="post" style="display:inline;">
+                            <form action="{% url 'reinstate_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Reinstate this appointment?');">
                                 {% csrf_token %}
-                                <button type="submit" class="reinstate-btn" style="padding: 8px 12px;" >Reinstate</button>
+                                <button type="submit" class="reinstate-btn" style="padding: 8px 12px;">Reinstate</button>
                             </form>
                         {% else %}
                             <a href="{% url 'complete_appointment' appointment.id %}" 
                                class="complete-btn"
-                               onclick="return confirm('Are you sure this appointment is finished?')">
+                               onclick="return confirm('Mark this appointment as COMPLETED? This will move it to patient history.')">
                                ✓ Complete
                             </a>
 
-                            <form action="{% url 'cancel_appointment' appointment.id %}" method="post" style="display:inline;">
+                            <form action="{% url 'cancel_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to CANCEL this appointment?');">
                                 {% csrf_token %}
                                 <button type="submit" class="delete-btn">Cancel</button>
                             </form>
@@ -314,9 +326,13 @@
 
                         <a href="{% url 'edit_appointment' appointment.id %}" class="edit-btn">Edit</a>
 
-                        <form action="{% url 'delete_appointment' appointment.id %}" method="post" style="display:inline;">
+                        <form action="{% url 'delete_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Permanently DELETE this appointment record?');">
                             {% csrf_token %}
-                            <button type="submit" class="delete-btn" style="padding: 8px 12px;">Delete</button>
+                            {% if appointment.status == "Cancelled" %}
+                                <button type="submit" class="delete-btn" style="padding: 8px 12px;">Delete</button>
+                            {% else %}
+                                <button type="button" class="delete-btn disabled" style="padding: 8px 12px;" title="Cancel appointment first to delete" disabled>Delete</button>
+                            {% endif %}
                         </form>
 
                     </td>
