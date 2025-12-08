@@ -25,6 +25,13 @@
         .welcome-section h2 { margin: 0; font-size: 1.6rem; color: #2c3e50; }
         .welcome-section p { margin: 5px 0 0; color: #7f8c8d; font-size: 0.95rem; }
 
+        /* MODIFIED: Added display: flex and gap to align actions horizontally */
+        .header-actions {
+            display: flex; 
+            align-items: center;
+            gap: 15px; 
+        }
+
         .notif-wrapper { position: relative; }
         .notif-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #555; }
         .notif-btn:hover { color: #007bff; }
@@ -34,6 +41,7 @@
             width: 300px; background: white; border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #eee;
             overflow: hidden;
+            z-index: 100; /* Added z-index to prevent being obscured */
         }
 
         .profile-card {
@@ -83,12 +91,19 @@
             width: 90%;
             max-width: 500px;
             max-height: 80vh;   /* limit height */
-            overflow-y: auto;    /* vertical scroll */
+            overflow-y: auto;   /* vertical scroll */
             box-sizing: border-box;
         }
 
         .form-label { font-weight: 600; margin-bottom: 5px; display: block; }
         .form-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; }
+
+        .btn-book-new {
+            background-color: #007bff; color: white; padding: 12px 24px;
+            border-radius: 8px; text-decoration: none; font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); transition: transform 0.2s;
+        }
+        .btn-book-new:hover { transform: translateY(-2px); background-color: #0069d9; }
 
         /* sticky submit button */
         .modal-content form button[type="submit"] {
@@ -165,6 +180,7 @@
                         <div class="notif-empty">Check Dashboard for details</div>
                     </div>
                 </div>
+
                 <a href="{% url 'book_appointment' %}" class="btn-book-new">+ Book Appointment</a>
             </div>
         </div>
@@ -232,7 +248,6 @@
     </main>
 </div>
 
-<!-- EDIT MODAL -->
 <div id="editModal" class="modal">
     <div class="modal-content">
 

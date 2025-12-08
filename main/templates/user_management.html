@@ -23,6 +23,17 @@
     z-index: 2;
     overflow: hidden;
 }
+.user-table-wrapper {
+    max-height: 350px; /* adjust height as needed */
+    overflow-y: auto;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 12px;
+}
+
+.user-table-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
 .sidebar::before {
     content: "";
@@ -214,6 +225,7 @@
         <h3>Medical Staff (Doctors: {{ doctors|length }})</h3>
         
         {% if doctors %}
+        
             <table class="user-table">
                 <thead>
                     <tr>

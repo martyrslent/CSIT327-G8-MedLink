@@ -5,74 +5,98 @@
 
 {% block style %}
 <style>
-    /* Page background & overlay */
-    body {
-        margin: 0;
-        font-family: "Segoe UI", sans-serif;
-        background: linear-gradient(-45deg, #ff5e00, #970000ff, #ad0505, #420b01);
-        background-size: 400% 400%;
-        animation: moveBg 12s ease infinite;
-        color: #1b1b1b;
-        min-height: 100vh;
-        position: relative;
-    }
-    @keyframes moveBg {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    .bg-overlay {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: url("{% static 'main/img/room2.png' %}") no-repeat center center;
-        background-size: cover;
-        opacity: 0.12;
-        pointer-events: none;
-        z-index: 0;
-    }
+/* Background & overlay */
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: linear-gradient(-45deg, #ff5e00, #970000ff, #ad0505, #420b01);
+    background-size: 400% 400%;
+    animation: moveBg 12s ease infinite;
+    color: #1b1b1b;
+    min-height: 100vh;
+}
+@keyframes moveBg {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.bg-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: url("{% static 'main/img/room2.png' %}") no-repeat center center;
+    background-size: cover;
+    opacity: 0.12;
+    pointer-events: none;
+    z-index: 0;
+}
 
-    /* Sidebar (cleaned & robust) */
+/* Top-right profile */
+.top-right-profile {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.20);
+    z-index: 10;
+    transition: all 0.2s ease;
+    flex-direction: row-reverse; /* profile circle on the right */
+}
+.top-right-profile .role-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #444;
+    text-transform: capitalize;
+}
+.top-right-profile .profile-circle {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: #ad0505;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+}
+/* Sidebar */
 .sidebar {
     position: fixed;
-    top: 0;
-    left: 0;
+    top: 0; left: 0;
     height: 100%;
     width: 220px;
-    background: #ffffff;
+    background: #fff;
     padding: 30px 20px;
     display: flex;
     flex-direction: column;
     gap: 25px;
-    box-sizing: border-box;
     border-right: 1px solid rgba(0,0,0,0.08);
     z-index: 2;
-    overflow: hidden;
 }
-
 .sidebar::before {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
     background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
     background-size: cover;
     opacity: 0.28;
     pointer-events: none;
     z-index: 0;
 }
-
 .sidebar .logo img {
     width: 150px;
     display: block;
-    margin: 0 auto 30px auto;
+    margin: 0 auto 20px auto;
     position: relative;
     z-index: 1;
 }
-
-/* Nav list */
 .sidebar nav ul {
     list-style: none;
     padding: 0;
@@ -80,202 +104,141 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    position: relative;
-    z-index: 1;
 }
-
-/* Links */
 .sidebar nav ul li a {
-    color: #fff; /* reliable white */
-    text-decoration: none;
+    display: block;
     padding: 10px 14px;
     border-radius: 10px;
-    display: block;
     font-weight: 600;
-    transition: background 0.25s ease, transform 0.22s ease, box-shadow 0.25s ease;
-    background: #ad0505; /* base red */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-    position: relative;
-    z-index: 1;
+    color: #fff;
+    text-decoration: none;
+    background: #ad0505;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+    transition: background 0.25s, transform 0.22s, box-shadow 0.25s;
 }
-
-/* Hover / focus state: subtle slide + gradient + lift */
 .sidebar nav ul li a:hover,
 .sidebar nav ul li a:focus {
     background: linear-gradient(to right, #ff7b00, #d10000);
-    color: #fff;
     transform: translateX(6px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
-    outline: none;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
 }
-
-/* Active state (optional) */
 .sidebar nav ul li a.active {
     background: linear-gradient(to right, #d10000, #a30000);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.20);
     transform: translateX(3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
+/* Main content */
+.content {
+    margin-left: 115px;
+    padding: 20px 20px 36px 20px;
+    position: relative;
+    z-index: 2;
+}
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #fff;
+}
 
-    /* Main content container - scooched left a bit */
-    .content {
-        margin-left: 115px;
-        padding: 20px 20px 36px 20px;
-        position: relative;
-        z-index: 2;
-    }
-    .page-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        margin-bottom: 12px;
-        color: #ffffff;
-        
-    }
+/* Stat cards */
+.top-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 24px;
+    margin-left: 4px;
+}
+.stat-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    text-align: center;
+    color: #b10000;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+    transition: transform 0.22s, box-shadow 0.22s;
+}
+.stat-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+}
+.stat-card img.icon {
+    width: 60px; height: 60px;
+    margin: 0 auto 10px auto;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+.stat-number { font-size: 28px; font-weight: 700; margin-top: 6px; }
+.stat-desc { font-size: 0.9rem; color: #6b6b6b; }
 
-    /* Top row + stat cards */
-    .top-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 18px;
-        margin-bottom: 24px;
-        margin-left: 4px; /* alignment nudge */
-    }
+/* Tables */
+.wide-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 26px;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.18);
+    margin-left: 4px;
+}
+.wide-card .header-row { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+.wide-card h3 { margin:0; font-size:1.05rem; }
 
-    .stat-card {
-        background: #ffffff;         /* solid white */
-        border-radius: 14px;
-        padding: 18px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-        text-align: center;
-        color: #b10000;              /* primary accent for numbers/text */
-        transition: transform 0.22s ease, box-shadow 0.22s ease;
-    }
-    .stat-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 30px rgba(0,0,0,0.22);
-    }
-    .stat-card img.icon {
-        width: 60px;
-        height: 60px;
-        margin-bottom: 10px;
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-        border-radius: 12px;
-        background: #fff;
-    }
-    .stat-number {
-        font-size: 28px;
-        font-weight: 700;
-        margin-top: 6px;
-    }
-    .stat-desc {
-        font-size: 0.9rem;
-        color: #6b6b6b;
-    }
+table {
+    width: calc(100% - 4px);
+    border-collapse: collapse;
+    color: #222;
+    font-size: 0.95rem;
+}
+table th, table td { padding: 12px 10px; text-align:left; vertical-align: middle; }
+table thead th { border-bottom: 2px solid rgba(200,0,0,0.08); }
+table tbody tr { transition: background 0.18s; }
+table tbody tr:nth-child(odd) { background: rgba(245,245,245,0.92); }
+table tbody tr:nth-child(even) { background: rgba(255,250,250,0.96); }
+table tbody tr:hover { background: rgba(255,238,238,0.96); }
 
-    /* Cards that hold tables */
-    .wide-card {
-        background: #ffffff;
-        border-radius: 16px;
-        padding: 20px;
-        margin-bottom: 26px;
-        box-shadow: 0 10px 26px rgba(0,0,0,0.18);
-        color: #222;
-        margin-left: 4px; /* nudge left */
-    }
-    .wide-card > div.header-row {
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        gap: 12px;
-        margin-bottom: 12px;
-    }
-    .wide-card h3 {
-        margin: 0;
-        font-size: 1.05rem;
-    }
+/* Buttons */
+.btn-action {
+    display:inline-block;
+    padding:8px 12px;
+    border-radius:10px;
+    color:#fff !important;
+    text-decoration:none !important;
+    font-size:0.9rem;
+    font-weight:700;
+    box-shadow:0 6px 14px rgba(0,0,0,0.12);
+    transition: transform 0.18s, box-shadow 0.18s;
+}
+.btn-action:hover { transform: translateY(-3px); box-shadow:0 10px 22px rgba(0,0,0,0.14); }
+.btn-approve { background: linear-gradient(90deg, #ff9a3d, #ff7b00); }
+.btn-complete { background: linear-gradient(90deg, #34c38f, #0bb07a); }
+.btn-manage { background: linear-gradient(90deg, #d83d00ff, #a30101ff); }
 
-    /* Table baseline + alignment polish */
-    table {
-        width: calc(100% - 4px); /* account for left nudge */
-        border-collapse: collapse;
-        color: #222;
-        font-size: 0.95rem;
-    }
-    table thead th {
-        padding: 12px 10px;
-        text-align: left;
-        font-weight: 700;
-        border-bottom: 2px solid rgba(200,0,0,0.08);
-    }
-    table th, table td {
-        padding: 12px 10px;
-        text-align: left;
-        vertical-align: middle;
-    }
-    table tbody tr {
-        transition: background 0.18s ease;
-    }
-
-    /* Light interval coloring (row striping) - subtle, easy to track */
-    table tbody tr:nth-child(odd) {
-        background: rgba(245, 245, 245, 0.92); /* light neutral */
-    }
-    table tbody tr:nth-child(even) {
-        background: rgba(255, 250, 250, 0.96);
-    }
-    /* Hover */
-    table tbody tr:hover {
-        background: rgba(255, 238, 238, 0.96);
-    }
-
-    /* Uniform action buttons (A: full buttons for all actions) */
-    .btn-action {
-        display: inline-block;
-        padding: 8px 12px;
-        border-radius: 10px;
-        color: #fff !important;
-        text-decoration: none !important;
-        font-size: 0.9rem;
-        font-weight: 700;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
-        vertical-align: middle;
-    }
-    .btn-action:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 22px rgba(0,0,0,0.14);
-    }
-
-    /* Specific color variants (same shape) - you may tweak colors later */
-    .btn-approve {
-        background: linear-gradient(90deg, #ff9a3d, #ff7b00); /* orange */
-    }
-    .btn-complete {
-        background: linear-gradient(90deg, #34c38f, #0bb07a); /* green */
-    }
-    .btn-manage {
-        background: linear-gradient(90deg, #d83d00ff, #a30101ff); /* blue */
-    }
-
-    /* small responsive tweaks */
-    @media (max-width: 900px) {
-        .content { margin-left: 0; padding: 20px; }
-        .top-row { grid-template-columns: 1fr; }
-        table { width: 100%; }
-    }
+/* Responsive */
+@media (max-width:900px) {
+    .content { margin-left:0; padding:20px; }
+    .top-row { grid-template-columns:1fr; }
+    table { width:100%; }
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="bg-overlay"></div>
 
+<div class="top-right-profile">
+    <div class="role-text">
+        {{ request.session.role|default:"User"|title }}
+    </div>
+    <div class="profile-circle">
+        {{ request.user.first_name|default:"X"|slice:":1" }}{{ request.user.last_name|default:"X"|slice:":1" }}
+    </div>
+</div>
+
 <aside class="sidebar">
     <div class="logo">
         <img src="{% static 'main/img/medlink.png' %}" alt="MedLink Logo">
-
     </div>
     <nav>
         <ul>
@@ -292,29 +255,26 @@
     <h1 class="page-title">Dashboard Overview ({{ request.session.role|title }})</h1>
 
     <section class="top-row">
-        <div class="stat-card card-red">
-            <img class="icon" src="{% static 'main/img/stet.png' %}" alt="Icon">
+        <div class="stat-card">
+            <img class="icon" src="{% static 'main/img/stet.png' %}" alt="Doctors">
             <h3>Doctors Online</h3>
             <div class="stat-number">{{ active_doctors }} / {{ total_doctors }}</div>
             <p class="stat-desc">Currently marked "Is In"</p>
         </div>
-
-        <div class="stat-card card-orange">
-            <img class="icon" src="{% static 'main/img/request.png' %}" alt="Icon">
+        <div class="stat-card">
+            <img class="icon" src="{% static 'main/img/request.png' %}" alt="Requests">
             <h3>Pending Requests</h3>
             <div class="stat-number">{{ pending_appointments }}</div>
             <p class="stat-desc">Awaiting your approval</p>
         </div>
-
-        <div class="stat-card card-white">
-            <img class="icon" src="{% static 'main/img/patient.png' %}" alt="Icon">
+        <div class="stat-card">
+            <img class="icon" src="{% static 'main/img/patient.png' %}" alt="Patients">
             <h3>Total Patients</h3>
             <div class="stat-number">{{ total_patients }}</div>
             <p class="stat-desc">Registered users</p>
         </div>
-
-        <div class="stat-card card-red2">
-            <img class="icon" src="{% static 'main/img/appointment.png' %}" alt="Icon">
+        <div class="stat-card">
+            <img class="icon" src="{% static 'main/img/appointment.png' %}" alt="Appointments">
             <h3>Total Appointments</h3>
             <div class="stat-number">{{ total_appointments }}</div>
             <p class="stat-desc">All time history</p>
@@ -326,14 +286,9 @@
             <h3>Newest Registrations</h3>
             <a href="{% url 'user_management' %}" class="btn-action btn-manage">Manage Users</a>
         </div>
-
         <table>
             <thead>
-                <tr>
-                    <th style="width:40%;">Name</th>
-                    <th style="width:40%;">Email</th>
-                    <th style="width:20%;">Role</th>
-                </tr>
+                <tr><th>Name</th><th>Email</th><th>Role</th></tr>
             </thead>
             <tbody>
                 {% for user in recent_activity %}
@@ -354,15 +309,10 @@
             <h3>Recent Appointments</h3>
             <a href="{% url 'appointment_list' %}" class="btn-action btn-manage">View All</a>
         </div>
-
         <table>
             <thead>
                 <tr>
-                    <th style="width:25%;">Patient</th>
-                    <th style="width:25%;">Doctor</th>
-                    <th style="width:20%;">Date</th>
-                    <th style="width:15%;">Status</th>
-                    <th style="width:15%;">Action</th>
+                    <th>Patient</th><th>Doctor</th><th>Date</th><th>Status</th><th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -373,9 +323,9 @@
                     <td>{{ appt.appointment_date }}</td>
                     <td>
                         {% if appt.status == 'Pending' %}
-                            <span style="background:#fff3cd; color:#856404; padding:4px 8px; border-radius:6px; font-size:0.9em;">Pending</span>
+                            <span style="background:#fff3cd;color:#856404;padding:4px 8px;border-radius:6px;font-size:0.9em;">Pending</span>
                         {% elif appt.status == 'Approved' %}
-                            <span style="background:#d4edda; color:#155724; padding:4px 8px; border-radius:6px; font-size:0.9em;">Approved</span>
+                            <span style="background:#d4edda;color:#155724;padding:4px 8px;border-radius:6px;font-size:0.9em;">Approved</span>
                         {% else %}
                             {{ appt.status }}
                         {% endif %}
@@ -394,6 +344,5 @@
             </tbody>
         </table>
     </section>
-
 </main>
 {% endblock %}
