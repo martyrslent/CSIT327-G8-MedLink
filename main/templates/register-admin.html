@@ -14,7 +14,8 @@
         .form-group input[type="text"], 
         .form-group input[type="email"],
         .form-group input[type="password"],
-        .form-group select { 
+        .form-group select,
+        .form-group input[type="file"] { 
             width: 100%; 
             padding: 10px; 
             border: 1px solid #ccc; 
@@ -41,7 +42,7 @@
             {% endfor %}
         {% endif %}
 
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             
             <div class="form-group">
@@ -59,7 +60,6 @@
                 <input type="email" id="email" name="email" required>
             </div>
 
-            <!-- ROLE DROPDOWN -->
             <div class="form-group">
                 <label for="role">Staff Role</label>
                 <select id="role" name="role" required>
@@ -69,7 +69,6 @@
                 </select>
             </div>
 
-            <!-- SPECIALIZATION DROPDOWN -->
             <div class="form-group" id="specialization-group" style="display:none;">
                 <label for="specialization">Doctor Specialization</label>
                 <select id="specialization" name="specialization">
@@ -84,6 +83,11 @@
                     <option value="ENT Specialist">ENT Specialist</option>
                     <option value="Psychiatrist">Psychiatrist</option>
                 </select>
+            </div>
+
+            <div class="form-group" id="profile-picture-group" style="display:none;">
+                <label for="profile_picture">Profile Picture</label>
+                <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
             </div>
 
             <div class="form-group">
@@ -105,14 +109,26 @@
     <script>
         document.getElementById("role").addEventListener("change", function () {
             const specializationGroup = document.getElementById("specialization-group");
+            const profilePicGroup = document.getElementById("profile-picture-group");
+            const specializationInput = document.getElementById("specialization");
+            const profilePicInput = document.getElementById("profile_picture");
 
             if (this.value === "doctor") {
+                // Show both fields for doctors
                 specializationGroup.style.display = "block";
-                document.getElementById("specialization").setAttribute("required", "required");
+                profilePicGroup.style.display = "block";
+                
+                // Make specialization required
+                specializationInput.setAttribute("required", "required");
             } else {
+                // Hide both fields for other staff
                 specializationGroup.style.display = "none";
-                document.getElementById("specialization").removeAttribute("required");
-                document.getElementById("specialization").value = "";
+                profilePicGroup.style.display = "none";
+                
+                // Remove requirement and clear values
+                specializationInput.removeAttribute("required");
+                specializationInput.value = "";
+                profilePicInput.value = ""; 
             }
         });
     </script>
