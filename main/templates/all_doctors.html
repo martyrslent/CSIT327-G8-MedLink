@@ -3,30 +3,55 @@
 
 {% block title %}All Doctors{% endblock %}
 
+
 {% block content %}
 
 <style>
+.wrapper, body, html {
+    background-image: url('{% static "main/img/wavybg2.png" %}') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+}
+
+
 /* Page Layout */
 .doctor-page {
     display: flex;
     gap: 20px;
-    padding: 40px 0;
+    padding: 80px 0 40px; /* Added top padding to avoid navbar overlap */
 }
+
+
 
 /* Sidebar styling */
 .filter-sidebar {
-    width: 220px;
+    width: 280px; /* Increased width */
+    min-height: 100%; /* Makes sidebar stretch to match the height of the doctor cards */
     padding: 20px;
+<<<<<<< Updated upstream
+    border-radius: 20px;
+=======
     border-radius: 12px;
-    background-color: #fff;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-    height: fit-content;
+>>>>>>> Stashed changes
+    background: linear-gradient(135deg, #fff 0%, #f8f0e5 50%, #af00006e 100%);
+    box-shadow: 0 6px 20px rgba(75, 0, 0, 0.6);
+    animation: slideInLeft 0.5s ease-out;
+}
+
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
 }
 
 .filter-sidebar h3 {
     margin-bottom: 15px;
-    font-size: 1.2rem;
+    font-size: 2rem;
     color: #d10000;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(255, 107, 0, 0.3); /* subtle orange-red shadow */
 }
 
 .filter-sidebar ul {
@@ -36,18 +61,41 @@
 
 .filter-sidebar li {
     margin-bottom: 10px;
+    font-size: 1.3rem;
+    animation: fadeIn 0.4s ease-out; /* fade-in for each item */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .filter-sidebar a {
     text-decoration: none;
-    color: #007bff;
+    color: #d10000;
     font-weight: 500;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: block;
+    padding: 4px 0;
 }
 
 .filter-sidebar a:hover {
     color: #ff5500;
+    transform: translateX(3px); /* subtle hover shift */
 }
+
+.filter-sidebar h3 {
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    color: #d10000;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(255, 107, 0, 0.3);
+    background-color: #f8e5d8; /* Light orange-red background */
+    padding: 10px;
+    border-radius: 8px;
+    display: block;
+}
+
 
 /* Doctor list styling */
 .doctor-list {
@@ -55,27 +103,40 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
+    margin-left: 20px; /* Adds space from sidebar */
 }
 
 .doctor-list h1 {
     grid-column: 1 / -1;
     margin-bottom: 20px;
-    font-size: 2rem;
+    font-size: 3rem;
     color: #d10000;
 }
 
+/* Doctor card styling */
 .doctor-card {
     padding: 20px;
     border-radius: 12px;
     background-color: #fff;
     box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+<<<<<<< Updated upstream
     text-align: center; /* Centers the text */
+    min-height: 150px; /* Fixed minimum height */
+    height: 300px; /* Fixed height */
+=======
+    min-height: 150px; /* Fixed minimum height */
+    height: 180px; /* Fixed height */
+>>>>>>> Stashed changes
+    overflow: hidden; /* Prevents stretching */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 }
 
 .doctor-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 25px rgba(88, 0, 0, 0.53);
 }
 
 .doctor-card h2 {
@@ -90,8 +151,20 @@
     color: #555;
 }
 
+.nodoctor {
+    grid-column: 1 / -1;
+    text-align: center;
+    margin-top: 20px;
+    margin-left: 20px;
+    font-size: 1rem;
+    color: #555;
+}
+
+
+
 .status-available { color: #155724; font-weight: 600; }
 .status-unavailable { color: #856404; font-weight: 600; }
+
 
 /* --- DOCTOR IMAGE STYLING (Rectangular Update) --- */
 .doc-avatar {
@@ -110,12 +183,34 @@
     display: block;
 }
 
+.status-available {
+    color: #155724;
+    font-weight: 600;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 6px;
+    padding: 4px 8px;
+    display: inline-block;
+}
+
+.status-unavailable {
+    color: #856404;
+    font-weight: 600;
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+    padding: 4px 8px;
+    display: inline-block;
+
+}
+
 /* Responsive */
 @media (max-width: 900px) {
-    .doctor-page { flex-direction: column; padding: 20px 0; }
+    .doctor-page { flex-direction: column; padding: 60px 0 20px; }
     .filter-sidebar { width: 100%; margin-bottom: 20px; }
     .doctor-list { grid-template-columns: 1fr; }
 }
+
 </style>
 
 <div class="doctor-page">
@@ -164,7 +259,9 @@
                 </div>
             {% endfor %}
         {% else %}
+        <div class="nodoctor">
             <p>No doctors found.</p>
+        </div>
         {% endif %}
 
     </div>
