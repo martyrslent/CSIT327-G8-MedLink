@@ -70,6 +70,7 @@
     background-color: #fff;
     box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center; /* Centers the text */
 }
 
 .doctor-card:hover {
@@ -92,6 +93,23 @@
 .status-available { color: #155724; font-weight: 600; }
 .status-unavailable { color: #856404; font-weight: 600; }
 
+/* --- DOCTOR IMAGE STYLING (Rectangular Update) --- */
+.doc-avatar {
+    width: 100%;       /* Spans the full width of the card padding */
+    height: 250px;     /* Fixed height for consistency */
+    margin-bottom: 15px;
+    border-radius: 8px; /* Subtle rounded corners */
+    overflow: hidden;
+    background-color: #f9f9f9;
+}
+
+.doc-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image fills the rectangle perfectly */
+    display: block;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .doctor-page { flex-direction: column; padding: 20px 0; }
@@ -102,7 +120,6 @@
 
 <div class="doctor-page">
 
-    <!-- SIDEBAR FILTER -->
     <aside class="filter-sidebar">
         <h3>Specialties</h3>
         <ul>
@@ -121,13 +138,20 @@
         </ul>
     </aside>
 
-    <!-- DOCTOR LIST -->
     <div class="doctor-list">
         <h1>All Doctors</h1>
 
         {% if doctors %}
             {% for doc in doctors %}
                 <div class="doctor-card">
+                    <div class="doc-avatar">
+                        {% if doc.profile_image %}
+                            <img src="{{ doc.profile_image }}" alt="{{ doc.first_name }}">
+                        {% else %}
+                            <img src="{% static 'main/img/doctor.png' %}" alt="Default Doctor">
+                        {% endif %}
+                    </div>
+
                     <h2>{{ doc.first_name }} {{ doc.last_name }}</h2>
                     <p><strong>Specialty:</strong> {{ doc.specialization }}</p>
                     <p><strong>Status:</strong>

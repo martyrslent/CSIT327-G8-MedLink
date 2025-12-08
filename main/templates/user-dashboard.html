@@ -70,7 +70,7 @@
     
     .notif-status { font-weight: bold; font-size: 0.85rem; text-transform: uppercase; }
     .status-approved-text { color: #28a745; }
-    .status-cancelled-text { color: #dc3545; }
+    .status-cancelled-text { color: #dc3545; } /* Used for Cancelled AND Declined */
     .status-pending-text { color: #ffc107; }
 
     .notif-empty { padding: 20px; text-align: center; color: #999; font-style: italic; }
@@ -216,6 +216,7 @@
                                     <span class="notif-status 
                                         {% if note.status == 'Approved' %}status-approved-text{% endif %}
                                         {% if note.status == 'Cancelled' %}status-cancelled-text{% endif %}
+                                        {% if note.status == 'Declined' %}status-cancelled-text{% endif %} 
                                         {% if note.status == 'Pending' %}status-pending-text{% endif %}">
                                         {{ note.status }}
                                     </span>

@@ -208,6 +208,7 @@ def register_page(request):
 
 
 # --- ADMIN REGISTRATION PAGE (Includes staff roles) ---
+# --- ADMIN REGISTRATION PAGE (Includes staff roles) ---
 @superadmin_required
 def register_admin_page(request):
     if request.method == "POST":
@@ -217,7 +218,7 @@ def register_admin_page(request):
         password = request.POST.get("password")
         confirm_password = request.POST.get("confirm_password")
         role = request.POST.get("role")
-        specialization = request.POST.get("specialization")  # NEW FIELD
+        specialization = request.POST.get("specialization")
 
         # Basic validation
         if password != confirm_password:
@@ -243,9 +244,33 @@ def register_admin_page(request):
                 messages.error(request, "Email already registered!")
                 return render(request, "register-admin.html")
 
+            # --- NEW: HANDLE IMAGE UPLOAD ---
+            profile_image_url = None
+            if is_doctor_flag and request.FILES.get("profile_picture"):
+                image_file = request.FILES["profile_picture"]
+                try:
+                    # 1. Unique filename
+                    file_ext = image_file.name.split('.')[-1]
+                    # We don't have user_id yet, so we use email hash or timestamp
+                    filename = f"doc_{int(time.time())}.{file_ext}"
+                    
+                    # 2. Upload to 'avatars' bucket
+                    supabase.storage.from_("avatars").upload(
+                        file=image_file.read(),
+                        path=filename,
+                        file_options={"content-type": image_file.content_type}
+                    )
+                    
+                    # 3. Get Public URL
+                    profile_image_url = supabase.storage.from_("avatars").get_public_url(filename)
+                except Exception as e:
+                    print(f"Image upload failed: {e}")
+                    # Decide: Fail completely, or continue without image?
+                    # Let's log it but continue (optional)
+            
             hashed_password = make_password(password)
 
-            # Insert into users table
+            # Insert into users table (Included profile_image)
             user_insert = supabase.table("users").insert({
                 "first_name": first_name,
                 "last_name": last_name,
@@ -253,7 +278,8 @@ def register_admin_page(request):
                 "password": hashed_password,
                 "is_admin": is_admin_flag,
                 "is_doctor": is_doctor_flag,
-                "is_superadmin": False
+                "is_superadmin": False,
+                "profile_image": profile_image_url  # <--- Added this
             }).execute()
 
             # Get newly inserted user ID
@@ -1411,8 +1437,8 @@ def user_dashboard(request):
                 appt_date = datetime.strptime(appt['appointment_date'], '%Y-%m-%d').date()
                 
                 # --- UPDATED DASHBOARD LOGIC ---
-                # Show Future or Today, BUT EXCLUDE Completed AND Cancelled
-                if appt_date >= today and appt.get('status') not in ['Completed', 'Cancelled']:
+                # Show Future or Today, BUT EXCLUDE Completed, Cancelled, AND Declined
+                if appt_date >= today and appt.get('status') not in ['Completed', 'Cancelled', 'Declined']:
                     upcoming_appointments.append(appt)
                     
                     # Create Reminder if Approved AND within 3 days
@@ -1478,9 +1504,8 @@ def appointment_history(request):
                 # --- UPDATED LOGIC HERE ---
                 # Show in history if:
                 # 1. Date is in the past
-                # 2. Status is 'Completed'
-                # 3. Status is 'Cancelled' (This was missing!)
-                if appt_date < today or appt.get('status') in ['Completed', 'Cancelled']:
+                # 2. Status is 'Completed', 'Cancelled', OR 'Declined'
+                if appt_date < today or appt.get('status') in ['Completed', 'Cancelled', 'Declined']:
                     past_appointments.append(appt)
             except ValueError:
                 continue
@@ -1502,10 +1527,10 @@ def all_doctors(request):
     specialty = request.GET.get("specialty")
 
     try:
-        # Fetch from doctors table AND join user info including is_in
+        # Fetch from doctors table AND join user info including profile_image
         query = (
             supabase.table("doctors")
-            .select("doctor_id, specialization, users!inner(first_name, last_name, email, is_in)")
+            .select("doctor_id, specialization, users!inner(first_name, last_name, email, is_in, profile_image)")
         )
 
         if specialty and specialty.lower() != "all":
@@ -1524,7 +1549,8 @@ def all_doctors(request):
                 "last_name": user.get("last_name"),
                 "email": user.get("email"),
                 "specialization": d.get("specialization"),
-                "is_in": user.get("is_in", False),  # status from users table
+                "is_in": user.get("is_in", False),
+                "profile_image": user.get("profile_image"),  # <--- The new image field
             })
 
     except Exception as e:
@@ -1535,10 +1561,13 @@ def all_doctors(request):
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
+    # This return statement is crucial!
     return render(request, "all_doctors.html", {
         "doctors": page_obj,
         "selected_specialty": specialty,
     })
+
+    
 
 def privacy_page(request):
     return render(request, "privacy.html")
