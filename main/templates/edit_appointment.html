@@ -11,6 +11,8 @@
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 400px;
+    margin: auto;
   }
   .form-group {
     margin-bottom: 15px;
@@ -20,12 +22,13 @@
     margin-bottom: 5px;
     font-weight: bold;
   }
-  .form-group input {
+  .form-group input, .form-group select {
     width: 100%;
     padding: 8px;
-    box-sizing: border-box; /* Important for 100% width */
+    box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 4px;
+    font-size: 1rem;
   }
   .btn-submit {
     padding: 10px 15px;
@@ -62,22 +65,112 @@
 {% endif %}
 
 <div class="card full form-card">
-  <form method="POST">
+  <form id="edit-appointment-form" method="POST">
     {% csrf_token %}
+    <input type="hidden" id="doctor_name" value="{{ appointment.doctor_name }}">
+
     <div class="form-group">
-      <label for="first_name">First Name</label>
-      <input type="text" id="first_name" name="first_name" value="{{ appointment.first_name }}">
+      <label for="appointment_date">Appointment Date</label>
+      <input 
+        type="date" 
+        id="appointment_date" 
+        name="appointment_date" 
+        value="{{ appointment.appointment_date|date:'Y-m-d' }}"
+        min="{{ today|date:'Y-m-d' }}"
+        required
+      >
     </div>
+
     <div class="form-group">
-      <label for="last_name">Last Name</label>
-      <input type="text" id="last_name" name="last_name" value="{{ appointment.last_name }}">
+      <label for="appointment_time">Appointment Time</label>
+      <select id="appointment_time" name="appointment_time" required>
+        <option disabled>Select Time</option>
+        {% for t in times %}
+          <option value="{{ t }}" {% if t == appointment.appointment_time %}selected{% endif %}>
+            {{ t }}
+          </option>
+        {% endfor %}
+      </select>
     </div>
-    <div class="form-group">
-      <label for="appointment_date">Appointment Date (YYYY-MM-DD)</label>
-      <input type="date" id="appointment_date" name="appointment_date" value="{{ appointment.appointment_date|date:'Y-m-d' }}">
-    </div>
+
     <button type="submit" class="btn-submit">Save Changes</button>
     <a href="{% url 'appointment_list' %}" class="btn-cancel">Cancel</a>
   </form>
 </div>
+
+<script>
+const dateInput = document.getElementById("appointment_date");
+const timeSelect = document.getElementById("appointment_time");
+const doctorName = document.getElementById("doctor_name").value;
+const appointmentId = "{{ appointment.id }}";
+const form = document.getElementById("edit-appointment-form");
+let bookedTimes = [];
+let originalTime = "{{ appointment.appointment_time }}"; // keep original appointment time
+
+function fetchBookedTimes(selectedDate) {
+    fetch(`/get_booked_times?date=${selectedDate}&appointment_id=${appointmentId}&doctor_name=${doctorName}`)
+      .then(res => res.json())
+      .then(data => {
+          bookedTimes = data.booked_times;
+
+          // Clear select
+          timeSelect.innerHTML = "";
+
+          const times = [
+            "08:00 AM","08:30 AM","09:00 AM","09:30 AM","10:00 AM","10:30 AM",
+            "11:00 AM","11:30 AM","12:00 PM","12:30 PM","01:00 PM","01:30 PM",
+            "02:00 PM","02:30 PM","03:00 PM","03:30 PM","04:00 PM","04:30 PM",
+            "05:00 PM"
+          ];
+
+          times.forEach(t => {
+              const option = document.createElement("option");
+              option.value = t;
+              option.textContent = t;
+
+              // Disable booked times except for the original appointment
+              if (bookedTimes.includes(t) && t !== originalTime) {
+                  option.disabled = true;
+                  option.textContent += " (Booked)";
+              }
+
+              // Default selected: original time if exists, otherwise first available
+              if (t === originalTime) {
+                  option.selected = true;
+              }
+
+              timeSelect.appendChild(option);
+          });
+
+          // If no option selected yet (original time not in times), select first available
+          if (!timeSelect.querySelector("option[selected]")) {
+              for (let opt of timeSelect.options) {
+                  if (!opt.disabled) {
+                      opt.selected = true;
+                      break;
+                  }
+              }
+          }
+      });
+}
+
+// Load booked times on page load
+fetchBookedTimes(dateInput.value);
+
+// Update booked times when date changes
+dateInput.addEventListener("change", () => {
+    originalTime = null; // clear original highlight for new date
+    fetchBookedTimes(dateInput.value);
+});
+
+// Prevent booking already booked time
+form.addEventListener("submit", (e) => {
+    const selectedTime = timeSelect.value;
+    if (bookedTimes.includes(selectedTime) && selectedTime !== originalTime) {
+        e.preventDefault();
+        alert(`Cannot book ${selectedTime} because it is already taken for Dr. ${doctorName}.`);
+    }
+});
+</script>
+
 {% endblock %}

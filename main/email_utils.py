@@ -11,6 +11,8 @@ def send_appointment_confirmation_email(user_name, user_email, doctor_name, appo
         action = "has been reinstated"
     elif status == "Approved":
         action = "has been approved"
+    elif status == "Rescheduled":
+        action = "has been rescheduled"
     else:
         action = "updated"
 
@@ -27,13 +29,7 @@ Thank you for choosing MedLink!
 """
 
     try:
-        send_mail(
-            subject,
-            message,
-            None,  # uses DEFAULT_FROM_EMAIL automatically
-            [user_email],
-            fail_silently=False
-        )
+        send_mail(subject, message, None, [user_email], fail_silently=False)
         return True
     except Exception as e:
         print("Email failed:", e)

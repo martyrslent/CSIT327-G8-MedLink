@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
-        /* --- Shared Video UI Styles --- */
         body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .dashboard-wrap { display: flex; min-height: 100vh; }
         .content { flex: 1; padding: 30px; }
@@ -17,107 +16,99 @@
         .nav a { color: rgba(255,255,255,0.8); }
         .nav a:hover { background: rgba(255,255,255,0.1); color: white; }
 
-        /* 1. TOP NAV BAR */
         .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            padding: 15px 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            display: flex; justify-content: space-between; align-items: center;
+            background: white; padding: 15px 30px;
+            border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             margin-bottom: 30px;
         }
         .welcome-section h2 { margin: 0; font-size: 1.6rem; color: #2c3e50; }
         .welcome-section p { margin: 5px 0 0; color: #7f8c8d; font-size: 0.95rem; }
-        
-        .header-actions { display: flex; align-items: center; gap: 25px; }
 
-        /* Bell Icon & Dropdown */
         .notif-wrapper { position: relative; }
-        .notif-btn {
-            background: none; border: none; font-size: 1.4rem; cursor: pointer;
-            color: #555; position: relative; transition: color 0.3s;
-        }
+        .notif-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #555; }
         .notif-btn:hover { color: #007bff; }
-        .notif-badge {
-            position: absolute; top: -2px; right: -2px;
-            width: 9px; height: 9px; background: #dc3545;
-            border-radius: 50%; border: 2px solid white;
-        }
+
         .notif-dropdown {
-            display: none;
-            position: absolute; right: 0; top: 45px;
-            width: 300px; background: white;
-            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            z-index: 1000; overflow: hidden; border: 1px solid #eee;
+            display: none; position: absolute; right: 0; top: 45px;
+            width: 300px; background: white; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #eee;
+            overflow: hidden;
         }
-        .notif-header { padding: 12px 15px; background: #f8f9fa; border-bottom: 1px solid #eee; font-weight: bold; color: #555; font-size: 0.9rem; }
-        .notif-item { padding: 15px; border-bottom: 1px solid #f1f1f1; font-size: 0.9rem; color: #444; }
-        .notif-item:hover { background-color: #fafafa; }
-        .notif-empty { padding: 20px; text-align: center; color: #999; font-style: italic; }
 
-        /* Button consistency */
-        .btn-book-new {
-            background-color: #007bff; color: white; padding: 12px 24px;
-            border-radius: 8px; text-decoration: none; font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); transition: transform 0.2s;
-        }
-        .btn-book-new:hover { transform: translateY(-2px); background-color: #0069d9; }
-
-        /* --- Profile Specific Styles --- */
         .profile-card {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
+            background: white; padding: 40px; border-radius: 15px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            max-width: 700px;
-            margin: 0 auto;
-            position: relative;
+            max-width: 700px; margin: 0 auto;
         }
-        .profile-header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #f0f0f0;
-            padding-bottom: 20px;
-        }
+        .profile-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #f0f0f0; padding-bottom: 20px; }
+
         .profile-img {
-            width: 120px; height: 120px;
-            border-radius: 50%; object-fit: cover;
-            margin-bottom: 15px;
-            border: 4px solid #dc3545;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
+            border: 4px solid #dc3545; margin-bottom: 15px;
         }
+
         .info-row {
             display: flex; justify-content: space-between;
             padding: 15px 0; border-bottom: 1px dashed #eee;
         }
-        .info-label { font-weight: 600; color: #666; display: flex; align-items: center; gap: 10px; }
+        .info-label { font-weight: 600; color: #666; }
         .info-value { color: #333; font-weight: 500; font-size: 1.05rem; }
-        
+
         .bio-box {
-            background: #f8f9fa; padding: 15px; border-radius: 10px;
-            margin-top: 15px; border-left: 4px solid #007bff;
-            font-size: 0.95rem; line-height: 1.6; color: #555;
+            background: #f8f9fa; padding: 15px;
+            border-radius: 10px; border-left: 4px solid #007bff;
+            margin-top: 10px; color: #555;
+        }
+
+        .section-label {
+            margin-top: 25px; margin-bottom: 8px;
+            font-weight: bold; color: #444;
+            display: flex; align-items: center; gap: 8px;
         }
 
         .action-grid {
             margin-top: 30px; padding-top: 20px; border-top: 2px solid #f0f0f0;
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
         }
-        
-        /* Modal Styles */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .modal-content { background-color: #fff; margin: 5% auto; padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); animation: slideDown 0.3s; }
-        @keyframes slideDown { from {transform: translateY(-50px); opacity: 0;} to {transform: translateY(0); opacity: 1;} }
-        
-        .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #444; }
-        .form-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; margin-bottom: 15px; }
-        .form-input:focus { border-color: #007bff; outline: none; box-shadow: 0 0 0 3px rgba(0,123,255,0.1); }
 
-        /* Delete specific styles */
-        .text-danger { color: #dc3545; }
-        .alert-box { background: #fff5f5; border-left: 4px solid #dc3545; padding: 15px; margin-bottom: 20px; color: #a00; font-size: 0.9rem; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+
+        /* UPDATED: modal scrollable */
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;   /* limit height */
+            overflow-y: auto;    /* vertical scroll */
+            box-sizing: border-box;
+        }
+
+        .form-label { font-weight: 600; margin-bottom: 5px; display: block; }
+        .form-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; }
+
+        /* sticky submit button */
+        .modal-content form button[type="submit"] {
+            position: sticky;
+            bottom: 0;
+            margin-top: 10px;
+            z-index: 10;
+            background:#007bff;
+            color:white;
+            padding:10px;
+            border-radius:8px;
+            width:100%;
+            font-weight:bold;
+            border:none;
+            cursor:pointer;
+        }
+
+        .modal-content form button[type="submit"]:hover {
+            background:#0056b3;
+        }
 
     </style>
 
@@ -126,31 +117,20 @@
             const menu = document.getElementById("notificationMenu");
             menu.style.display = (menu.style.display === "block") ? "none" : "block";
         }
-        
-        // Edit Modal
+
         function openEditModal() { document.getElementById('editModal').style.display = 'block'; }
         function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
-        // Delete Modal
         function openDeleteModal() { document.getElementById('deleteModal').style.display = 'block'; }
         function closeDeleteModal() { document.getElementById('deleteModal').style.display = 'none'; }
-        
-        // Close menus when clicking outside
-        window.onclick = function(event) {
-            const editModal = document.getElementById('editModal');
-            const deleteModal = document.getElementById('deleteModal');
-            const notifMenu = document.getElementById("notificationMenu");
-            const notifBtn = document.getElementById("notifBtn");
 
-            if (event.target == editModal) { editModal.style.display = "none"; }
-            if (event.target == deleteModal) { deleteModal.style.display = "none"; }
-            
-            if (!notifBtn.contains(event.target) && !notifMenu.contains(event.target)) {
-                notifMenu.style.display = "none";
-            }
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('editModal')) closeEditModal();
+            if (event.target == document.getElementById('deleteModal')) closeDeleteModal();
         }
     </script>
 </head>
+
 <body>
 
 <div class="dashboard-wrap">
@@ -162,11 +142,7 @@
           <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
           <li><a href="{% url 'user_profile' %}" style="color:white; font-weight:bold;">Profile</a></li>
           <li><a href="{% url 'appointment_history' %}">History</a></li>
-          <li>
-            <a href="{% url 'logout' %}" onclick="return confirm('Are you sure you want to log out?');">
-                Logout
-            </a>
-          </li>
+          <li><a href="{% url 'logout' %}">Logout</a></li>
         </ul>
       </nav>
     </aside>
@@ -196,23 +172,22 @@
         <div class="profile-card">
             
             <div class="profile-header">
-                <div style="position: relative; display: inline-block;">
-                    {% if profile_image %}
-                        <img src="{{ profile_image }}" alt="Profile" class="profile-img">
-                    {% else %}
-                        <img src="{% static 'main/img/person.png' %}" alt="Profile" class="profile-img">
-                    {% endif %}
+                {% if profile_image %}
+                    <img src="{{ profile_image }}" class="profile-img">
+                {% else %}
+                    <img src="{% static 'main/img/person.png' %}" class="profile-img">
+                {% endif %}
 
-                    <form id="avatar-form" action="{% url 'update_profile_picture' %}" method="POST" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <label for="file-input" style="display: block; margin-top: 10px; cursor: pointer; color: #007bff; font-size: 0.9em; font-weight: 600;">
-                            <i class="fa fa-camera"></i> Change Photo
-                        </label>
-                        <input id="file-input" type="file" name="profile_picture" accept="image/*" style="display: none;" onchange="document.getElementById('avatar-form').submit();">
-                    </form>
-                </div>
-                <h2 style="margin: 10px 0 5px; color: #333;">{{ full_name }}</h2>
-                <span style="color: #777; font-size: 0.9rem;">Patient Account</span>
+                <form id="avatar-form" action="{% url 'update_profile_picture' %}" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <label for="file-input" style="cursor: pointer; color:#007bff;">
+                        <i class="fa fa-camera"></i> Change Photo
+                    </label>
+                    <input id="file-input" type="file" name="profile_picture" accept="image/*" style="display:none;" onchange="document.getElementById('avatar-form').submit();">
+                </form>
+
+                <h2>{{ full_name }}</h2>
+                <span>Patient Account</span>
             </div>
 
             <div class="info-row">
@@ -230,24 +205,25 @@
                 <span class="info-value">{{ gender|default:"--" }}</span>
             </div>
 
-            <div style="margin-top: 20px;">
-                <span class="info-label" style="margin-bottom: 10px;"><i class="fa fa-align-left"></i> Bio</span>
-                <div class="bio-box">
-                    {{ bio|default:"No bio added yet. Tell us a bit about yourself!" }}
-                </div>
-            </div>
+            <div class="section-label"><i class="fa fa-align-left"></i> Bio</div>
+            <div class="bio-box">{{ bio|default:"No bio added yet." }}</div>
 
-            <button onclick="openEditModal()" style="width: 100%; background-color: #28a745; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; margin-top: 25px; font-weight: bold; transition: 0.3s;">
+            <div class="section-label"><i class="fa fa-allergies"></i> Allergies</div>
+            <div class="bio-box">{{ allergies|default:"No listed allergies." }}</div>
+
+            <div class="section-label"><i class="fa fa-notes-medical"></i> Medical Information</div>
+            <div class="bio-box">{{ medical_conditions|default:"No medical information provided." }}</div>
+
+            <button onclick="openEditModal()" style="width: 100%; background-color: #28a745; color: white; padding: 12px; border-radius: 8px; margin-top: 25px; font-weight: bold;">
                 <i class="fa fa-pencil"></i> Edit Profile
             </button>
 
             <div class="action-grid">
-                <a href="{% url 'change_password' %}" style="display: flex; align-items: center; justify-content: center; background-color: #007bff; color: white; padding: 12px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem;">
-                    <i class="fa fa-lock" style="margin-right: 8px;"></i> Change Password
+                <a href="{% url 'change_password' %}" style="background:#007bff; color:white; text-align:center; padding:12px; border-radius:8px;">
+                    <i class="fa fa-lock"></i> Change Password
                 </a>
-
-                <button onclick="openDeleteModal()" style="width: 100%; background-color: #dc3545; color: white; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; justify-content: center;">
-                    <i class="fa fa-trash" style="margin-right: 8px;"></i> Delete Account
+                <button onclick="openDeleteModal()" style="background:#dc3545; color:white; padding:12px; border-radius:8px;">
+                    <i class="fa fa-trash"></i> Delete Account
                 </button>
             </div>
 
@@ -256,75 +232,45 @@
     </main>
 </div>
 
+<!-- EDIT MODAL -->
 <div id="editModal" class="modal">
     <div class="modal-content">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0; color:#333;">Edit Personal Info</h2>
-            <span onclick="closeEditModal()" style="cursor:pointer; font-size:1.5rem;">&times;</span>
-        </div>
-        
+
+        <h2>Edit Personal Info</h2>
+
         <form action="{% url 'update_personal_info' %}" method="POST">
             {% csrf_token %}
-            
-            <div style="display: flex; gap: 15px;">
-                <div style="flex:1;">
-                    <label class="form-label">First Name</label>
-                    <input type="text" name="first_name" value="{{ full_name.split.0 }}" class="form-input" required>
-                </div>
-                <div style="flex:1;">
-                    <label class="form-label">Last Name</label>
-                    <input type="text" name="last_name" value="{{ full_name.split.1 }}" class="form-input" required>
-                </div>
-            </div>
 
-            <div style="display: flex; gap: 15px;">
-                <div style="flex: 1;">
-                    <label class="form-label">Age</label>
-                    <input type="number" name="age" value="{{ age }}" class="form-input">
-                </div>
-                <div style="flex: 1;">
-                    <label class="form-label">Gender</label>
-                    <select name="gender" class="form-input">
-                        <option value="Male" {% if gender == 'Male' %}selected{% endif %}>Male</option>
-                        <option value="Female" {% if gender == 'Female' %}selected{% endif %}>Female</option>
-                        <option value="Other" {% if gender == 'Other' %}selected{% endif %}>Other</option>
-                    </select>
-                </div>
-            </div>
+            <label class="form-label">First Name</label>
+            <input type="text" name="first_name" value="{{ full_name.split.0 }}" class="form-input">
 
-            <label class="form-label">Bio / Story</label>
-            <textarea name="bio" rows="4" class="form-input" placeholder="Tell us about yourself...">{{ bio }}</textarea>
+            <label class="form-label">Last Name</label>
+            <input type="text" name="last_name" value="{{ full_name.split.1 }}" class="form-input">
 
-            <div style="text-align: right; margin-top: 10px;">
-                <button type="button" onclick="closeEditModal()" style="background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin-right: 10px;">Cancel</button>
-                <button type="submit" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Save Changes</button>
-            </div>
+            <label class="form-label">Age</label>
+            <input type="number" name="age" value="{{ age }}" class="form-input">
+
+            <label class="form-label">Gender</label>
+            <select name="gender" class="form-input">
+                <option value="Male" {% if gender == 'Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if gender == 'Female' %}selected{% endif %}>Female</option>
+                <option value="Other" {% if gender == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+
+            <label class="form-label">Bio</label>
+            <textarea name="bio" class="form-input" rows="3">{{ bio }}</textarea>
+
+            <label class="form-label">Allergies</label>
+            <textarea name="allergies" class="form-input" rows="3">{{ allergies }}</textarea>
+
+           <label class="form-label">Medical Information</label>
+<textarea name="medical_conditions" class="form-input" rows="3">{{ medical_conditions }}</textarea>
+
+            <button type="submit">
+                Save Changes
+            </button>
         </form>
-    </div>
-</div>
 
-<div id="deleteModal" class="modal">
-    <div class="modal-content" style="border-top: 5px solid #dc3545;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0; color:#dc3545;">Delete Account</h2>
-            <span onclick="closeDeleteModal()" style="cursor:pointer; font-size:1.5rem;">&times;</span>
-        </div>
-
-        <div class="alert-box">
-            <strong>Warning:</strong> This action is permanent and cannot be undone. All your data and appointment history will be lost.
-        </div>
-        
-        <form action="{% url 'delete_account' %}" method="POST">
-            {% csrf_token %}
-            
-            <label class="form-label">To confirm, please enter your password:</label>
-            <input type="password" name="password_confirmation" class="form-input" placeholder="Enter your password" required>
-
-            <div style="text-align: right; margin-top: 20px;">
-                <button type="button" onclick="closeDeleteModal()" style="background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; margin-right: 10px;">Cancel</button>
-                <button type="submit" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Confirm Delete</button>
-            </div>
-        </form>
     </div>
 </div>
 

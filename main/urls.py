@@ -41,7 +41,7 @@ urlpatterns = [
     path('appointments/decline/<int:appointment_id>/', views.decline_appointment, name='decline_appointment'),
     path("appointments/reinstate/<int:appointment_id>/", views.reinstate_appointment, name="reinstate_appointment"),
     path('delete-user/<int:user_id>/', views.delete_user, name='delete_user'),
-    
+    path('get_booked_times/', views.get_booked_times, name='get_booked_times'),
     # [FIXED] Changed int: to str: to handle UUIDs or IDs with characters
     path('doctor/view-patient/<str:patient_id>/', views.view_patient_health, name='view_patient_health'),
     

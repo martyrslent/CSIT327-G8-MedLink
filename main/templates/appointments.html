@@ -222,6 +222,7 @@
                 <th>Doctor Name</th> 
                 <th>Patient Email</th> 
                 <th>Appointment Date</th>
+                <th>Appointment Time</th>
                 <th>Status</th> 
                 <th>Actions</th>
             </tr>
@@ -235,9 +236,9 @@
                     <td>{{ appointment.doctor_name }}</td> 
                     <td>{{ appointment.user_email }}</td> 
                     <td>{{ appointment.appointment_date }}</td>
+                    <td>{{ appointment.appointment_time }}</td>
                     <td><span class="status-pending">Pending</span></td>
                     <td class="action-buttons">
-                        
                         {% if request.session.is_doctor %}
                             <a href="{% url 'view_patient_health' appointment.patient_id %}?appt_id={{ appointment.id }}" class="view-btn">View Profile</a>
                         {% endif %}
@@ -246,12 +247,13 @@
                             {% csrf_token %}
                             <button type="submit" class="approve-btn">Approve</button>
                         </form>
-                        
+
                         <a href="{% url 'edit_appointment' appointment.id %}" class="edit-btn">Edit</a>
-                        
-                        <form action="{% url 'delete_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to DELETE this appointment? This action cannot be undone.');">
-                            {% csrf_token %}
-                            <button type="submit" class="delete-btn">Delete</button>
+
+                        <form action="{% url 'decline_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to DECLINE this appointment?');">
+    {% csrf_token %}
+    <button type="submit" class="delete-btn">Decline</button>
+</form>
                         </form>
                     </td>
                 </tr>
@@ -280,6 +282,7 @@
                 <th>Doctor Name</th> 
                 <th>Patient Email</th> 
                 <th>Appointment Date</th>
+                <th>Appointment Time</th>
                 <th>Status</th> 
                 <th>Actions</th>
             </tr>
@@ -293,6 +296,7 @@
                     <td>{{ appointment.doctor_name }}</td> 
                     <td>{{ appointment.user_email }}</td> 
                     <td>{{ appointment.appointment_date }}</td>
+                    <td>{{ appointment.appointment_time }}</td>
                     <td>
                         {% if appointment.status == "Cancelled" %}
                             <span class="status-pending">Cancelled</span>
@@ -301,7 +305,6 @@
                         {% endif %}
                     </td>
                     <td class="action-buttons">
-
                         {% if request.session.is_doctor %}
                             <a href="{% url 'view_patient_health' appointment.patient_id %}?appt_id={{ appointment.id }}" class="view-btn">View Profile</a>
                         {% endif %}
@@ -334,7 +337,6 @@
                                 <button type="button" class="delete-btn disabled" style="padding: 8px 12px;" title="Cancel appointment first to delete" disabled>Delete</button>
                             {% endif %}
                         </form>
-
                     </td>
                 </tr>
                 {% endif %}

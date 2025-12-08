@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
     <style>
-        /* ... (Your existing CSS remains exactly the same) ... */
-        /* Shared Video UI Styles */
         body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .dashboard-wrap { display: flex; min-height: 100vh; }
         .content { flex: 1; padding: 30px; }
@@ -18,45 +16,28 @@
         .nav a { color: rgba(255,255,255,0.8); }
         .nav a:hover { background: rgba(255,255,255,0.1); color: white; }
 
-        /* 1. TOP NAV BAR */
         .top-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            padding: 15px 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            margin-bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+            background: white; padding: 15px 30px; border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 30px;
         }
         .welcome-section h2 { margin: 0; font-size: 1.6rem; color: #2c3e50; }
-        .welcome-section p { margin: 5px 0 0; color: #7f8c8d; font-size: 0.95rem; }
-        
-        .header-actions { display: flex; align-items: center; gap: 25px; }
+        .welcome-section p { margin: 5px 0 0; color: #7f8c8d; }
 
-        /* Bell Icon */
         .notif-wrapper { position: relative; }
-        .notif-btn {
-            background: none; border: none; font-size: 1.4rem; cursor: pointer;
-            color: #555; transition: color 0.3s;
-        }
+        .notif-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #555; }
         .notif-btn:hover { color: #007bff; }
-        
+
         .notif-dropdown {
-            display: none;
-            position: absolute; right: 0; top: 45px;
-            width: 250px; background: white;
-            border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            z-index: 1000; border: 1px solid #eee; padding: 15px; text-align: center; color: #777; font-size: 0.9rem;
+            display: none; position: absolute; right: 0; top: 45px; width: 250px;
+            background: white; border-radius: 12px; padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #eee;
+            text-align: center; color: #777; font-size: 0.9rem;
         }
 
-        /* --- Booking Form Specific Styles --- */
         .booking-card {
-            background: white;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            max-width: 800px;
+            background: white; padding: 40px; border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03); max-width: 800px;
             margin: 0 auto;
         }
 
@@ -66,142 +47,125 @@
         }
 
         .form-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
         }
 
         .form-group { margin-bottom: 20px; }
-        
-        .form-label { display: block; font-weight: 600; margin-bottom: 8px; color: #444; font-size: 0.95rem; }
-        
-        .form-input { 
-            width: 100%; padding: 12px; 
-            border: 1px solid #ddd; border-radius: 8px; 
-            font-size: 1rem; background-color: #fcfcfc; transition: 0.3s;
-            outline: none;
+        .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #444; }
+
+        .form-input {
+            width: 100%; padding: 12px; border: 1px solid #ddd;
+            border-radius: 8px; background: #fcfcfc; font-size: 1rem; outline: none;
+            transition: 0.3s ease;
         }
-        .form-input:focus { 
-            border-color: #007bff; background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(0,123,255,0.1); 
+        .form-input:focus {
+            border-color: #007bff; background: white;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
         }
 
-        /* Specific style for selects to match inputs */
         select.form-input {
-            cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px top 50%;
-            background-size: 12px auto;
+            appearance: none; background-repeat: no-repeat;
+            background-position: right 15px center; padding-right: 40px;
         }
 
         .btn-submit-booking {
-            width: 100%; background-color: #28a745; color: white; padding: 15px;
-            border: none; border-radius: 10px; cursor: pointer;
-            font-size: 1.1rem; font-weight: bold; transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%; background-color: #28a745; color: white;
+            padding: 15px; border: none; border-radius: 10px;
+            font-size: 1.1rem; font-weight: bold; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; transition: 0.2s;
         }
         .btn-submit-booking:hover {
             background-color: #218838; transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 5px 15px rgba(40,167,69,0.3);
         }
 
-        /* Message Box */
         .message-box { padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .msg-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .msg-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-
+        .msg-error { background: #f8d7da; color: #721c24; }
+        .msg-success { background: #d4edda; color: #155724; }
     </style>
 
     <script>
         const ALL_DOCTORS = [
             {% for doctor in doctors %}
-                {
-                    name: "Dr. {{ doctor.first_name }} {{ doctor.last_name }}",
-                    value: "{{ doctor.first_name }} {{ doctor.last_name }}",
-                    specialization: "{{ doctor.specialization }}",
-                    is_in: {% if doctor.is_in %}true{% else %}false{% endif %} 
-                },
+            {
+                name: "Dr. {{ doctor.first_name }} {{ doctor.last_name }}",
+                value: "{{ doctor.first_name }} {{ doctor.last_name }}",
+                specialization: "{{ doctor.specialization }}",
+                is_in: {{ doctor.is_in|yesno:"true,false" }}
+            },
             {% endfor %}
         ];
 
         function filterDoctors() {
-            const specializationSelect = document.getElementById('specialization_filter');
-            const doctorSelect = document.getElementById('doctor_name_select');
-            const selectedSpecialization = specializationSelect.value;
+            const specialization = document.getElementById("specialization_filter").value;
+            const select = document.getElementById("doctor_name_select");
+            select.innerHTML = '<option disabled selected>-- Choose a Doctor --</option>';
 
-            doctorSelect.innerHTML = '<option value="" disabled selected>-- Choose a Doctor --</option>';
-
-            const filteredDoctors = ALL_DOCTORS.filter(doctor => {
-                const matchesSpecialization = selectedSpecialization === 'All' || doctor.specialization === selectedSpecialization;
-                return matchesSpecialization && doctor.is_in; 
-            });
-
-            filteredDoctors.forEach(doctor => {
-                const option = document.createElement('option');
-                option.value = doctor.value;
-                option.textContent = doctor.name;
-                doctorSelect.appendChild(option);
+            ALL_DOCTORS.filter(doc =>
+                (specialization === "All" || doc.specialization === specialization) && doc.is_in
+            ).forEach(doc => {
+                const opt = document.createElement("option");
+                opt.value = doc.value;
+                opt.textContent = doc.name;
+                select.appendChild(opt);
             });
         }
 
         function toggleNotifications() {
             const menu = document.getElementById("notificationMenu");
-            menu.style.display = (menu.style.display === "block") ? "none" : "block";
+            menu.style.display = menu.style.display === "block" ? "none" : "block";
         }
 
-        window.onload = function() {
-            var today = new Date().toISOString().split('T')[0];
-            document.getElementsByName("appointment_date")[0].setAttribute('min', today);
-            document.getElementById('specialization_filter').addEventListener('change', filterDoctors);
-            filterDoctors();
-        }
-
-        window.onclick = function(event) {
-            if (!event.target.closest('#notifBtn') && !event.target.closest('#notificationMenu')) {
+        window.onclick = function(e) {
+            if (!e.target.closest('#notifBtn')) {
                 document.getElementById("notificationMenu").style.display = "none";
             }
         }
+
+        window.onload = function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementsByName("appointment_date")[0].setAttribute("min", today);
+            filterDoctors();
+        }
     </script>
 </head>
+
 <body>
 
 <div class="dashboard-wrap">
     <aside class="sidebar">
-      <div class="logo">MedLink</div>
-      <nav class="nav">
-        <ul>
-          <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
-          <li><a href="{% url 'user_profile' %}">Profile</a></li>
-          <li><a href="{% url 'appointment_history' %}">History</a></li> 
-          <li>
-            <a href="{% url 'logout' %}" onclick="return confirm('Are you sure you want to log out?');">
-                Logout
-            </a>
-          </li>
-        </ul>
-      </nav>
+        <div class="logo">MedLink</div>
+        <nav class="nav">
+            <ul>
+                <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
+                <li><a href="{% url 'user_profile' %}">Profile</a></li>
+                <li><a href="{% url 'appointment_history' %}">History</a></li>
+                <li><a href="{% url 'logout' %}" onclick="return confirm('Log out?');">Logout</a></li>
+            </ul>
+        </nav>
     </aside>
 
     <main class="content">
+
         <div class="top-header">
             <div class="welcome-section">
                 <h2>New Appointment 📅</h2>
                 <p>Schedule a consultation with our specialists.</p>
             </div>
-            <div class="header-actions">
-                <div class="notif-wrapper">
-                    <button id="notifBtn" class="notif-btn" onclick="toggleNotifications()">
-                        <i class="fa fa-bell"></i>
-                    </button>
-                    <div id="notificationMenu" class="notif-dropdown">
-                        Check Dashboard for latest updates.
-                    </div>
+
+            <div class="notif-wrapper">
+                <button id="notifBtn" class="notif-btn" onclick="toggleNotifications()">
+                    <i class="fa fa-bell"></i>
+                </button>
+                <div id="notificationMenu" class="notif-dropdown">
+                    Check dashboard for the latest updates.
                 </div>
             </div>
         </div>
 
         <div class="booking-card">
+
             {% if messages %}
                 {% for message in messages %}
                     <div class="message-box {% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
@@ -212,14 +176,14 @@
 
             <form method="POST" action="{% url 'book_appointment' %}">
                 {% csrf_token %}
-                
+
                 <div class="form-section-title">
                     <i class="fa fa-user-md"></i> Doctor & Schedule
                 </div>
-                
+
                 <div class="form-group">
                     <label class="form-label">Filter by Specialization</label>
-                    <select id="specialization_filter" class="form-input">
+                    <select id="specialization_filter" class="form-input" onchange="filterDoctors()">
                         <option value="All">All</option>
                         <option value="General Physician">General Physician</option>
                         <option value="Dentist">Dentist</option>
@@ -234,11 +198,10 @@
                         <option value="Psychiatrist">Psychiatrist</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label class="form-label">Select Doctor</label>
-                    <select name="doctor_name" id="doctor_name_select" class="form-input" required>
-                        <option value="" disabled selected>-- Choose a Doctor --</option>
-                    </select>
+                    <select name="doctor_name" id="doctor_name_select" class="form-input" required></select>
                 </div>
 
                 <div class="form-grid">
@@ -246,57 +209,41 @@
                         <label class="form-label">Date</label>
                         <input type="date" name="appointment_date" class="form-input" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Time</label>
-                        <select name="appointment_time" class="form-input" required>
-                            <option value="" disabled selected>Select Time</option>
-                            <option value="09:00 AM">09:00 AM</option>
-                            <option value="10:00 AM">10:00 AM</option>
-                            <option value="11:00 AM">11:00 AM</option>
-                            <option value="01:00 PM">01:00 PM</option>
-                            <option value="02:00 PM">02:00 PM</option>
-                            <option value="03:00 PM">03:00 PM</option>
-                            <option value="04:00 PM">04:00 PM</option>
-                        </select>
-                    </div>
-                </div>
 
-                <div class="form-section-title" style="margin-top: 30px;">
-                    <i class="fa fa-notes-medical"></i> Medical Information
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Allergies (if any)</label>
-                    <input type="text" name="allergies" class="form-input" placeholder="e.g. Peanuts, Penicillin, None">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Existing Medical Conditions</label>
-                    <input type="text" name="medical_conditions" class="form-input" placeholder="e.g. Asthma, Diabetes, None">
-                </div>
+                  <div class="form-group">
+    <label class="form-label">Time</label>
+    <select name="appointment_time" class="form-input" required>
+        <option disabled selected>Select Time</option>
+        <option value="08:00 AM">08:00 AM</option>
+        <option value="08:30 AM">08:30 AM</option>
+        <option value="09:00 AM">09:00 AM</option>
+        <option value="09:30 AM">09:30 AM</option>
+        <option value="10:00 AM">10:00 AM</option>
+        <option value="10:30 AM">10:30 AM</option>
+        <option value="11:00 AM">11:00 AM</option>
+        <option value="11:30 AM">11:30 AM</option>
+        <option value="12:00 PM">12:00 PM</option>
+        <option value="12:30 PM">12:30 PM</option>
+        <option value="01:00 PM">01:00 PM</option>
+        <option value="01:30 PM">01:30 PM</option>
+        <option value="02:00 PM">02:00 PM</option>
+        <option value="02:30 PM">02:30 PM</option>
+        <option value="03:00 PM">03:00 PM</option>
+        <option value="03:30 PM">03:30 PM</option>
+        <option value="04:00 PM">04:00 PM</option>
+        <option value="04:30 PM">04:30 PM</option>
+        <option value="05:00 PM">05:00 PM</option>
+    </select>
+</div>
 
-                <div class="form-section-title" style="margin-top: 30px;">
-                    <i class="fa fa-comment-medical"></i> Visit Details
-                </div>
 
-                <div class="form-group">
-                    <label class="form-label">Reason for Visit</label>
-                    <select name="reason_for_visit" class="form-input" required>
-                        <option value="" disabled selected>-- Select a Reason --</option>
-                        <option value="General Checkup">General Checkup</option>
-                        <option value="Consultation">Consultation</option>
-                        <option value="Follow-up">Follow-up</option>
-                        <option value="Feeling Sick (Fever/Flu)">Feeling Sick (Fever/Flu)</option>
-                        <option value="Emergency">Emergency</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn-submit-booking">
-                    <i class="fa fa-check-circle"></i> Confirm Appointment
+                <button class="btn-submit-booking" type="submit">
+                    <i class="fa fa-calendar-check"></i> Book Appointment
                 </button>
-
             </form>
         </div>
     </main>
 </div>
+
 </body>
 </html>
