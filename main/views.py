@@ -62,13 +62,19 @@ def view_patient_health(request, patient_id):
             messages.error(request, "Patient not found.")
             return redirect("appointment_list")
 
-        # Fetch their medical records (history)
-        records_response = supabase.table("patient_records").select("*").eq("user_id", patient_id).order("record_date", desc=True).execute()
-        medical_history = records_response.data or []
+        # [CHANGED] 1. Handle Reason for Visit via GET parameter
+        appointment_id = request.GET.get('appt_id')
+        current_appointment = None
+        
+        if appointment_id:
+            appt_response = supabase.table("appointment").select("*").eq("id", appointment_id).single().execute()
+            current_appointment = appt_response.data
+
+        # [NOTE] Medical History fetch removed as requested
 
         context = {
             "patient": patient,
-            "medical_history": medical_history
+            "current_appointment": current_appointment, 
         }
         return render(request, "doctor_patient_view.html", context)
 
@@ -693,10 +699,16 @@ def user_cancel_appointment(request, appointment_id):
 
 
 # --- APPOINTMENT REGISTRATION --- @admin_required
+@admin_required
 def register_appointment(request):
+    # [NEW] Prevent doctors from booking appointments manually
+    if request.session.get("role") == "doctor":
+        messages.error(request, "Doctors are not authorized to book appointments manually.")
+        return redirect("appointment_list")
+
     today = date.today().isoformat()
 
-    # Fetch doctors with specialization
+    # --- Fetch Doctors Logic ---
     try:
         doctors_response = supabase.table("users").select(
             "id, first_name, last_name, is_in, doctors(specialization)"
@@ -704,7 +716,6 @@ def register_appointment(request):
 
         all_doctors_data = []
         for d in doctors_response.data or []:
-            # Extract specialization
             specialization = None
             if d.get("doctors"):
                 if isinstance(d["doctors"], list) and d["doctors"]:
@@ -721,7 +732,6 @@ def register_appointment(request):
                     "specialization": specialization
                 })
 
-        # List of unique specializations for filter dropdown
         specializations = sorted(list({d["specialization"] for d in all_doctors_data}))
         
     except Exception as e:
@@ -736,6 +746,7 @@ def register_appointment(request):
         "today": today
     }
 
+    # --- Handle Form Submission ---
     if request.method == "POST":
         first_name = request.POST.get("first_name")
         last_name = request.POST.get("last_name")
@@ -745,7 +756,6 @@ def register_appointment(request):
         appointment_time = request.POST.get("appointment_time")
         reason_for_visit = request.POST.get("reason_for_visit")
 
-        # Basic validation
         if not all([first_name, last_name, doctor_name, user_email, appointment_date, appointment_time, reason_for_visit]):
             messages.error(request, "All fields are required.")
             return render(request, "appointment_form.html", context)
@@ -1000,22 +1010,27 @@ def cancel_appointment(request, appointment_id):
 # --- MARK APPOINTMENT COMPLETE (New from your old version) ---
 @admin_required
 def complete_appointment(request, appointment_id):
-    if request.method == 'POST':
-        try:
-            # Update the 'patient_records' table
-            response = supabase.table('patient_records').update({
-                'successful_appointment_visit': True,
-                'doctor_notes': 'Appointment completed and visit logged.'
-            }).eq('appointment_id', appointment_id).execute()
+    # [CHANGED] Allow admins, superadmins, AND doctors
+    allowed_roles = ["admin", "superadmin", "doctor"]
+    if request.session.get("role") not in allowed_roles:
+        messages.error(request, "Unauthorized action.")
+        return redirect("appointment_list")
+
+    try:
+        # 1. Update Appointment Status
+        supabase.table("appointment").update({"status": "Completed"}).eq("id", appointment_id).execute()
+
+        # 2. Update Patient Record
+        response = supabase.table('patient_records').update({
+            'successful_appointment_visit': True,
+            'doctor_notes': 'Appointment completed and visit logged.'
+        }).eq('appointment_id', appointment_id).execute()
+        
+        messages.success(request, f"Appointment #{appointment_id} marked as Complete!")
             
-            if response.data:
-                messages.success(request, f"Appointment #{appointment_id} successfully marked as completed.")
-            else:
-                messages.warning(request, f"Appointment #{appointment_id} marked as completed, but the corresponding log entry was not found.")
-                
-        except Exception as e:
-            print(f"DEBUG: Error completing appointment {appointment_id}: {str(e)}")
-            messages.error(request, f"Failed to complete appointment. An unexpected error occurred: {str(e)}")
+    except Exception as e:
+        print(f"DEBUG: Error completing appointment {appointment_id}: {str(e)}")
+        messages.error(request, f"Failed to complete appointment: {str(e)}")
             
     return redirect("appointment_list")
 
@@ -1079,27 +1094,32 @@ def edit_appointment(request, appointment_id):
 # --- DELETE APPOINTMENT (Includes Foreign Key fix) ---
 @admin_required
 def delete_appointment(request, appointment_id):
-    """
-    Deletes an appointment record, safely handling foreign key constraints
-    by setting the reference in patient_records to NULL first.
-    """
     try:
-        # 1. Update patient records referencing this appointment_id to NULL
-        print(f"DEBUG: Clearing FK constraint for appointment ID: {appointment_id}")
+        # [CHANGED] 1. Check status before deleting
+        check_response = supabase.table("appointment").select("status").eq("id", appointment_id).single().execute()
+        if check_response.data:
+            status = check_response.data.get("status")
+            if status != "Cancelled":
+                messages.error(request, "Appointment must be Cancelled before it can be deleted.")
+                return redirect("appointment_list")
+        else:
+            messages.error(request, "Appointment not found.")
+            return redirect("appointment_list")
+
+        # 2. Update patient records referencing this appointment_id to NULL
         supabase.table('patient_records').update({'appointment_id': None}).eq('appointment_id', appointment_id).execute()
         
-        # 2. Safely delete the appointment.
+        # 3. Safely delete the appointment.
         response = supabase.table("appointment").delete().eq("id", appointment_id).execute()
         
         if response.data:
-            messages.success(request, f"Appointment #{appointment_id} deleted successfully and patient links updated.")
+            messages.success(request, f"Appointment #{appointment_id} deleted successfully.")
         else:
-            messages.error(request, f"Could not find or delete appointment #{appointment_id}.")
+            messages.error(request, f"Could not delete appointment #{appointment_id}.")
 
     except Exception as e:
-        error_message = str(e)
-        print(f"DEBUG: Error deleting appointment {appointment_id}: {error_message}")
-        messages.error(request, f"Failed to delete appointment. An unexpected error occurred: {error_message}")
+        print(f"DEBUG: Error deleting appointment {appointment_id}: {e}")
+        messages.error(request, "Failed to delete appointment.")
     
     return redirect("appointment_list")
 
@@ -1328,31 +1348,6 @@ def admin_dashboard(request):
             "recent_activity": [], "appointments": []
         })
     
-@admin_required
-def complete_appointment(request, appointment_id):
-    # Security check using your role system
-    if request.session.get("role") not in ["admin", "superadmin"]:
-        return redirect("login")
-
-    try:
-        # 1. Update Appointment Status (Makes it disappear from the main list)
-        supabase.table("appointment").update({"status": "Completed"}).eq("id", appointment_id).execute()
-
-        # 2. Update Patient Record (Logs the successful visit)
-        # We try to find the record linked to this appointment_id
-        response = supabase.table('patient_records').update({
-            'successful_appointment_visit': True,
-            'doctor_notes': 'Appointment completed and visit logged.'
-        }).eq('appointment_id', appointment_id).execute()
-        
-        messages.success(request, "Appointment marked as Complete! It has been moved to Patient Records.")
-            
-    except Exception as e:
-        print(f"DEBUG: Error completing appointment {appointment_id}: {str(e)}")
-        messages.error(request, f"Failed to complete appointment: {str(e)}")
-            
-    return redirect("appointment_list")
-
 
 # ... existing imports ...
 
@@ -1465,37 +1460,6 @@ def appointment_history(request):
         print(f"Error: {e}")
         return redirect("user_dashboard")
 
-    
-
-def appointment_history(request):
-    if not request.session.get("user_id"):
-        return redirect("login")
-        
-    try:
-        user_email = request.session.get("user_email")
-        
-        # Fetch all appointments
-        response = supabase.table("appointment").select("*").eq("user_email", user_email).order("appointment_date", desc=True).execute()
-        all_appointments = response.data or []
-        
-        today = datetime.now().date()
-        past_appointments = []
-
-        for appt in all_appointments:
-            try:
-                appt_date = datetime.strptime(appt['appointment_date'], '%Y-%m-%d').date()
-                
-                # Condition: Is Past OR Is Completed
-                if appt_date < today or appt.get('status') == 'Completed':
-                    past_appointments.append(appt)
-            except ValueError:
-                continue
-
-        return render(request, "appointment_history.html", {"history": past_appointments})
-
-    except Exception as e:
-        print(f"Error: {e}")
-        return redirect("user_dashboard")
     
 def home(request):
     return render(request, "home.html")

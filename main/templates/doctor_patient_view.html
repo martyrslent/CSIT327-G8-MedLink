@@ -1,10 +1,11 @@
 {% extends 'admin_base.html' %}
 
-{% block content %}
-<div class="main-content">
+{% block content %}<div class="main-content">
     <div class="header-wrapper">    
         <div class="header-title">
             <h2>Patient Medical Profile</h2>
+        </div>
+    </div>
 
     <div class="stats-container" style="display: block; margin-top: 20px;">
         <div class="card" style="background: rgba(245, 242, 242, 0.171); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
@@ -22,7 +23,7 @@
             </div>
         </div>
 
-        <div class="card" style="background: #fffdfd49; padding: 25px; border-radius: 10px; border-left: 5px solid #e74c3c;">
+        <div class="card" style="background: #fffdfd49; padding: 25px; border-radius: 10px; border-left: 5px solid #e74c3c; margin-bottom: 20px;">
             <h3 style="color: #ee1f08; margin-top: 0;">⚠️ Medical Alert Information</h3>
             
             <div style="margin-top: 15px;">
@@ -48,29 +49,22 @@
             </div>  
         </div>
 
-        <div class="card" style="background: rgba(114, 102, 102, 0.363); padding: 20px; border-radius: 10px; margin-top: 20px;">
-            <h3>Medical History</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr style="border-bottom: 2px solid #eee;">
-                        <th style="text-align: left; padding: 10px;">Date</th>
-                        <th style="text-align: left; padding: 10px;">Doctor Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for record in medical_history %}
-                    <tr style="border-bottom: 1px solid #eee;">
-                        <td style="padding: 10px;">{{ record.record_date }}</td>
-                        <td style="padding: 10px;">{{ record.doctor_notes }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="2" style="padding: 20px; text-align: center; color: #7f8c8d;">No previous records found.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+        <div class="card" style="background: rgba(114, 102, 102, 0.363); padding: 20px; border-radius: 10px;">
+            <h3 style="color: #f0f2f5e1;">Current Appointment Details</h3>
+            
+            {% if current_appointment %}
+                <div style="margin-top: 15px;">
+                    <p><strong>Appointment Date:</strong> {{ current_appointment.appointment_date }} at {{ current_appointment.appointment_time }}</p>
+                    <hr style="border-color: #ffffff33;">
+                    <h4 style="margin-bottom: 5px; color: #f7f1f1ee;">Reason for Visit:</h4>
+                    <div style="background: rgba(255, 255, 255, 0.9); color: #333; padding: 15px; border-radius: 5px;">
+                        {{ current_appointment.reason_for_visit|linebreaks }}
+                    </div>
+                </div>
+            {% else %}
+                <p style="color: #ddd;"><em>No specific appointment selected.</em></p>
+            {% endif %}
         </div>
-    </div>
-</div>
+
+    </div></div>
 {% endblock %}
