@@ -1,19 +1,52 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block title %}About MedLink{% endblock %}
 
 {% block content %}
+<style>
+.wrapper, body, html {
+    background-image: url('{% static "main/img/wavybg2.png" %}') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-attachment: fixed !important;
+}
+
+.about-container {
+    padding: 100px 20px 40px; /* Push content down */
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.about-container h1 {
+    margin-bottom: 20px;
+    font-size: 3rem;
+    color: #d10000;
+}
+
+.about-container img {
+    width: 100%;
+    max-width: 600px;
+    margin: 20px auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    display: block;
+}
+
+.about-container p {
+    font-size: 1.1rem;
+    color: #131313ff;
+    margin-bottom: 15px;
+}
+</style>
 
 <div class="about-container">
     <h1>About Us</h1>
-
+    <img src="{% static "main/img/hospital3.png" %}" alt="About Us Image">
     <p>
-        MedLink is committed to providing convenient digital healthcare services.
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur id
-        risus sed lorem luctus porta. Nullam vel ex sit amet urna dapibus
-        pharetra. Sed suscipit leo nec lectus luctus ultricies.
+        MedLink is dedicated to making healthcare accessible, convenient, and personalized through innovative digital solutions. Our mission is to connect patients with trusted medical professionals, streamline appointments, and provide resources that support your overall wellness. We combine technology with compassionate care to ensure every individual receives timely and effective healthcare, right at their fingertips.
     </p>
-
     <p>
         Our mission is to connect patients with qualified healthcare professionals,
         ensuring accessibility, convenience, and trust.

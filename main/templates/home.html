@@ -14,35 +14,35 @@
 
 <!-- Hero Fullscreen Section -->
 <section class="hero-fullscreen">
-
     <!-- MERGED NAVBAR -->
     <nav class="navbar">
-        <!-- From base.html -->
         <a href="{% url 'home' %}" class="nav-link">Home</a>
         <a href="{% url 'all_doctors' %}" class="nav-link">All Doctors</a>
         <a href="{% url 'about' %}" class="nav-link">About</a>
-
-        <!-- From friend’s design -->
-        <a href="#" class="nav-link">Privacy Policy</a>
-
-        <!-- Highlight button from base.html -->
+        <a href="{% url 'privacy' %}" class="nav-link">Privacy Policy</a>
         <a href="{% url 'register' %}" class="nav-link highlight">Create Account</a>
     </nav>
 
-    <!-- HERO CONTENT -->
-    <div class="hero-content">
-        <div class="hero-logo">
-            <img src="{% static 'main/img/medlink.png' %}" alt="MedLink Logo">
-        </div>
-
-        <div class="hero-text">
-            <h1>Your Health, Our Priority</h1>
-            <p>Trusted medical care delivered with compassion and expertise. Experience personalized
-               healthcare services designed for your wellness journey.</p>
-
-            <a href="{% url 'login' %}" class="btn-appointment">Book Appointment</a>
+   <!-- SPLIT CONTENT -->
+<div class="hero-split">
+    <!-- LEFT SIDE (gradient bg with content container) -->
+    <div class="hero-left">
+        <div class="hero-container">
+            <div class="hero-logo">
+                <img src="{% static 'main/img/medlink.png' %}" alt="MedLink Logo">
+            </div>
+            <div class="hero-text">
+                <h1>Your Health, Our Priority</h1>
+                <p>Trusted medical care delivered with compassion and expertise. Experience personalized healthcare services designed for your wellness journey.</p>
+                <a href="{% url 'login' %}" class="btn-appointment">Book Appointment</a>
+            </div>
         </div>
     </div>
+
+    <!-- RIGHT SIDE (animated background images remain) -->
+    <div class="hero-right"></div>
+</div>
+
 </section>
 
 <!-- Features Section -->
@@ -71,32 +71,83 @@
     </div>
 </footer>
 
-<!-- FULL CSS FROM YOUR FRIEND (UNCHANGED) -->
+<!-- CSS -->
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; background: #fff; }
 
-/* --- Hero Section --- */
+
+
+/* Hero Section Split */
 .hero-fullscreen {
     width: 100%;
     height: 100vh;
     position: relative;
     overflow: hidden;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-split {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.hero-left {
+    flex: 1;
+    background: linear-gradient(135deg, #aa0000ff, #c20000ff, #ff3300ff);
+    background-size: 400% 400%;
+    animation: gradientAnimation 5s ease infinite;
+    position: relative;
+}
+
+.hero-right {
+    flex: 1;
+    display: flex;
     justify-content: center;
     align-items: center;
-    text-align: center;
+    background-size: cover;
+    background-position: center;
+    position: relative;
 }
+
+/* Hero container on left side */
+.hero-container {
+    background: #ffffff; /* white background */
+    border-radius: 25px; /* smooth corners */
+    padding: 40px;
+    max-width: 450px;
+    margin: 50px; /* spacing from edges */
+    text-align: left;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.hero-left .hero-logo img {
+    width: 400px;
+    margin-bottom: 30px;
+}
+
+.hero-left .hero-text h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+}
+
+.hero-left .hero-text p {
+    font-size: 1.3rem;
+    margin-bottom: 25px;
+}
+
 
 /* Navbar */
 .navbar {
     position: absolute;
     top: 30px;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 30px;
     display: flex;
     gap: 25px;
     background: rgba(255,255,255,0.85);
@@ -119,7 +170,6 @@ body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; backg
     transform: translateY(-2px);
 }
 
-/* Highlight button */
 .highlight {
     background: #d10000;
     color: white !important;
@@ -132,44 +182,56 @@ body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; backg
     background: #ff5500;
 }
 
-/* Hero Content */
-.hero-content { z-index: 5; }
+/* Gradient Animation */
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Hero Content (right side) */
+.hero-content {
+    text-align: center;
+    max-width: 80%;
+    z-index: 5;
+}
+
 .hero-logo img {
-    width: 300px;
+    width: 350px;
     margin-bottom: 40px;
-    filter: drop-shadow(0 10px 25px rgba(0,0,0,0.3));
+    filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0));
 }
 
 .hero-text h1 {
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: 700;
     color: #d10000;
-    text-shadow: 2px 2px 8px rgba(0,0,0,0.25);
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0);
     margin-bottom: 20px;
 }
 
 .hero-text p {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     color: #700000;
-    max-width: 650px;
+    max-width: 700px;
     margin: 0 auto 30px;
     opacity: 0.9;
-    text-shadow: 1px 1px 5px rgba(0,0,0,0.15);
+    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0);
 }
 
 /* Book Appointment Button */
 .btn-appointment {
     display: inline-block;
-    padding: 18px 40px;
+    padding: 25px 35px;
     background: linear-gradient(135deg, #ff5500, #d13a00);
     color: #fff;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 1.5rem;
     border-radius: 50px;
     text-decoration: none;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(255,85,0,0.4);
+    box-shadow: 0 8px 25px rgba(196, 0, 0, 0.68);
     transition: all 0.3s ease;
 }
 
@@ -193,7 +255,7 @@ body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; backg
     box-shadow: 0 12px 35px rgba(255,85,0,0.5);
 }
 
-/* --- Features --- */
+/* Features Section */
 .features {
     padding: 100px 30px;
     display: grid;
@@ -255,29 +317,29 @@ body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; backg
 }
 </style>
 
-<!-- JS (kept exactly as original) -->
+<!-- JS -->
 <script>
-const hero = document.querySelector('.hero-fullscreen');
+const heroRight = document.querySelector('.hero-right');
 const bgImages = [
-    "{% static 'main/img/hospital.png' %}",
+    "{% static 'main/img/home.png' %}",
     "{% static 'main/img/hospital2.png' %}",
     "{% static 'main/img/hospital4.png' %}"
 ];
 let index = 0;
 let posX = 0;
-hero.style.backgroundImage = `url('${bgImages[0]}')`;
-hero.style.backgroundSize = 'cover';
-hero.style.backgroundPosition = '0% center';
-hero.style.transition = 'background-position 0.1s linear';
+heroRight.style.backgroundImage = `url('${bgImages[0]}')`;
+heroRight.style.backgroundSize = 'cover';
+heroRight.style.backgroundPosition = 'center center';
+heroRight.style.transition = 'background-position 0.1s linear';
 
 function slideBackground() {
     posX -= 0.1;
     if(posX <= -100) {
         posX = 0;
         index = (index + 1) % bgImages.length;
-        hero.style.backgroundImage = `url('${bgImages[index]}')`;
+        heroRight.style.backgroundImage = `url('${bgImages[index]}')`;
     }
-    hero.style.backgroundPosition = `${posX}% center`;
+    heroRight.style.backgroundPosition = `${posX}% center`;
     requestAnimationFrame(slideBackground);
 }
 slideBackground();
