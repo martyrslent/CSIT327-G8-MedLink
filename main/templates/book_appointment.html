@@ -86,49 +86,55 @@
     </style>
 
     <script>
-        const ALL_DOCTORS = [
-            {% for doctor in doctors %}
-            {
-                name: "Dr. {{ doctor.first_name }} {{ doctor.last_name }}",
-                value: "{{ doctor.first_name }} {{ doctor.last_name }}",
-                specialization: "{{ doctor.specialization }}",
-                is_in: {{ doctor.is_in|yesno:"true,false" }}
-            },
-            {% endfor %}
-        ];
+    const ALL_DOCTORS = [
+        {% for doctor in doctors %}
+        {
+            name: "Dr. {{ doctor.first_name }} {{ doctor.last_name }}",
+            value: "{{ doctor.first_name }} {{ doctor.last_name }}",
+            specialization: "{{ doctor.specialization }}",
+            is_in: {{ doctor.is_in|yesno:"true,false" }}
+        },
+        {% endfor %}
+    ];
 
-        function filterDoctors() {
-            const specialization = document.getElementById("specialization_filter").value;
-            const select = document.getElementById("doctor_name_select");
-            select.innerHTML = '<option disabled selected>-- Choose a Doctor --</option>';
+    function filterDoctors() {
+        const specialization = document.getElementById("specialization_filter").value;
+        const select = document.getElementById("doctor_name_select");
+        select.innerHTML = '<option value="" disabled selected>-- Choose a Doctor --</option>';
 
-            ALL_DOCTORS.filter(doc =>
-                (specialization === "All" || doc.specialization === specialization) && doc.is_in
-            ).forEach(doc => {
-                const opt = document.createElement("option");
-                opt.value = doc.value;
-                opt.textContent = doc.name;
-                select.appendChild(opt);
-            });
+        const availableDoctors = ALL_DOCTORS.filter(doc =>
+            (specialization === "All" || doc.specialization === specialization) && doc.is_in
+        );
+
+        availableDoctors.forEach(doc => {
+            const opt = document.createElement("option");
+            opt.value = doc.value;
+            opt.textContent = doc.name;
+            select.appendChild(opt);
+        });
+
+        if (availableDoctors.length === 1) {
+            select.selectedIndex = 1;
         }
+    }
 
-        function toggleNotifications() {
-            const menu = document.getElementById("notificationMenu");
-            menu.style.display = menu.style.display === "block" ? "none" : "block";
-        }
+    function toggleNotifications() {
+        const menu = document.getElementById("notificationMenu");
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
 
-        window.onclick = function(e) {
-            if (!e.target.closest('#notifBtn')) {
-                document.getElementById("notificationMenu").style.display = "none";
-            }
+    window.onclick = function(e) {
+        if (!e.target.closest('#notifBtn')) {
+            document.getElementById("notificationMenu").style.display = "none";
         }
+    }
 
-        window.onload = function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementsByName("appointment_date")[0].setAttribute("min", today);
-            filterDoctors();
-        }
-    </script>
+    window.onload = function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementsByName("appointment_date")[0].setAttribute("min", today);
+        filterDoctors();
+    }
+</script>
 </head>
 
 <body>
@@ -147,7 +153,6 @@
     </aside>
 
     <main class="content">
-
         <div class="top-header">
             <div class="welcome-section">
                 <h2>New Appointment 📅</h2>
@@ -165,7 +170,6 @@
         </div>
 
         <div class="booking-card">
-
             {% if messages %}
                 {% for message in messages %}
                     <div class="message-box {% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
@@ -184,24 +188,17 @@
                 <div class="form-group">
                     <label class="form-label">Filter by Specialization</label>
                     <select id="specialization_filter" class="form-input" onchange="filterDoctors()">
-                        <option value="All">All</option>
-                        <option value="General Physician">General Physician</option>
-                        <option value="Dentist">Dentist</option>
-                        <option value="Pediatrician">Pediatrician</option>
-                        <option value="Cardiologist">Cardiologist</option>
-                        <option value="Dermatologist">Dermatologist</option>
-                        <option value="Gynecologist">Gynecologist</option>
-                        <option value="Neurologist">Neurologist</option>
-                        <option value="Orthopedic">Orthopedic</option>
-                        <option value="Ophthalmologist">Ophthalmologist</option>
-                        <option value="ENT Specialist">ENT Specialist</option>
-                        <option value="Psychiatrist">Psychiatrist</option>
+                        {% for spec in specializations %}
+                            <option value="{{ spec }}">{{ spec }}</option>
+                        {% endfor %}
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Select Doctor</label>
-                    <select name="doctor_name" id="doctor_name_select" class="form-input" required></select>
+                    <select name="doctor_name" id="doctor_name_select" class="form-input" required>
+                        <option value="" disabled selected>-- Choose a Doctor --</option>
+                    </select>
                 </div>
 
                 <div class="form-grid">
@@ -210,32 +207,44 @@
                         <input type="date" name="appointment_date" class="form-input" required>
                     </div>
 
-                  <div class="form-group">
-    <label class="form-label">Time</label>
-    <select name="appointment_time" class="form-input" required>
-        <option disabled selected>Select Time</option>
-        <option value="08:00 AM">08:00 AM</option>
-        <option value="08:30 AM">08:30 AM</option>
-        <option value="09:00 AM">09:00 AM</option>
-        <option value="09:30 AM">09:30 AM</option>
-        <option value="10:00 AM">10:00 AM</option>
-        <option value="10:30 AM">10:30 AM</option>
-        <option value="11:00 AM">11:00 AM</option>
-        <option value="11:30 AM">11:30 AM</option>
-        <option value="12:00 PM">12:00 PM</option>
-        <option value="12:30 PM">12:30 PM</option>
-        <option value="01:00 PM">01:00 PM</option>
-        <option value="01:30 PM">01:30 PM</option>
-        <option value="02:00 PM">02:00 PM</option>
-        <option value="02:30 PM">02:30 PM</option>
-        <option value="03:00 PM">03:00 PM</option>
-        <option value="03:30 PM">03:30 PM</option>
-        <option value="04:00 PM">04:00 PM</option>
-        <option value="04:30 PM">04:30 PM</option>
-        <option value="05:00 PM">05:00 PM</option>
-    </select>
-</div>
+                    <div class="form-group">
+                        <label class="form-label">Time</label>
+                        <select name="appointment_time" class="form-input" required>
+                            <option disabled selected>Select Time</option>
+                            <option value="08:00 AM">08:00 AM</option>
+                            <option value="08:30 AM">08:30 AM</option>
+                            <option value="09:00 AM">09:00 AM</option>
+                            <option value="09:30 AM">09:30 AM</option>
+                            <option value="10:00 AM">10:00 AM</option>
+                            <option value="10:30 AM">10:30 AM</option>
+                            <option value="11:00 AM">11:00 AM</option>
+                            <option value="11:30 AM">11:30 AM</option>
+                            <option value="12:00 PM">12:00 PM</option>
+                            <option value="12:30 PM">12:30 PM</option>
+                            <option value="01:00 PM">01:00 PM</option>
+                            <option value="01:30 PM">01:30 PM</option>
+                            <option value="02:00 PM">02:00 PM</option>
+                            <option value="02:30 PM">02:30 PM</option>
+                            <option value="03:00 PM">03:00 PM</option>
+                            <option value="03:30 PM">03:30 PM</option>
+                            <option value="04:00 PM">04:00 PM</option>
+                            <option value="04:30 PM">04:30 PM</option>
+                            <option value="05:00 PM">05:00 PM</option>
+                        </select>
+                    </div>
+                </div>
 
+                <div class="form-group">
+                    <label class="form-label">Reason for Visit</label>
+                    <select name="reason_for_visit" class="form-input" required>
+                        <option value="" disabled selected>-- Select Reason --</option>
+                        <option value="Check-up">Annual Check-up</option>
+                        <option value="Consultation">New Symptom/Consultation</option>
+                        <option value="Vaccination">Vaccination</option>
+                        <option value="Follow-up">Follow-up Visit</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
 
                 <button class="btn-submit-booking" type="submit">
                     <i class="fa fa-calendar-check"></i> Book Appointment
