@@ -4,157 +4,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MedLink</title>
+    <title>MedLink - Your Health, Our Priority</title>
 
-    <!-- Global stylesheet from your base.html -->
     <link rel="stylesheet" href="{% static 'main/css/base.css' %}">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-<!-- Hero Fullscreen Section -->
 <section class="hero-fullscreen">
-    <!-- MERGED NAVBAR -->
+
     <nav class="navbar">
         <a href="{% url 'home' %}" class="nav-link">Home</a>
         <a href="{% url 'all_doctors' %}" class="nav-link">All Doctors</a>
-        <a href="{% url 'about' %}" class="nav-link">About</a>
-        <a href="{% url 'privacy' %}" class="nav-link">Privacy Policy</a>
+        <a href="{% url 'about' %}" class="nav-link">About Us</a>
+        <a href="#" class="nav-link">Privacy Policy</a>
         <a href="{% url 'register' %}" class="nav-link highlight">Create Account</a>
     </nav>
 
-   <!-- SPLIT CONTENT -->
-<div class="hero-split">
-    <!-- LEFT SIDE (gradient bg with content container) -->
-    <div class="hero-left">
-        <div class="hero-container">
-            <div class="hero-logo">
+    <div class="hero-overlay">
+        <div class="hero-content-modern">
+            <div class="hero-logo-modern">
                 <img src="{% static 'main/img/medlink.png' %}" alt="MedLink Logo">
             </div>
-            <div class="hero-text">
+
+            <div class="hero-text-modern">
                 <h1>Your Health, Our Priority</h1>
-                <p>Trusted medical care delivered with compassion and expertise. Experience personalized healthcare services designed for your wellness journey.</p>
-                <a href="{% url 'login' %}" class="btn-appointment">Book Appointment</a>
+                <p>Trusted medical care delivered with compassion and expertise. Experience personalized
+                   healthcare services designed for your wellness journey.</p>
+
+                <a href="{% url 'login' %}" class="btn-primary-action">Book Appointment Today</a>
             </div>
         </div>
     </div>
-
-    <!-- RIGHT SIDE (animated background images remain) -->
-    <div class="hero-right"></div>
-</div>
-
 </section>
 
-<!-- Features Section -->
-<section class="features">
-    <div class="feature-card">
-        <div class="feature-image doctor-bg"></div>
+<section class="features-grid">
+    <div class="feature-card-modern">
+        <div class="feature-icon doctor-icon"></div>
         <h3>Expert Doctors</h3>
         <p>Board-certified professionals dedicated to your health and wellbeing.</p>
     </div>
-    <div class="feature-card">
-        <div class="feature-image appointment-bg"></div>
+    <div class="feature-card-modern">
+        <div class="feature-icon appointment-icon"></div>
         <h3>Easy Appointments</h3>
         <p>Schedule visits hassle-free with our intuitive online booking system.</p>
     </div>
-    <div class="feature-card">
-        <div class="feature-image patient-bg"></div>
-        <h3>Patient Care</h3>
+    <div class="feature-card-modern">
+        <div class="feature-icon patient-icon"></div>
+        <h3>Compassionate Care</h3>
         <p>Personalized attention ensuring your comfort and complete safety.</p>
     </div>
 </section>
 
-<!-- Footer -->
-<footer class="footer">
+<footer class="footer-modern">
     <div class="footer-content">
-        <p>&copy; 2025 MedLink. All rights reserved. | Providing healthcare excellence.</p>
+        <p>&copy; 2025 MedLink. All Rights Reserved.</p>
     </div>
 </footer>
 
-<!-- CSS -->
 <style>
+/* New Base Styling */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; background: #fff; }
-
-
-
-/* Hero Section Split */
-.hero-fullscreen {
-    width: 100%;
-    height: 100vh;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
+:root {
+    --primary-color: #D10000; /* Original Red */
+    --secondary-color: #FF5500; /* Original Orange/Highlight */
+    --text-dark: #333333;
+    --text-light: #F0F0F0;
+    --bg-light: #F7F7F7;
+    --bg-card: #FFFFFF;
 }
 
-.hero-split {
-    display: flex;
-    width: 100%;
-    height: 100%;
+body {
+    font-family: 'Poppins', sans-serif; /* Poppins for general text/headings */
+    line-height: 1.6;
+    color: var(--text-dark);
+    background: var(--bg-light);
 }
 
-.hero-left {
-    flex: 1;
-    background: linear-gradient(135deg, #aa0000ff, #c20000ff, #ff3300ff);
-    background-size: 400% 400%;
-    animation: gradientAnimation 5s ease infinite;
-    position: relative;
-}
-
-.hero-right {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-}
-
-/* Hero container on left side */
-.hero-container {
-    background: #ffffff; /* white background */
-    border-radius: 25px; /* smooth corners */
-    padding: 40px;
-    max-width: 450px;
-    margin: 50px; /* spacing from edges */
-    text-align: left;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.hero-left .hero-logo img {
-    width: 400px;
-    margin-bottom: 30px;
-}
-
-.hero-left .hero-text h1 {
-    font-size: 3.5rem;
-    margin-bottom: 20px;
-}
-
-.hero-left .hero-text p {
-    font-size: 1.3rem;
-    margin-bottom: 25px;
-}
-
-
-/* Navbar */
+/* 1. ORIGINAL NAVBAR STYLES (Pulled from your source code) */
 .navbar {
     position: absolute;
     top: 30px;
-    right: 30px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     gap: 25px;
     background: rgba(255,255,255,0.85);
     padding: 10px 30px;
     border-radius: 50px;
     box-shadow: 0 6px 25px rgba(0,0,0,0.15);
-    z-index: 10;
+    z-index: 100; /* Ensure it is on top */
+    font-family: 'Inter', sans-serif; /* Use Inter font for the nav links */
 }
 
 .nav-link {
@@ -163,6 +109,8 @@ body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; backg
     font-weight: 600;
     font-size: 1rem;
     transition: all 0.3s ease;
+    /* Resetting some styles from previous attempts to match original */
+    padding: 0;
 }
 
 .nav-link:hover {
@@ -173,176 +121,208 @@ body { font-family: 'Inter', sans-serif; line-height: 1.6; color: #900000; backg
 .highlight {
     background: #d10000;
     color: white !important;
-    padding: 8px 18px;
+    padding: 8px 18px; /* Original padding */
     border-radius: 25px;
     transition: all .3s ease;
 }
 
 .highlight:hover {
     background: #ff5500;
+    /* Keeping the original hover style */
 }
 
-/* Gradient Animation */
-@keyframes gradientAnimation {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* Hero Content (right side) */
-.hero-content {
-    text-align: center;
-    max-width: 80%;
-    z-index: 5;
-}
-
-.hero-logo img {
-    width: 350px;
-    margin-bottom: 40px;
-    filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0));
-}
-
-.hero-text h1 {
-    font-size: 3.5rem;
-    font-weight: 700;
-    color: #d10000;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0);
-    margin-bottom: 20px;
-}
-
-.hero-text p {
-    font-size: 1.4rem;
-    color: #700000;
-    max-width: 700px;
-    margin: 0 auto 30px;
-    opacity: 0.9;
-    text-shadow: 1px 1px 5px rgba(0, 0, 0, 0);
-}
-
-/* Book Appointment Button */
-.btn-appointment {
-    display: inline-block;
-    padding: 25px 35px;
-    background: linear-gradient(135deg, #ff5500, #d13a00);
-    color: #fff;
-    font-weight: 600;
-    font-size: 1.5rem;
-    border-radius: 50px;
-    text-decoration: none;
+/* 2. Hero Section - Fullscreen and High Contrast (Modernized) */
+.hero-fullscreen {
+    width: 100%;
+    height: 100vh;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(196, 0, 0, 0.68);
-    transition: all 0.3s ease;
+    /* Background properties are set by the JS for the sliding effect */
+    background-size: cover;
+    background-position: 0% center;
+    background-color: #444; /* Fallback color */
 }
 
-.btn-appointment::before {
-    content: '';
+/* FIX: Overlay for Readability */
+.hero-overlay {
     position: absolute;
-    top: 0; left: -75%;
-    width: 50%;
+    top: 0;
+    left: 0;
+    width: 100%;
     height: 100%;
-    background: rgba(255,255,255,0.3);
-    transform: skewX(-25deg);
-    transition: all 0.5s ease;
+    /* Subtle dark overlay to ensure white text is visible over background images */
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
-.btn-appointment:hover::before {
-    left: 125%;
+.hero-content-modern { z-index: 5; color: white; }
+
+.hero-logo-modern img {
+    width: 300px;
+    margin-bottom: 40px;
+    filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
 }
 
-.btn-appointment:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 12px 35px rgba(255,85,0,0.5);
+.hero-text-modern h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: white; /* High contrast text */
+    text-shadow: 0 0 10px rgba(0,0,0,0.8);
+    margin-bottom: 20px;
+    letter-spacing: 1px;
 }
 
-/* Features Section */
-.features {
-    padding: 100px 30px;
+.hero-text-modern p {
+    font-size: 1.25rem;
+    color: var(--text-light);
+    max-width: 700px;
+    margin: 0 auto 40px;
+    text-shadow: 0 0 5px rgba(0,0,0,0.6);
+}
+
+/* Primary Action Button (Modernized) */
+.btn-primary-action {
+    display: inline-block;
+    padding: 18px 45px;
+    background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(255, 85, 0, 0.5);
+}
+
+.btn-primary-action:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(255, 85, 0, 0.7);
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+}
+
+/* 3. Features Section (Modernized) */
+.features-grid {
+    padding: 100px 50px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 40px;
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
 }
 
-.feature-card {
-    background: rgba(255,255,255,0.9);
-    border-radius: 24px;
-    padding: 40px 30px;
+.feature-card-modern {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 40px;
     text-align: center;
-    box-shadow: 0 10px 40px rgba(209,0,0,0.08);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-    position: relative;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.08);
+    transition: transform 0.4s ease, box-shadow 0.4s ease, border 0.4s ease;
+    border: 1px solid var(--bg-light);
 }
 
-.feature-card:hover {
-    transform: translateY(-12px) rotateX(2deg);
-    box-shadow: 0 25px 60px rgba(209,0,0,0.2);
+.feature-card-modern:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 25px 60px rgba(209,0,0,0.15);
+    border-color: var(--primary-color);
 }
 
-.feature-image {
-    width: 80px;
-    height: 80px;
-    border-radius: 20px;
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
     margin: 0 auto 20px;
-    animation: pulse 2s infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: white;
 }
 
-.doctor-bg { background: linear-gradient(135deg, #d10000, #ff5500); box-shadow: 0 0 20px rgba(255,85,0,0.4); }
-.appointment-bg { background: linear-gradient(135deg, #ff5500, #d13a00); box-shadow: 0 0 20px rgba(209,0,0,0.4); }
-.patient-bg { background: linear-gradient(135deg, #900000, #d10000); box-shadow: 0 0 20px rgba(255,85,0,0.3); }
+.doctor-icon { background: var(--primary-color); }
+.appointment-icon { background: var(--secondary-color); }
+.patient-icon { background: #3c00c7; }
 
-@keyframes pulse {
-    0%,100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+.feature-card-modern h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 15px;
 }
 
-.feature-card h3 { font-size: 1.5rem; font-weight: 600; color: #d10000; margin-bottom: 15px; }
-.feature-card p { font-size: 1rem; color: #700000; opacity: 0.9; }
+.feature-card-modern p {
+    font-size: 1rem;
+    color: var(--text-dark);
+}
 
-/* Footer */
-.footer {
-    background: linear-gradient(135deg, #f7f7f7 0%, #ffeded 100%);
+/* 4. Footer (Modernized) */
+.footer-modern {
+    background: #fff;
+    border-top: 4px solid #D10000;
     padding: 30px 20px;
     text-align: center;
-    border-top: 4px solid #d10000;
 }
 
-.footer-content p { color: #900000; font-size: 0.95rem; }
+.footer-content p {
+    color: #333;
+    font-size: 0.95rem;
+}
+/* Media Queries for Responsiveness */
+@media (max-width: 1024px) {
+    .navbar { gap: 20px; padding: 10px 20px; }
+    .hero-text-modern h1 { font-size: 3rem; }
+    .hero-text-modern p { font-size: 1.1rem; max-width: 90%; }
+}
 
-@media (max-width: 900px) {
-    .hero-text h1 { font-size: 2.5rem; }
-    .hero-text p { font-size: 1rem; }
-    .features { grid-template-columns: 1fr; padding: 60px 20px; }
+@media (max-width: 768px) {
+    .navbar {
+        /* Stack navigation items for small screens */
+        flex-direction: column;
+        padding: 10px 15px;
+        gap: 10px;
+        top: 20px;
+        width: 90%;
+        border-radius: 20px;
+    }
+    .hero-text-modern h1 { font-size: 2.2rem; }
+    .hero-text-modern p { font-size: 1rem; }
+    .btn-primary-action { padding: 15px 30px; font-size: 1rem; }
+    .features-grid { padding: 60px 20px; }
 }
 </style>
 
-<!-- JS -->
 <script>
-const heroRight = document.querySelector('.hero-right');
+const hero = document.querySelector('.hero-fullscreen');
 const bgImages = [
-    "{% static 'main/img/home.png' %}",
+    "{% static 'main/img/hospital.png' %}",
     "{% static 'main/img/hospital2.png' %}",
     "{% static 'main/img/hospital4.png' %}"
 ];
 let index = 0;
 let posX = 0;
-heroRight.style.backgroundImage = `url('${bgImages[0]}')`;
-heroRight.style.backgroundSize = 'cover';
-heroRight.style.backgroundPosition = 'center center';
-heroRight.style.transition = 'background-position 0.1s linear';
 
-function slideBackground() {
-    posX -= 0.1;
-    if(posX <= -100) {
-        posX = 0;
-        index = (index + 1) % bgImages.length;
-        heroRight.style.backgroundImage = `url('${bgImages[index]}')`;
+if (hero) {
+    // Set initial background image
+    hero.style.backgroundImage = `url('${bgImages[0]}')`;
+    hero.style.backgroundSize = 'cover';
+    hero.style.backgroundPosition = '0% center';
+
+    function slideBackground() {
+        if (!hero) return;
+
+        posX -= 0.05; // Subtle sliding speed
+        if(posX <= -100) {
+            posX = 0;
+            index = (index + 1) % bgImages.length;
+            hero.style.backgroundImage = `url('${bgImages[index]}')`;
+        }
+        hero.style.backgroundPosition = `${posX}% center`;
+        requestAnimationFrame(slideBackground);
     }
-    heroRight.style.backgroundPosition = `${posX}% center`;
-    requestAnimationFrame(slideBackground);
+    slideBackground();
 }
-slideBackground();
 </script>
 
 </body>
