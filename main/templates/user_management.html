@@ -5,8 +5,10 @@
 
 {% block style %}
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    /* Sidebar (cleaned & robust) */
+/* Sidebar (cleaned & robust) */
 .sidebar {
     position: fixed;
     top: 0;
@@ -22,19 +24,8 @@
     border-right: 1px solid rgba(0,0,0,0.08);
     z-index: 2;
     overflow: hidden;
+    font-family: 'Poppins', sans-serif;
 }
-.user-table-wrapper {
-    max-height: 350px; /* adjust height as needed */
-    overflow-y: auto;
-    border: 1px solid rgba(0,0,0,0.08);
-    border-radius: 12px;
-}
-
-.user-table-wrapper table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
 .sidebar::before {
     content: "";
     position: absolute;
@@ -48,7 +39,6 @@
     pointer-events: none;
     z-index: 0;
 }
-
 .sidebar .logo img {
     width: 150px;
     display: block;
@@ -56,8 +46,6 @@
     position: relative;
     z-index: 1;
 }
-
-/* Nav list */
 .sidebar nav ul {
     list-style: none;
     padding: 0;
@@ -68,23 +56,20 @@
     position: relative;
     z-index: 1;
 }
-
-/* Links */
 .sidebar nav ul li a {
-    color: #fff; /* reliable white */
+    color: #fff;
     text-decoration: none;
     padding: 10px 14px;
     border-radius: 10px;
     display: block;
     font-weight: 600;
     transition: background 0.25s ease, transform 0.22s ease, box-shadow 0.25s ease;
-    background: #ad0505; /* base red */
+    background: #ad0505;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
     position: relative;
     z-index: 1;
+    font-family: 'Poppins', sans-serif;
 }
-
-/* Hover / focus state: subtle slide + gradient + lift */
 .sidebar nav ul li a:hover,
 .sidebar nav ul li a:focus {
     background: linear-gradient(to right, #ff7b00, #d10000);
@@ -93,121 +78,149 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
     outline: none;
 }
-
-/* Active state (optional) */
 .sidebar nav ul li a.active {
     background: linear-gradient(to right, #d10000, #a30000);
     box-shadow: 0 8px 20px rgba(0,0,0,0.20);
     transform: translateX(3px);
 }
 
-    /* Match Admin Dashboard UI: white cards, shadows, button system, table striping */
+/* Match Admin Dashboard UI: white cards, shadows, button system, table striping */
+.user-management-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    align-items: start;
+}
+@media (min-width: 768px) {
     .user-management-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 20px;
-        align-items: start; /* ensure both cards align at the top */
+        grid-template-columns: 1fr 1fr;
     }
-    @media (min-width: 768px) {
-        .user-management-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-    }
+}
+.card.full {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 10px 26px rgba(0,0,0,0.18);
+    color: #222;
+    font-family: 'Poppins', sans-serif;
+}
+h1.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-left: 4px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'Poppins', sans-serif;
+}
+.status-tag {
+    background: #8d0000b4;
+    color: white;
+    padding: 7px 13px;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+}
 
+/* Tables: matching admin dashboard style, reduced row height and button alignment */
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
+}
+.user-table thead th {
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 700;
+    border-bottom: 2px solid rgba(200,0,0,0.08);
+    background: rgba(255, 255, 255, 1);
+    font-family: 'Poppins', sans-serif;
+}
+.user-table th, .user-table td {
+    padding: 12px 10px;
+    text-align: left;
+    vertical-align: middle;
+    font-family: 'Poppins', sans-serif;
+}
+.user-table tbody tr {
+    height: 50px; /* Reduced row height */
+}
+.user-table tbody tr:nth-child(odd) { background: rgba(245, 245, 245, 0.92); }
+.user-table tbody tr:nth-child(even) { background: rgba(255, 250, 250, 0.96); }
+.user-table tbody tr:hover { background: rgba(255, 238, 238, 0.96); }
 
-    .card.full {
-        background: #ffffff;
-        border-radius: 14px;
-        padding: 18px;
-        box-shadow: 0 10px 26px rgba(0,0,0,0.18);
-        color: #222;
-    }
+/* Badges tuned to dashboard palette */
+.status-badge { display:inline-block; padding:6px 8px; border-radius:6px; font-weight:700; font-size:0.85rem; font-family: 'Poppins', sans-serif; }
+.doctor-badge { background:#d4edda; color:#155724; }
+.doctor-notin-badge { background:#f8d7da; color:#721c24; }
+.patient-badge { background:#fff3cd; color:#856404; }
 
-    h1.page-title {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #ffffff;
-        margin-left: 4px; /* keep alignment consistent with dashboard */
-        margin-bottom: 12px;
-    }
+/* Reuse admin-dashboard button system: .btn-action and variants */
+.action-btn, .btn-action {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 10px;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-size: 0.9rem;
+    font-weight: 700;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    vertical-align: middle;
+    border: none;
+    cursor: pointer;
+    font-family: 'Poppins', sans-serif;
+}
+.action-btn:hover, .btn-action:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,0.14); }
+.btn-approve { background: linear-gradient(90deg, #ff9a3d, #ff7b00); }
+.btn-complete { background: linear-gradient(90deg, #34c38f, #0bb07a); }
+.btn-manage { background: linear-gradient(90deg, #6c7cff, #4a5dd6); }
+.btn-addstaff { background: linear-gradient(90deg, #ff5100ff, #af0000ff); }
+.delete-btn { background: linear-gradient(90deg, #dc3545, #c82333); }
+.toggle-btn { background: linear-gradient(90deg, #fdbd5cff, #ee9b00ff); color: #ffffffff !important; }
+.toggle-btn-inactive { background: linear-gradient(90deg, #d1c27d, #b8a97d); color: #ffffff !important; } /* Deeper yellow-grayish */
 
-    /* Tables: matching admin dashboard style */
-    .user-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-        font-size: 0.95rem;
-    }
-    .user-table thead th {
-        padding: 12px 10px;
-        text-align: left;
-        font-weight: 700;
-        border-bottom: 2px solid rgba(200,0,0,0.08);
-        background: rgba(255, 255, 255, 1);
-    }
-    .user-table th, .user-table td {
-        padding: 12px 10px;
-        text-align: left;
-        vertical-align: middle;
-    }
+/* Button container for horizontal alignment */
+.button-container {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start;
+}
 
-    /* Row striping */
-    .user-table tbody tr:nth-child(odd) { background: rgba(245, 245, 245, 0.92); }
-    .user-table tbody tr:nth-child(even) { background: rgba(255, 250, 250, 0.96); }
-    .user-table tbody tr:hover { background: rgba(255, 238, 238, 0.96); }
+/* Adjust action column width */
+.user-table th:nth-child(4), .user-table td:nth-child(4) {
+    width: 220px;
+}
 
-    /* Badges tuned to dashboard palette */
-    .status-badge { display:inline-block; padding:6px 8px; border-radius:6px; font-weight:700; font-size:0.85rem; }
-    .doctor-badge { background:#d4edda; color:#155724; }
-    .doctor-notin-badge { background:#f8d7da; color:#721c24; }
-    .patient-badge { background:#fff3cd; color:#856404; }
+/* Place the Add New Staff button below the doctors table to align both tables at top */
+.add-staff-container { margin-top: 14px; margin-right: 30px;}
+.add-staff-container .btn-action { width: 100%; display: block; text-align:center; }
 
-    /* Reuse admin-dashboard button system: .btn-action and variants */
-    .action-btn, .btn-action {
-        display: inline-block;
-        padding: 8px 12px;
-        border-radius: 10px;
-        color: #fff !important;
-        text-decoration: none !important;
-        font-size: 0.9rem;
-        font-weight: 700;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
-        vertical-align: middle;
-        border: none;
-        cursor: pointer;
-    }
-    .action-btn:hover, .btn-action:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,0.14); }
+/* Messages styling to match cards */
+.messages-container p {
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+    font-family: 'Poppins', sans-serif;
+}
 
-    .btn-approve { background: linear-gradient(90deg, #ff9a3d, #ff7b00); }
-    .btn-complete { background: linear-gradient(90deg, #34c38f, #0bb07a); }
-    .btn-manage { background: linear-gradient(90deg, #6c7cff, #4a5dd6); }
-    .btn-addstaff { background: linear-gradient(90deg, #ff5100ff, #af0000ff); }
-    .delete-btn { background: linear-gradient(90deg, #dc3545, #c82333); }
-    .toggle-btn { background: linear-gradient(90deg, #fdbd5cff, #ee9b00ff); color: #ffffffff !important; }
-
-    /* Place the Add New Staff button below the doctors table to align both tables at top */
-    .add-staff-container { margin-top: 14px; margin-right: 30px;}
-    .add-staff-container .btn-action { width: 100%; display: block; text-align:center; }
-
-    /* Messages styling to match cards */
-    .messages-container p {
-        padding: 10px;
-        border-radius: 8px;
-        margin-bottom: 12px;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.06);
-    }
-
-    @media (max-width: 767px) {
-        .add-staff-container .btn-action { width: 100%; }
-
-    }
-
+@media (max-width: 767px) {
+    .add-staff-container .btn-action { width: 100%; }
+}
 </style>
 {% endblock %}
 
 {% block content %}
-<h1 class="page-title">User Management ({{ total_users|default:0 }} Total Users)</h1>
+<h1 class="page-title">
+    User Management
+    <span class="status-tag">Total User Count: {{ total_users|default:0 }}</span>
+</h1>
 
 {% if messages %}
     <div class="messages-container">
@@ -220,12 +233,9 @@
 {% endif %}
 
 <div class="user-management-grid">
-    
     <div class="card full">
         <h3>Medical Staff (Doctors: {{ doctors|length }})</h3>
-        
         {% if doctors %}
-        
             <table class="user-table">
                 <thead>
                     <tr>
@@ -242,41 +252,39 @@
                             <td>{{ doctor.email }}</td>
                             <td>
                                 {% if doctor.is_in %}
-                                    <span class="status-badge doctor-badge">Doctor</span>
+                                    <span class="status-badge doctor-badge">Ready</span>
                                 {% else %}
-                                    <span class="status-badge doctor-notin-badge">Doctor (Not In)</span>
+                                    <span class="status-badge doctor-notin-badge">Away</span>
                                 {% endif %}
                             </td>
                             <td>
                                 {% if request.session.role == "superadmin" %}
-                                    <a href="{% url 'edit_user' doctor.id %}" class="action-btn btn-action btn-manage">Edit</a>
-                                    <form method="POST" action="{% url 'toggle_is_in' doctor.id %}" style="display:inline;">
-                                        {% csrf_token %}
-                                        {% if doctor.is_in %}
-                                            <button type="submit" class="action-btn toggle-btn">Set Not In</button>
-                                        {% else %}
-                                            <button type="submit" class="action-btn toggle-btn">Set In</button>
-                                        {% endif %}
-                                    </form>
-                                    <form method="POST" action="{% url 'delete_user' doctor.id %}" style="display:inline;" onsubmit="return confirm('Are you absolutely sure you want to permanently delete Dr. {{ doctor.last_name }}?');">
-                                        {% csrf_token %}
-                                        <button type="submit" class="action-btn delete-btn">Delete</button>
-                                    </form>
+                                    <div class="button-container">
+                                        <a href="{% url 'edit_user' doctor.id %}" class="action-btn btn-action btn-manage">Edit</a>
+                                        <form method="POST" action="{% url 'toggle_is_in' doctor.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            {% if doctor.is_in %}
+                                                <button type="submit" class="action-btn toggle-btn-inactive">Inactive</button>
+                                            {% else %}
+                                                <button type="submit" class="action-btn toggle-btn">Active</button>
+                                            {% endif %}
+                                        </form>
+                                        <form method="POST" action="{% url 'delete_user' doctor.id %}" style="display:inline;" onsubmit="return confirm('Are you absolutely sure you want to permanently delete Dr. {{ doctor.last_name }}?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="action-btn delete-btn">Delete</button>
+                                        </form>
+                                    </div>
                                 {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-
-            <!-- moved Add New Staff button here so both columns align at top -->
             <div class="add-staff-container">
                 <a class="btn-action btn-addstaff" href="{% url 'register_admin' %}">+ Add New Staff Member</a>
             </div>
-
         {% else %}
             <p>No doctors currently registered.</p>
-            <!-- still show the add button when no doctors -->
             <div class="add-staff-container">
                 <a class="btn-action btn-manage" href="{% url 'register_admin' %}">+ Add New Staff Member</a>
             </div>
@@ -285,7 +293,6 @@
 
     <div class="card full">
         <h3>Registered Patients ({{ patients|length }})</h3>
-        
         {% if patients %}
             <table class="user-table">
                 <thead>
@@ -303,15 +310,17 @@
                             <td>{{ patient.email }}</td>
                             <td><span class="status-badge patient-badge">Patient</span></td>
                             <td>
-                                {% if request.session.role == "superadmin" or request.session.role == "admin" %}
-                                    <a href="{% url 'edit_user' patient.id %}" class="action-btn btn-action btn-manage">Edit</a>
-                                {% endif %}
-                                {% if request.session.role == "superadmin" %}
-                                    <form method="POST" action="{% url 'delete_user' patient.id %}" style="display:inline;" onsubmit="return confirm('Are you absolutely sure you want to permanently delete {{ patient.first_name }} {{ patient.last_name }}? This action cannot be undone.');">
-                                        {% csrf_token %}
-                                        <button type="submit" class="action-btn delete-btn">Delete</button>
-                                    </form>
-                                {% endif %}
+                                <div class="button-container">
+                                    {% if request.session.role == "superadmin" or request.session.role == "admin" %}
+                                        <a href="{% url 'edit_user' patient.id %}" class="action-btn btn-action btn-manage">Edit</a>
+                                    {% endif %}
+                                    {% if request.session.role == "superadmin" %}
+                                        <form method="POST" action="{% url 'delete_user' patient.id %}" style="display:inline;" onsubmit="return confirm('Are you absolutely sure you want to permanently delete {{ patient.first_name }} {{ patient.last_name }}? This action cannot be undone.');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="action-btn delete-btn">Delete</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}
@@ -321,6 +330,5 @@
             <p>No regular patients currently registered.</p>
         {% endif %}
     </div>
-    
 </div>
 {% endblock %}

@@ -8,74 +8,98 @@
     <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* --- CORE VARS & RESET --- */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
         :root {
-            --primary-blue: #007bff; /* Main brand color */
-            --secondary-green: #28a745; /* Success color */
+            --primary-blue: #007bff;
+            --secondary-green: #28a745;
             --text-dark: #2c3e50;
             --text-muted: #7f8c8d;
             --bg-light: #f4f6f9;
             --border-color: #e6eeef;
         }
+
         body {
             background-color: var(--bg-light);
             font-family: 'Poppins', sans-serif;
             margin: 0;
-            padding: 0;
+            padding: 30px;
+            position: relative;
+            min-height: 100vh;
+            background: url('{% static "main/img/womandoctor.png" %}') no-repeat center center;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(141, 0, 0, 0.21), rgba(255, 123, 0, 0.22));
+            z-index: 0;
         }
 
-        /* --- CONTAINER AND TITLE --- */
-        .form-container { 
-            max-width: 600px; /* Increased size for professional forms */
-            margin: 50px auto; 
-            padding: 40px; 
-            border-radius: 12px; 
-            background-color: white; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Soft, professional shadow */
+        .form-container {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(141, 0, 0, 0.1), rgba(255, 123, 0, 0.1)), white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         }
-        .form-container h2 { 
-            text-align: center; 
-            color: var(--text-dark); 
-            margin-bottom: 30px; 
+
+        .form-container h2 {
+            text-align: center;
+            color: var(--text-dark);
+            margin-bottom: 30px;
             font-size: 1.8rem;
             font-weight: 700;
+            font-family: 'Poppins', sans-serif;
         }
 
-        /* --- FORM ELEMENTS --- */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
 
-        .form-group { 
-            margin-bottom: 20px; 
+        .form-group {
+            margin-bottom: 20px;
+            font-family: 'Poppins', sans-serif;
         }
         .form-group.full-width {
             grid-column: 1 / -1;
         }
-        .form-group label { 
-            display: block; 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            color: var(--text-dark); 
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dark);
             font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
         }
 
-        .form-group input[type="text"], 
+        .form-group input[type="text"],
         .form-group input[type="date"],
         .form-group input[type="email"],
         .form-group input[type="time"],
-        .form-group select { 
-            width: 100%; 
-            padding: 12px; /* Slightly larger padding */
-            border: 1px solid var(--border-color); 
-            border-radius: 8px; /* More rounded corners */
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             box-sizing: border-box;
             background: #fcfcfc;
             transition: all 0.3s ease;
+            font-family: 'Poppins', sans-serif;
         }
         .form-group input:focus,
         .form-group select:focus {
@@ -85,35 +109,34 @@
             background: white;
         }
 
-        /* --- MESSAGES --- */
-        .error-message, .success-message { 
+        .error-message, .success-message {
             padding: 15px;
             border-radius: 8px;
-            margin-bottom: 20px; 
-            text-align: center; 
-            font-weight: 600; 
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
             font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
         }
-        .error-message { 
-            background-color: #f8d7da; 
-            color: #721c24; 
+        .error-message {
+            background-color: #f8d7da;
+            color: #721c24;
             border: 1px solid #f5c6cb;
         }
-        .success-message { 
-            background-color: #d4edda; 
-            color: #155724; 
+        .success-message {
+            background-color: #d4edda;
+            color: #155724;
             border: 1px solid #c3e6cb;
         }
-        
-        /* --- BUTTONS & LINKS --- */
-        .btn-submit { 
-            background-color: var(--secondary-green); 
-            color: white; 
-            padding: 15px 20px; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            width: 100%; 
+
+        .btn-submit {
+            background: linear-gradient(to right, #8d0000, #ff7b00);
+            color: white;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
             font-size: 1.1rem;
             font-weight: 700;
             margin-top: 15px;
@@ -122,22 +145,25 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
+            font-family: 'Poppins', sans-serif;
         }
-        .btn-submit:hover { 
-            background-color: #218838; 
-            box-shadow: 0 5px 15px rgba(40,167,69,0.3);
+        .btn-submit:hover {
+            background: linear-gradient(to right, #ad0505, #ff9a3d);
+            box-shadow: 0 5px 15px rgba(173, 5, 5, 0.3);
         }
-        .back-link { 
-            display: block; 
-            text-align: center; 
-            margin-top: 25px; 
-            color: var(--primary-blue); 
-            text-decoration: none; 
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 25px;
+            color: #6c757d;
+            text-decoration: none;
             font-weight: 500;
+            font-family: 'Poppins', sans-serif;
             transition: color 0.2s;
         }
         .back-link:hover {
-            color: #0056b3;
+            color: #5a6268;
             text-decoration: underline;
         }
     </style>
@@ -154,7 +180,6 @@
 
         <form method="POST">
             {% csrf_token %}
-            
             <div class="form-grid">
                 <div class="form-group">
                     <label for="first_name"><i class="fas fa-user"></i> Patient First Name</label>
@@ -197,10 +222,10 @@
                         {% endfor %}
                     </select>
                 </div>
-            
+
                 <div class="form-group">
                     <label for="appointment_date"><i class="fas fa-calendar-day"></i> Appointment Date</label>
-                   <input type="date" id="appointment_date" name="appointment_date" required min="{{ today }}">
+                    <input type="date" id="appointment_date" name="appointment_date" required min="{{ today }}">
                 </div>
 
                 <div class="form-group">
@@ -240,7 +265,6 @@
                         <option value="Other">Other</option>
                     </select>
                 </div>
-
             </div>
 
             <button type="submit" class="btn-submit">
@@ -254,35 +278,23 @@
     </div>
 
     <script>
-    function filterDoctors() {
-        const specSelect = document.getElementById("specialization");
-        const doctorSelect = document.getElementById("doctor_name");
-        const selectedSpec = specSelect.value;
+        function filterDoctors() {
+            const specSelect = document.getElementById("specialization");
+            const doctorSelect = document.getElementById("doctor_name");
+            const selectedSpec = specSelect.value;
 
-        // Start from 1 to skip the initial '-- Choose Doctor --' option
-        for (let i = 1; i < doctorSelect.options.length; i++) { 
-            const option = doctorSelect.options[i];
-            const doctorSpec = option.getAttribute("data-specialization");
-            
-            // Check if the doctor is currently 'Not In' (disabled)
-            const isDisabled = option.disabled; 
-            
-            // Display option if specialization matches OR if "All" is selected, AND if the option is not disabled.
-            if (selectedSpec === "All" || doctorSpec === selectedSpec) {
-                // Only show if the doctor is available OR if the option isn't disabled (to allow showing "Not In" options if needed)
-                // We rely on the Django logic to make unavailable doctors disabled, but we display them based on filter match.
-                option.style.display = ""; 
-            } else {
-                option.style.display = "none";
+            for (let i = 1; i < doctorSelect.options.length; i++) {
+                const option = doctorSelect.options[i];
+                const doctorSpec = option.getAttribute("data-specialization");
+                if (selectedSpec === "All" || doctorSpec === selectedSpec) {
+                    option.style.display = "";
+                } else {
+                    option.style.display = "none";
+                }
             }
+            doctorSelect.value = "";
         }
-
-        // Reset doctor selection when filtering
-        doctorSelect.value = "";
-    }
-    
-    // Run the filter on load to ensure the initial list matches the default specialization filter (if one is set)
-    window.onload = filterDoctors;
+        window.onload = filterDoctors;
     </script>
 </body>
 </html>

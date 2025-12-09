@@ -5,11 +5,15 @@
 
 {% block style %}
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 /* Move content away from sidebar */
 .content-wrapper {
-    margin-left: -20px; /* same as admin dashboard sidebar width */
+    margin-left: -20px;
     padding: 20px 30px 40px 30px;
     min-height: 80vh;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Page title */
@@ -18,57 +22,77 @@
     font-weight: 700;
     color: #ffffff;
     margin-bottom: 20px;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Search bar container */
 form input[type="text"] {
-    padding: 10px 12px;
-    width: 250px;
-    border: 3px solid #ff7b00; /* orange accent */
-    border-radius: 8px;
+    padding: 14px 16px;
+    width: 300px;
+    border: 3px solid #ff7b00;
+    border-radius: 10px;
     transition: all 0.3s ease;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    box-shadow: 0 4px 8px rgba(173,5,5,0.2);
+    animation: searchGrow 0.3s ease forwards;
 }
 form input[type="text"]:focus {
     outline: none;
-    border-color: #ad0505; /* primary red */
-    box-shadow: 0 0 8px rgba(173,5,5,0.4);
+    border-color: #ad0505;
+    box-shadow: 0 0 12px rgba(173,5,5,0.5);
+    transform: scale(1.02);
+}
+@keyframes searchGrow {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.02); }
 }
 
 /* Search button */
 form button {
-    padding: 12px 20px;
-    margin-left: 8px;
-    background: linear-gradient(90deg, #ff7b00, #ad0505);
+    padding: 14px 24px;
+    margin-left: 10px;
+    background: linear-gradient(90deg, #ff7b00, #ad0505, #8d0000);
     color: #ffffff;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     font-weight: 700;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 6px 14px rgba(173,5,5,0.3);
+    animation: btnPulse 0.5s ease infinite alternate;
 }
 form button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(173,5,5,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(173,5,5,0.4);
+}
+@keyframes btnPulse {
+    0% { box-shadow: 0 6px 14px rgba(173,5,5,0.3); }
+    100% { box-shadow: 0 10px 20px rgba(173,5,5,0.4); }
 }
 
 /* Table card */
 table {
     width: 100%;
     border-collapse: collapse;
-    background: #ffffff; /* white card background */
+    background: #ffffff;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Table headers */
 table thead th {
-    background-color: #ffffff; /* white */
+    background-color: #ffffff;
     color: #000000d5;
     font-weight: 700;
     text-align: left;
     padding: 12px 10px;
     border-bottom: 2px solid rgba(173,5,5,0.1);
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Table rows */
@@ -91,6 +115,7 @@ table td {
     vertical-align: middle;
     color: #222;
     font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Completed status */
@@ -102,6 +127,7 @@ table td {
     font-weight: 600;
     font-size: 0.85em;
     display: inline-block;
+    font-family: 'Poppins', sans-serif;
 }
 
 /* Sidebar (cleaned & robust) */
@@ -120,8 +146,8 @@ table td {
     border-right: 1px solid rgba(0,0,0,0.08);
     z-index: 2;
     overflow: hidden;
+    font-family: 'Poppins', sans-serif;
 }
-
 .sidebar::before {
     content: "";
     position: absolute;
@@ -135,7 +161,6 @@ table td {
     pointer-events: none;
     z-index: 0;
 }
-
 .sidebar .logo img {
     width: 150px;
     display: block;
@@ -143,8 +168,6 @@ table td {
     position: relative;
     z-index: 1;
 }
-
-/* Nav list */
 .sidebar nav ul {
     list-style: none;
     padding: 0;
@@ -155,23 +178,20 @@ table td {
     position: relative;
     z-index: 1;
 }
-
-/* Links */
 .sidebar nav ul li a {
-    color: #fff; /* reliable white */
+    color: #fff;
     text-decoration: none;
     padding: 10px 14px;
     border-radius: 10px;
     display: block;
     font-weight: 600;
     transition: background 0.25s ease, transform 0.22s ease, box-shadow 0.25s ease;
-    background: #ad0505; /* base red */
+    background: #ad0505;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
     position: relative;
     z-index: 1;
+    font-family: 'Poppins', sans-serif;
 }
-
-/* Hover / focus state: subtle slide + gradient + lift */
 .sidebar nav ul li a:hover,
 .sidebar nav ul li a:focus {
     background: linear-gradient(to right, #ff7b00, #d10000);
@@ -180,8 +200,6 @@ table td {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
     outline: none;
 }
-
-/* Active state (optional) */
 .sidebar nav ul li a.active {
     background: linear-gradient(to right, #d10000, #a30000);
     box-shadow: 0 8px 20px rgba(0,0,0,0.20);
@@ -193,22 +211,21 @@ table td {
     border-radius: 12px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.12);
     margin-top: 20px;
+    font-family: 'Poppins', sans-serif;
 }
-
 .table-title {
     font-size: 1.2rem;
     font-weight: 700;
     color: #222;
     margin-bottom: 15px;
+    font-family: 'Poppins', sans-serif;
 }
-
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="content-wrapper">
-
-    <h1 class="page-title">Patient Consultation Records </h1>
+    <h1 class="page-title">Patient Consultation Records</h1>
 
     <!-- 🔎 SEARCH BAR -->
     <form method="get" style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
@@ -222,39 +239,34 @@ table td {
     </form>
 
     <!-- 📋 COMPLETED RECORDS TABLE -->
-<div class="table-container">
-    <h3 class="table-title">Patient Visitor Log</h3>
-
-    <table>
-
-        <thead>
-
-            <tr>
-                <th>Patient</th>
-                <th>Doctor</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Notes</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            {% for record in records %}
-            <tr>
-                <td>{{ record.user_id.first_name }} {{ record.user_id.last_name }}</td>
-                <td>{{ record.appointment_id.doctor_name|default:"N/A" }}</td>
-                <td>{{ record.appointment_id.appointment_date }}</td>
-                <td><span class="status-completed">✔ Completed</span></td>
-                <td>{{ record.doctor_notes|default:"—"|truncatechars:80 }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="5" style="text-align:center; padding:15px;">No completed records found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-
+    <div class="table-container">
+        <h3 class="table-title">Patient Visitor Log</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.user_id.first_name }} {{ record.user_id.last_name }}</td>
+                    <td>{{ record.appointment_id.doctor_name|default:"N/A" }}</td>
+                    <td>{{ record.appointment_id.appointment_date }}</td>
+                    <td><span class="status-completed">✔ Completed</span></td>
+                    <td>{{ record.doctor_notes|default:"—"|truncatechars:80 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align:center; padding:15px;">No completed records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

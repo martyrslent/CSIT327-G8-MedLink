@@ -2,318 +2,438 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>My Profile</title>
-    <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <style>
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .dashboard-wrap { display: flex; min-height: 100vh; }
-        .content { flex: 1; padding: 30px; }
-        .sidebar { background: #dc3545; }
-        .nav a { color: rgba(255,255,255,0.8); }
-        .nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>My Profile</title>
+  <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-        .top-header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: white; padding: 15px 30px;
-            border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            margin-bottom: 30px;
-        }
-        .welcome-section h2 { margin: 0; font-size: 1.6rem; color: #2c3e50; }
-        .welcome-section p { margin: 5px 0 0; color: #7f8c8d; font-size: 0.95rem; }
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    .dashboard-wrap { display: flex; min-height: 100vh; }
+    .content { flex: 1; padding: 30px; }
 
-        .header-actions {
-            display: flex; 
-            align-items: center;
-            gap: 15px; 
-        }
+    /* Sidebar adjustments */
+    .sidebar { 
+      background: #ffffff; 
+      padding: 30px 20px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 23px; 
+      box-sizing: border-box; 
+      border-right: 1px solid rgba(0,0,0,0.08); 
+      z-index: 2; 
+      overflow: hidden; 
+      font-family: 'Poppins', sans-serif;
+      position: relative;
+    }
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
+      background-size: cover;
+      opacity: 0.28;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .sidebar .logo { 
+      width: 180px; 
+      display: block; 
+      margin: 0 auto 30px auto; 
+      position: relative; 
+      z-index: 1; 
+    }
+    .sidebar .logo img {
+      width: 100%;
+      height: auto;
+    }
+    .sidebar nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .sidebar nav ul li a {
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 16px;
+      border-radius: 12px;
+      display: block;
+      font-weight: 600;
+      transition: background 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
+      background: linear-gradient(to right, #8d0000, #ad0505);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      position: relative;
+      z-index: 1;
+      font-family: 'Poppins', sans-serif;
+    }
+    .sidebar nav ul li a:hover,
+    .sidebar nav ul li a:focus {
+      background: linear-gradient(to right, #ad0505, #d10000);
+      color: #fff;
+      transform: translateX(8px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      outline: none;
+    }
+    .sidebar nav ul li a.active {
+      background: linear-gradient(to right, #d10000, #a30000);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      transform: translateX(4px);
+    }
 
-        .notif-wrapper { position: relative; }
-        .notif-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #555; }
-        .notif-btn:hover { color: #007bff; }
+    /* 1. TOP NAV BAR */
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 15px 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      margin-bottom: 30px;
+    }
+    .welcome-section h2 { margin: 0; font-size: 1.6rem; color: #2c3e50; }
+    .welcome-section p { margin: 5px 0 0; color: #7f8c8d; font-size: 0.95rem; }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .notif-wrapper { position: relative; }
+    .notif-btn {
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #8d0000;
+    }
+    .notif-btn:hover { color: #ad0505; }
+    .notif-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 45px;
+      width: 300px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border: 1px solid #eee;
+      overflow: hidden;
+      z-index: 100;
+    }
 
-        .notif-dropdown {
-            display: none; position: absolute; right: 0; top: 45px;
-            width: 300px; background: white; border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #eee;
-            overflow: hidden;
-            z-index: 100;
-        }
+    /* Profile Card */
+    .profile-card {
+      background: linear-gradient(135deg, rgba(141, 0, 0, 0.23), rgba(255, 123, 0, 0.26)), white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    .profile-header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 20px;
+    }
+    .profile-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #ad0505;
+      margin-bottom: 15px;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 0;
+      border-bottom: 1px dashed #eee;
+      border-top: 1px solid #f0f0f0;
+    }
+    .info-label {
+      font-weight: 600;
+      color: #666;
+    }
+    .info-value {
+      color: #333;
+      font-weight: 500;
+      font-size: 1.05rem;
+    }
+    .bio-box {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 4px solid #ad0505;
+      margin-top: 10px;
+      color: #555;
+    }
+    .section-label {
+      margin-top: 25px;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #444;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .action-grid {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 2px solid #f0f0f0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 5% auto;
+      padding: 20px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    .form-label {
+      font-weight: 600;
+      margin-bottom: 5px;
+      display: block;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .btn-book-new {
+      background: linear-gradient(to right, #8d0000, #ff7b00);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: 0 4px 10px rgba(173, 5, 5, 0.2);
+      transition: transform 0.2s;
+    }
+    .btn-book-new:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(to right, #ad0505, #ff9a3d);
+    }
+    .modal-content form button[type="submit"] {
+      background: linear-gradient(to right, #8d0000, #ff7b00);
+      color: white;
+      padding: 10px;
+      border-radius: 12px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.2s;
+    }
+    .modal-content form button[type="submit"]:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(to right, #ad0505, #ff9a3d);
+    }
+    .modal-content form button[type="button"] {
+      background: linear-gradient(to right, #6c757d, #888);
+      color: white;
+      padding: 10px;
+      border-radius: 12px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      transition: transform 0.2s;
+    }
+    .modal-content form button[type="button"]:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(to right, #7c878d, #999);
+    }
+  </style>
 
-        .profile-card {
-            background: white; padding: 40px; border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-            max-width: 700px; margin: 0 auto;
-        }
-        .profile-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #f0f0f0; padding-bottom: 20px; }
+  <script>
+    function toggleNotifications() {
+      const menu = document.getElementById("notificationMenu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    }
 
-        .profile-img {
-            width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
-            border: 4px solid #dc3545; margin-bottom: 15px;
-        }
+    function openEditModal() { document.getElementById('editModal').style.display = 'block'; }
+    function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
-        .info-row {
-            display: flex; justify-content: space-between;
-            padding: 15px 0; border-bottom: 1px dashed #eee;
-        }
-        .info-label { font-weight: 600; color: #666; }
-        .info-value { color: #333; font-weight: 500; font-size: 1.05rem; }
+    function openDeleteModal() { document.getElementById('deleteModal').style.display = 'block'; }
+    function closeDeleteModal() { document.getElementById('deleteModal').style.display = 'none'; }
 
-        .bio-box {
-            background: #f8f9fa; padding: 15px;
-            border-radius: 10px; border-left: 4px solid #007bff;
-            margin-top: 10px; color: #555;
-        }
-
-        .section-label {
-            margin-top: 25px; margin-bottom: 8px;
-            font-weight: bold; color: #444;
-            display: flex; align-items: center; gap: 8px;
-        }
-
-        .action-grid {
-            margin-top: 30px; padding-top: 20px; border-top: 2px solid #f0f0f0;
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-        }
-
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-
-        .modal-content {
-            background-color: #fff;
-            margin: 5% auto;
-            padding: 20px;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-sizing: border-box;
-        }
-
-        .form-label { font-weight: 600; margin-bottom: 5px; display: block; }
-        .form-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; }
-
-        .btn-book-new {
-            background-color: #007bff; color: white; padding: 12px 24px;
-            border-radius: 8px; text-decoration: none; font-weight: 600;
-            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2); transition: transform 0.2s;
-        }
-        .btn-book-new:hover { transform: translateY(-2px); background-color: #0069d9; }
-
-        /* sticky submit button */
-        .modal-content form button[type="submit"] {
-            position: sticky;
-            bottom: 0;
-            margin-top: 10px;
-            z-index: 10;
-            background:#007bff;
-            color:white;
-            padding:10px;
-            border-radius:8px;
-            width:100%;
-            font-weight:bold;
-            border:none;
-            cursor:pointer;
-        }
-
-        .modal-content form button[type="submit"]:hover {
-            background:#0056b3;
-        }
-
-    </style>
-
-    <script>
-        function toggleNotifications() {
-            const menu = document.getElementById("notificationMenu");
-            menu.style.display = (menu.style.display === "block") ? "none" : "block";
-        }
-
-        function openEditModal() { document.getElementById('editModal').style.display = 'block'; }
-        function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
-
-        function openDeleteModal() { document.getElementById('deleteModal').style.display = 'block'; }
-        function closeDeleteModal() { document.getElementById('deleteModal').style.display = 'none'; }
-
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('editModal')) closeEditModal();
-            if (event.target == document.getElementById('deleteModal')) closeDeleteModal();
-        }
-    </script>
+    window.onclick = function(event) {
+      if (event.target == document.getElementById('editModal')) closeEditModal();
+      if (event.target == document.getElementById('deleteModal')) closeDeleteModal();
+    }
+  </script>
 </head>
 
 <body>
-
 <div class="dashboard-wrap">
-    
-    <aside class="sidebar">
-      <div class="logo">MedLink</div>
-      <nav class="nav">
-        <ul>
-          <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
-          <li><a href="{% url 'user_profile' %}" style="color:white; font-weight:bold;">Profile</a></li>
-          <li><a href="{% url 'appointment_history' %}">History</a></li>
-          <li><a href="{% url 'logout' %}">Logout</a></li>
-        </ul>
-      </nav>
-    </aside>
+  <aside class="sidebar">
+    <div class="logo"><img src="{% static 'main/img/medlink.png' %}" alt="MedLink"></div>
+    <nav class="nav">
+      <ul>
+        <li><a href="{% url 'user_dashboard' %}"><i class="fas fa-home" style="color:#ffffff; margin-right:10px;"></i>Dashboard</a></li>
+        <li><a href="{% url 'user_profile' %}" style="color:white; font-weight:bold;"><i class="fas fa-user" style="color:#ffffff; margin-right:10px;"></i>Profile</a></li>
+        <li><a href="{% url 'appointment_history' %}"><i class="fas fa-history" style="color:#ffffff; margin-right:10px;"></i>History</a></li>
+        <li><a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt" style="color:#ffffff; margin-right:10px;"></i>Logout</a></li>
+      </ul>
+    </nav>
+  </aside>
 
-    <main class="content">
+  <main class="content">
+    <div class="top-header">
+      <div class="welcome-section">
+        <h2>User Profile 👤</h2>
+        <p>Manage your personal information and settings.</p>
+      </div>
 
-        <div class="top-header">
-            <div class="welcome-section">
-                <h2>User Profile 👤</h2>
-                <p>Manage your personal information and settings.</p>
-            </div>
-
-            <div class="header-actions">
-                <div class="notif-wrapper">
-                    <button id="notifBtn" class="notif-btn" onclick="toggleNotifications()">
-                        <i class="fa fa-bell"></i>
-                    </button>
-                    <div id="notificationMenu" class="notif-dropdown">
-                        <div class="notif-header">Recent Updates</div>
-                        <div class="notif-empty">Check Dashboard for details</div>
-                    </div>
-                </div>
-
-                <a href="{% url 'book_appointment' %}" class="btn-book-new">+ Book Appointment</a>
-            </div>
+      <div class="header-actions">
+        <div class="notif-wrapper">
+          <button id="notifBtn" class="notif-btn" onclick="toggleNotifications()">
+            <i class="fa fa-bell"></i>
+          </button>
+          <div id="notificationMenu" class="notif-dropdown">
+            <div class="notif-header">Recent Updates</div>
+            <div class="notif-empty">Check Dashboard for details</div>
+          </div>
         </div>
+        <a href="{% url 'user_dashboard' %}" class="btn-book-new">Back to Dashboard</a>
+      </div>
+    </div>
 
-        <div class="profile-card">
-            
-            <div class="profile-header">
-                {% if profile_image %}
-                    <img src="{{ profile_image }}" class="profile-img">
-                {% else %}
-                    <img src="{% static 'main/img/person.png' %}" class="profile-img">
-                {% endif %}
+    <div class="profile-card">
+      <div class="profile-header">
+        {% if profile_image %}
+          <img src="{{ profile_image }}" class="profile-img">
+        {% else %}
+          <img src="{% static 'main/img/person.png' %}" class="profile-img">
+        {% endif %}
 
-                <form id="avatar-form" action="{% url 'update_profile_picture' %}" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <label for="file-input" style="cursor: pointer; color:#007bff;">
-                        <i class="fa fa-camera"></i> Change Photo
-                    </label>
-                    <input id="file-input" type="file" name="profile_picture" accept="image/*" style="display:none;" onchange="document.getElementById('avatar-form').submit();">
-                </form>
+        <form id="avatar-form" action="{% url 'update_profile_picture' %}" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <label for="file-input" style="cursor: pointer; color:#ad0505;">
+            <i class="fa fa-camera"></i> Change Photo
+          </label>
+          <input id="file-input" type="file" name="profile_picture" accept="image/*" style="display:none;" onchange="document.getElementById('avatar-form').submit();">
+        </form>
 
-                <h2>{{ full_name }}</h2>
-                <span>Patient Account</span>
-            </div>
+        <h2>{{ full_name }}</h2>
+        <span>Patient Account</span>
+      </div>
 
-            <div class="info-row">
-                <span class="info-label"><i class="fa fa-envelope"></i> Email</span>
-                <span class="info-value">{{ email }}</span>
-            </div>
+      <div class="info-row">
+        <span class="info-label"><i class="fa fa-envelope"></i> Email</span>
+        <span class="info-value">{{ email }}</span>
+      </div>
 
-            <div class="info-row">
-                <span class="info-label"><i class="fa fa-birthday-cake"></i> Age</span>
-                <span class="info-value">{{ age|default:"--" }}</span>
-            </div>
+      <div class="info-row">
+        <span class="info-label"><i class="fa fa-birthday-cake"></i> Age</span>
+        <span class="info-value">{{ age|default:"--" }}</span>
+      </div>
 
-            <div class="info-row">
-                <span class="info-label"><i class="fa fa-venus-mars"></i> Gender</span>
-                <span class="info-value">{{ gender|default:"--" }}</span>
-            </div>
+      <div class="info-row">
+        <span class="info-label"><i class="fa fa-venus-mars"></i> Gender</span>
+        <span class="info-value">{{ gender|default:"--" }}</span>
+      </div>
 
-            <div class="section-label"><i class="fa fa-align-left"></i> Bio</div>
-            <div class="bio-box">{{ bio|default:"No bio added yet." }}</div>
+      <div class="section-label"><i class="fa fa-align-left"></i> Bio</div>
+      <div class="bio-box">{{ bio|default:"No bio added yet." }}</div>
 
-            <div class="section-label"><i class="fa fa-allergies"></i> Allergies</div>
-            <div class="bio-box">{{ allergies|default:"No listed allergies." }}</div>
+      <div class="section-label"><i class="fa fa-allergies"></i> Allergies</div>
+      <div class="bio-box">{{ allergies|default:"No listed allergies." }}</div>
 
-            <div class="section-label"><i class="fa fa-notes-medical"></i> Medical Information</div>
-            <div class="bio-box">{{ medical_conditions|default:"No medical information provided." }}</div>
+      <div class="section-label"><i class="fa fa-notes-medical"></i> Medical Information</div>
+      <div class="bio-box">{{ medical_conditions|default:"No medical information provided." }}</div>
 
-            <button onclick="openEditModal()" style="width: 100%; background-color: #28a745; color: white; padding: 12px; border-radius: 8px; margin-top: 25px; font-weight: bold;">
-                <i class="fa fa-pencil"></i> Edit Profile
-            </button>
+      <button onclick="openEditModal()" style="width: 100%; background: linear-gradient(to right, #8d0000, #ff7b00); color: white; padding: 12px; border-radius: 12px; margin-top: 25px; font-weight: bold; border: none; font-family: 'Poppins', sans-serif;">
+        <i class="fa fa-pencil"></i> Edit Profile
+      </button>
 
-            <div class="action-grid">
-                <a href="{% url 'change_password' %}" style="background:#007bff; color:white; text-align:center; padding:12px; border-radius:8px;">
-                    <i class="fa fa-lock"></i> Change Password
-                </a>
-                <button onclick="openDeleteModal()" style="background:#dc3545; color:white; padding:12px; border-radius:8px;">
-                    <i class="fa fa-trash"></i> Delete Account
-                </button>
-            </div>
-
-        </div>
-
-    </main>
+      <div class="action-grid">
+        <a href="{% url 'change_password' %}" style="background: linear-gradient(to right, #8d0000, #ff7b00); color:white; text-align:center; padding:12px; border-radius:12px; border: none; font-family: 'Poppins', sans-serif;">
+          <i class="fa fa-lock"></i> Change Password
+        </a>
+        <button onclick="openDeleteModal()" style="background: linear-gradient(to right, #ac0000ff, #ff7b00); color:white; padding:12px; border-radius:12px; border: none; font-family: 'Poppins', sans-serif;">
+          <i class="fa fa-trash"></i> Delete Account
+        </button>
+      </div>
+    </div>
+  </main>
 </div>
 
 <div id="editModal" class="modal">
-    <div class="modal-content">
-
-        <h2>Edit Personal Info</h2>
-
-        <form action="{% url 'update_personal_info' %}" method="POST">
-            {% csrf_token %}
-
-            <label class="form-label">First Name</label>
-            <input type="text" name="first_name" value="{{ full_name.split.0 }}" class="form-input">
-
-            <label class="form-label">Last Name</label>
-            <input type="text" name="last_name" value="{{ full_name.split.1 }}" class="form-input">
-
-            <label class="form-label">Age</label>
-            <input type="number" name="age" value="{{ age }}" class="form-input">
-
-            <label class="form-label">Gender</label>
-            <select name="gender" class="form-input">
-                <option value="Male" {% if gender == 'Male' %}selected{% endif %}>Male</option>
-                <option value="Female" {% if gender == 'Female' %}selected{% endif %}>Female</option>
-                <option value="Other" {% if gender == 'Other' %}selected{% endif %}>Other</option>
-            </select>
-
-            <label class="form-label">Bio</label>
-            <textarea name="bio" class="form-input" rows="3">{{ bio }}</textarea>
-
-            <label class="form-label">Allergies</label>
-            <textarea name="allergies" class="form-input" rows="3">{{ allergies }}</textarea>
-
-            <label class="form-label">Medical Information</label>
-            <textarea name="medical_conditions" class="form-input" rows="3">{{ medical_conditions }}</textarea>
-
-            <button type="submit">
-                Save Changes
-            </button>
-        </form>
-
-    </div>
+  <div class="modal-content">
+    <h2>Edit Personal Info</h2>
+    <form action="{% url 'update_personal_info' %}" method="POST">
+      {% csrf_token %}
+      <label class="form-label">First Name</label>
+      <input type="text" name="first_name" value="{{ full_name.split.0 }}" class="form-input">
+      <label class="form-label">Last Name</label>
+      <input type="text" name="last_name" value="{{ full_name.split.1 }}" class="form-input">
+      <label class="form-label">Age</label>
+      <input type="number" name="age" value="{{ age }}" class="form-input">
+      <label class="form-label">Gender</label>
+      <select name="gender" class="form-input">
+        <option value="Male" {% if gender == 'Male' %}selected{% endif %}>Male</option>
+        <option value="Female" {% if gender == 'Female' %}selected{% endif %}>Female</option>
+        <option value="Other" {% if gender == 'Other' %}selected{% endif %}>Other</option>
+      </select>
+      <label class="form-label">Bio</label>
+      <textarea name="bio" class="form-input" rows="3">{{ bio }}</textarea>
+      <label class="form-label">Allergies</label>
+      <textarea name="allergies" class="form-input" rows="3">{{ allergies }}</textarea>
+      <label class="form-label">Medical Information</label>
+      <textarea name="medical_conditions" class="form-input" rows="3">{{ medical_conditions }}</textarea>
+      <button type="submit" style="background: linear-gradient(to right, #8d0000, #ff7b00); color: white; padding: 10px; border-radius: 12px; font-weight: bold; border: none; font-family: 'Poppins', sans-serif; margin-top: 10px; width: 100%; transition: transform 0.2s;">Save Changes</button>
+    </form>
+  </div>
 </div>
 
 <div id="deleteModal" class="modal">
-    <div class="modal-content">
-        <h2 style="color: #dc3545;">Delete Account</h2>
-        <p>Are you sure you want to delete your account? This action cannot be undone.</p>
-        
-        <form action="{% url 'delete_account' %}" method="POST" style="margin-top: 20px;">
-            {% csrf_token %}
-            
-            <div style="margin-bottom: 20px; text-align: left;">
-                <label for="delete-password" class="form-label" style="color: #333;">Confirm Password:</label>
-                <input type="password" name="password_confirmation" id="delete-password" required 
-                       placeholder="Enter your password"
-                       class="form-input" style="border-color: #dc3545;">
-            </div>
-
-            <div style="display: flex; gap: 15px;">
-                <button type="button" onclick="closeDeleteModal()" style="background: #6c757d; flex: 1; border: none; padding: 10px; border-radius: 8px; color: white; cursor: pointer;">
-                    Cancel
-                </button>
-                
-                <button type="submit" style="background: #dc3545; flex: 1; border: none; padding: 10px; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;">
-                    Yes, Delete
-                </button>
-            </div>
-        </form>
-    </div>
+  <div class="modal-content">
+    <h2 style="color: #a50000ff;">Delete Account</h2>
+    <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+    <form action="{% url 'delete_account' %}" method="POST" style="margin-top: 20px;">
+      {% csrf_token %}
+      <div style="margin-bottom: 20px; text-align: left;">
+        <label for="delete-password" class="form-label" style="color: #333;">Confirm Password:</label>
+        <input type="password" name="password_confirmation" id="delete-password" required placeholder="Enter your password" class="form-input" style="border-color: #dc3545;">
+      </div>
+      <div style="display: flex; gap: 15px;">
+        <button type="button" onclick="closeDeleteModal()" style="background: linear-gradient(to right, #6c757d, #888); color: white; padding: 10px; border-radius: 12px; font-weight: bold; border: none; font-family: 'Poppins', sans-serif; width: 100%; transition: transform 0.2s;">Cancel</button>
+        <button type="submit" style="background: linear-gradient(to right, #dc3545, #ff7b00); color: white; padding: 10px; border-radius: 12px; font-weight: bold; border: none; font-family: 'Poppins', sans-serif; width: 100%; transition: transform 0.2s;">Yes, Delete</button>
+      </div>
+    </form>
+  </div>
 </div>
-
 </body>
 </html>

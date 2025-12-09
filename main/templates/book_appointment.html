@@ -2,257 +2,386 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Book Appointment</title>
-    <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Book Appointment</title>
+  <link rel="stylesheet" href="{% static 'main/css/admin_dashboard.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
-    <style>
-        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .dashboard-wrap { display: flex; min-height: 100vh; }
-        .content { flex: 1; padding: 30px; }
-        .sidebar { background: #dc3545; }
-        .nav a { color: rgba(255,255,255,0.8); }
-        .nav a:hover { background: rgba(255,255,255,0.1); color: white; }
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-        .top-header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: white; padding: 15px 30px; border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 30px;
-        }
-        .welcome-section h2 { margin: 0; font-size: 1.6rem; color: #2c3e50; }
-        .welcome-section p { margin: 5px 0 0; color: #7f8c8d; }
+    body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+    .dashboard-wrap { display: flex; min-height: 100vh; }
+    .content { flex: 1; padding: 30px; }
 
-        .notif-wrapper { position: relative; }
-        .notif-btn { background: none; border: none; font-size: 1.4rem; cursor: pointer; color: #555; }
-        .notif-btn:hover { color: #007bff; }
+    /* Sidebar adjustments */
+    .sidebar { 
+      background: #ffffff; 
+      padding: 30px 20px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 23px; 
+      box-sizing: border-box; 
+      border-right: 1px solid rgba(0,0,0,0.08); 
+      z-index: 2; 
+      overflow: hidden; 
+      font-family: 'Poppins', sans-serif;
+      position: relative;
+    }
+    .sidebar::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
+      background-size: cover;
+      opacity: 0.28;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .sidebar .logo { 
+      width: 180px; 
+      display: block; 
+      margin: 0 auto 30px auto; 
+      position: relative; 
+      z-index: 1; 
+    }
+    .sidebar .logo img {
+      width: 100%;
+      height: auto;
+    }
+    .sidebar nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      z-index: 1;
+    }
+    .sidebar nav ul li a {
+      color: #fff;
+      text-decoration: none;
+      padding: 14px 16px;
+      border-radius: 12px;
+      display: block;
+      font-weight: 600;
+      transition: background 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
+      background: linear-gradient(to right, #8d0000, #ad0505);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      position: relative;
+      z-index: 1;
+      font-family: 'Poppins', sans-serif;
+    }
+    .sidebar nav ul li a:hover,
+    .sidebar nav ul li a:focus {
+      background: linear-gradient(to right, #ad0505, #d10000);
+      color: #fff;
+      transform: translateX(8px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      outline: none;
+    }
+    .sidebar nav ul li a.active {
+      background: linear-gradient(to right, #d10000, #a30000);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      transform: translateX(4px);
+    }
 
-        .notif-dropdown {
-            display: none; position: absolute; right: 0; top: 45px; width: 250px;
-            background: white; border-radius: 12px; padding: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #eee;
-            text-align: center; color: #777; font-size: 0.9rem;
-        }
+    /* 1. TOP NAV BAR */
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 15px 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      margin-bottom: 30px;
+    }
+    .welcome-section h2 { margin: 0; font-size: 1.6rem; color: #2c3e50; }
+    .welcome-section p { margin: 5px 0 0; color: #7f8c8d; }
+    .notif-wrapper { position: relative; }
+    .notif-btn {
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: #8d0000;
+    }
+    .notif-btn:hover { color: #ad0505; }
+    .notif-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 45px;
+      width: 250px;
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+      border: 1px solid #eee;
+      text-align: center;
+      color: #777;
+      font-size: 0.9rem;
+    }
 
-        .booking-card {
-            background: white; padding: 40px; border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.03); max-width: 800px;
-            margin: 0 auto;
-        }
+    /* Booking Card */
+   .booking-card {
+  background: linear-gradient(135deg, rgba(141, 0, 0, 0.2), rgba(255, 123, 0, 0.29)), white;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+  max-width: 800px;
+  margin: 0 auto;
+}
 
-        .form-section-title {
-            font-size: 1.2rem; color: #007bff; margin-bottom: 20px; font-weight: 600;
-            border-bottom: 2px solid #f0f2f5; padding-bottom: 10px;
-        }
+    .form-section-title {
+      font-size: 1.2rem;
+      color: #ad0505;
+      margin-bottom: 20px;
+      font-weight: 600;
+      border-bottom: 2px solid #f0f2f5;
+      padding-bottom: 10px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .form-group { margin-bottom: 20px; }
+    .form-label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+      color: #444;
+    }
+    .form-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fcfcfc;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+    }
+    .form-input:focus {
+      border-color: #ad0505;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(173, 5, 5, 0.15);
+    }
+    select.form-input {
+      appearance: none;
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+      padding-right: 40px;
+    }
 
-        .form-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-        }
+    /* Submit Button */
+    .btn-submit-booking {
+      width: 100%;
+      background: linear-gradient(to right, #8d0000, #ff7b00);
+      color: white;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: 0.2s;
+    }
+    .btn-submit-booking:hover {
+      background: linear-gradient(to right, #ad0505, #ff9a3d);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(173, 5, 5, 0.3);
+    }
 
-        .form-group { margin-bottom: 20px; }
-        .form-label { font-weight: 600; margin-bottom: 8px; display: block; color: #444; }
+    /* Message Box */
+    .message-box {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .msg-error { background: #f8d7da; color: #721c24; }
+    .msg-success { background: #d4edda; color: #155724; }
+  </style>
 
-        .form-input {
-            width: 100%; padding: 12px; border: 1px solid #ddd;
-            border-radius: 8px; background: #fcfcfc; font-size: 1rem; outline: none;
-            transition: 0.3s ease;
-        }
-        .form-input:focus {
-            border-color: #007bff; background: white;
-            box-shadow: 0 0 0 3px rgba(0,123,255,0.15);
-        }
-
-        select.form-input {
-            appearance: none; background-repeat: no-repeat;
-            background-position: right 15px center; padding-right: 40px;
-        }
-
-        .btn-submit-booking {
-            width: 100%; background-color: #28a745; color: white;
-            padding: 15px; border: none; border-radius: 10px;
-            font-size: 1.1rem; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            gap: 10px; transition: 0.2s;
-        }
-        .btn-submit-booking:hover {
-            background-color: #218838; transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40,167,69,0.3);
-        }
-
-        .message-box { padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .msg-error { background: #f8d7da; color: #721c24; }
-        .msg-success { background: #d4edda; color: #155724; }
-    </style>
-
-    <script>
+  <script>
     const ALL_DOCTORS = [
-        {% for doctor in doctors %}
-        {
-            name: "Dr. {{ doctor.first_name }} {{ doctor.last_name }}",
-            value: "{{ doctor.first_name }} {{ doctor.last_name }}",
-            specialization: "{{ doctor.specialization }}",
-            is_in: {{ doctor.is_in|yesno:"true,false" }}
-        },
-        {% endfor %}
+      {% for doctor in doctors %}
+      {
+        name: "Dr. {{ doctor.first_name }} {{ doctor.last_name }}",
+        value: "{{ doctor.first_name }} {{ doctor.last_name }}",
+        specialization: "{{ doctor.specialization }}",
+        is_in: {{ doctor.is_in|yesno:"true,false" }}
+      },
+      {% endfor %}
     ];
 
     function filterDoctors() {
-        const specialization = document.getElementById("specialization_filter").value;
-        const select = document.getElementById("doctor_name_select");
-        select.innerHTML = '<option value="" disabled selected>-- Choose a Doctor --</option>';
+      const specialization = document.getElementById("specialization_filter").value;
+      const select = document.getElementById("doctor_name_select");
+      select.innerHTML = '<option value="" disabled selected>-- Choose a Doctor --</option>';
 
-        const availableDoctors = ALL_DOCTORS.filter(doc =>
-            (specialization === "All" || doc.specialization === specialization) && doc.is_in
-        );
+      const availableDoctors = ALL_DOCTORS.filter(doc =>
+        (specialization === "All" || doc.specialization === specialization) && doc.is_in
+      );
 
-        availableDoctors.forEach(doc => {
-            const opt = document.createElement("option");
-            opt.value = doc.value;
-            opt.textContent = doc.name;
-            select.appendChild(opt);
-        });
+      availableDoctors.forEach(doc => {
+        const opt = document.createElement("option");
+        opt.value = doc.value;
+        opt.textContent = doc.name;
+        select.appendChild(opt);
+      });
 
-        if (availableDoctors.length === 1) {
-            select.selectedIndex = 1;
-        }
+      if (availableDoctors.length === 1) {
+        select.selectedIndex = 1;
+      }
     }
 
     function toggleNotifications() {
-        const menu = document.getElementById("notificationMenu");
-        menu.style.display = menu.style.display === "block" ? "none" : "block";
+      const menu = document.getElementById("notificationMenu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
     }
 
     window.onclick = function(e) {
-        if (!e.target.closest('#notifBtn')) {
-            document.getElementById("notificationMenu").style.display = "none";
-        }
+      if (!e.target.closest('#notifBtn')) {
+        document.getElementById("notificationMenu").style.display = "none";
+      }
     }
 
     window.onload = function() {
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementsByName("appointment_date")[0].setAttribute("min", today);
-        filterDoctors();
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementsByName("appointment_date")[0].setAttribute("min", today);
+      filterDoctors();
     }
-</script>
+  </script>
 </head>
 
 <body>
-
 <div class="dashboard-wrap">
-    <aside class="sidebar">
-        <div class="logo">MedLink</div>
-        <nav class="nav">
-            <ul>
-                <li><a href="{% url 'user_dashboard' %}">Dashboard</a></li>
-                <li><a href="{% url 'user_profile' %}">Profile</a></li>
-                <li><a href="{% url 'appointment_history' %}">History</a></li>
-                <li><a href="{% url 'logout' %}" onclick="return confirm('Log out?');">Logout</a></li>
-            </ul>
-        </nav>
-    </aside>
+  <aside class="sidebar">
+    <div class="logo"><img src="{% static 'main/img/medlink.png' %}" alt="MedLink"></div>
+    <nav class="nav">
+      <ul>
+        <li><a href="{% url 'user_dashboard' %}"><i class="fas fa-home" style="color:#ffffff; margin-right:10px;"></i>Dashboard</a></li>
+        <li><a href="{% url 'user_profile' %}"><i class="fas fa-user" style="color:#ffffff; margin-right:10px;"></i>Profile</a></li>
+        <li><a href="{% url 'appointment_history' %}"><i class="fas fa-history" style="color:#ffffff; margin-right:10px;"></i>History</a></li>
+        <li><a href="{% url 'logout' %}" onclick="return confirm('Log out?');"><i class="fas fa-sign-out-alt" style="color:#ffffff; margin-right:10px;"></i>Logout</a></li>
+      </ul>
+    </nav>
+  </aside>
 
-    <main class="content">
-        <div class="top-header">
-            <div class="welcome-section">
-                <h2>New Appointment 📅</h2>
-                <p>Schedule a consultation with our specialists.</p>
-            </div>
+  <main class="content">
+    <div class="top-header">
+      <div class="welcome-section">
+        <h2>New Appointment 📅</h2>
+        <p>Schedule a consultation with our specialists.</p>
+      </div>
 
-            <div class="notif-wrapper">
-                <button id="notifBtn" class="notif-btn" onclick="toggleNotifications()">
-                    <i class="fa fa-bell"></i>
-                </button>
-                <div id="notificationMenu" class="notif-dropdown">
-                    Check dashboard for the latest updates.
-                </div>
-            </div>
+      <div class="notif-wrapper">
+        <button id="notifBtn" class="notif-btn" onclick="toggleNotifications()">
+          <i class="fa fa-bell"></i>
+        </button>
+        <div id="notificationMenu" class="notif-dropdown">
+          Check dashboard for the latest updates.
+        </div>
+      </div>
+    </div>
+
+    <div class="booking-card">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="message-box {% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST" action="{% url 'book_appointment' %}">
+        {% csrf_token %}
+
+        <div class="form-section-title">
+          <i class="fa fa-user-md"></i> Doctor & Schedule
         </div>
 
-        <div class="booking-card">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="message-box {% if message.tags == 'error' %}msg-error{% else %}msg-success{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            <form method="POST" action="{% url 'book_appointment' %}">
-                {% csrf_token %}
-
-                <div class="form-section-title">
-                    <i class="fa fa-user-md"></i> Doctor & Schedule
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Filter by Specialization</label>
-                    <select id="specialization_filter" class="form-input" onchange="filterDoctors()">
-                        {% for spec in specializations %}
-                            <option value="{{ spec }}">{{ spec }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Select Doctor</label>
-                    <select name="doctor_name" id="doctor_name_select" class="form-input" required>
-                        <option value="" disabled selected>-- Choose a Doctor --</option>
-                    </select>
-                </div>
-
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Date</label>
-                        <input type="date" name="appointment_date" class="form-input" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">Time</label>
-                        <select name="appointment_time" class="form-input" required>
-                            <option disabled selected>Select Time</option>
-                            <option value="08:00 AM">08:00 AM</option>
-                            <option value="08:30 AM">08:30 AM</option>
-                            <option value="09:00 AM">09:00 AM</option>
-                            <option value="09:30 AM">09:30 AM</option>
-                            <option value="10:00 AM">10:00 AM</option>
-                            <option value="10:30 AM">10:30 AM</option>
-                            <option value="11:00 AM">11:00 AM</option>
-                            <option value="11:30 AM">11:30 AM</option>
-                            <option value="12:00 PM">12:00 PM</option>
-                            <option value="12:30 PM">12:30 PM</option>
-                            <option value="01:00 PM">01:00 PM</option>
-                            <option value="01:30 PM">01:30 PM</option>
-                            <option value="02:00 PM">02:00 PM</option>
-                            <option value="02:30 PM">02:30 PM</option>
-                            <option value="03:00 PM">03:00 PM</option>
-                            <option value="03:30 PM">03:30 PM</option>
-                            <option value="04:00 PM">04:00 PM</option>
-                            <option value="04:30 PM">04:30 PM</option>
-                            <option value="05:00 PM">05:00 PM</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Reason for Visit</label>
-                    <select name="reason_for_visit" class="form-input" required>
-                        <option value="" disabled selected>-- Select Reason --</option>
-                        <option value="Check-up">Annual Check-up</option>
-                        <option value="Consultation">New Symptom/Consultation</option>
-                        <option value="Vaccination">Vaccination</option>
-                        <option value="Follow-up">Follow-up Visit</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-
-                <button class="btn-submit-booking" type="submit">
-                    <i class="fa fa-calendar-check"></i> Book Appointment
-                </button>
-            </form>
+        <div class="form-group">
+          <label class="form-label">Filter by Specialization</label>
+          <select id="specialization_filter" class="form-input" onchange="filterDoctors()">
+            {% for spec in specializations %}
+              <option value="{{ spec }}">{{ spec }}</option>
+            {% endfor %}
+          </select>
         </div>
-    </main>
+
+        <div class="form-group">
+          <label class="form-label">Select Doctor</label>
+          <select name="doctor_name" id="doctor_name_select" class="form-input" required>
+            <option value="" disabled selected>-- Choose a Doctor --</option>
+          </select>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" name="appointment_date" class="form-input" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Time</label>
+            <select name="appointment_time" class="form-input" required>
+              <option disabled selected>Select Time</option>
+              <option value="08:00 AM">08:00 AM</option>
+              <option value="08:30 AM">08:30 AM</option>
+              <option value="09:00 AM">09:00 AM</option>
+              <option value="09:30 AM">09:30 AM</option>
+              <option value="10:00 AM">10:00 AM</option>
+              <option value="10:30 AM">10:30 AM</option>
+              <option value="11:00 AM">11:00 AM</option>
+              <option value="11:30 AM">11:30 AM</option>
+              <option value="12:00 PM">12:00 PM</option>
+              <option value="12:30 PM">12:30 PM</option>
+              <option value="01:00 PM">01:00 PM</option>
+              <option value="01:30 PM">01:30 PM</option>
+              <option value="02:00 PM">02:00 PM</option>
+              <option value="02:30 PM">02:30 PM</option>
+              <option value="03:00 PM">03:00 PM</option>
+              <option value="03:30 PM">03:30 PM</option>
+              <option value="04:00 PM">04:00 PM</option>
+              <option value="04:30 PM">04:30 PM</option>
+              <option value="05:00 PM">05:00 PM</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Reason for Visit</label>
+          <select name="reason_for_visit" class="form-input" required>
+            <option value="" disabled selected>-- Select Reason --</option>
+            <option value="Check-up">Annual Check-up</option>
+            <option value="Consultation">New Symptom/Consultation</option>
+            <option value="Vaccination">Vaccination</option>
+            <option value="Follow-up">Follow-up Visit</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <button class="btn-submit-booking" type="submit">
+          <i class="fa fa-calendar-check"></i> Book Appointment
+        </button>
+      </form>
+    </div>
+  </main>
 </div>
-
 </body>
 </html>

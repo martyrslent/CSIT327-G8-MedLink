@@ -7,19 +7,20 @@
 
 <style>
 /* -------------------------------------------------------------------------- */
-/* ⚙️ STICKY FOOTER FIX (Base.html Integration)               */
+/* ⚙️ STICKY FOOTER FIX (Base.html Integration)                               */
 /* -------------------------------------------------------------------------- */
-
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 /* 1. Ensure the viewport root elements take full height */
 html, body {
-    height: 100%; /* REQUIRED: Ensures root containers take full viewport height */
-    margin: 0; /* Ensures no default spacing pushes content */
+    height: 100%;
+    margin: 0;
     padding: 0;
 }
 
 /* 2. Setup the main wrapper (assuming it's .wrapper in base.html) to be a flex container */
 .wrapper { 
-    min-height: 100%; /* Fix: Ensures the wrapper stretches to the bottom */
+    min-height: 100%;
     display: flex;
     flex-direction: column;
 }
@@ -31,7 +32,7 @@ html, body {
     background-position: center !important;
     background-repeat: no-repeat !important;
     background-attachment: fixed !important;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Poppins', sans-serif; /* Match home.html */
 }
 
 /* Page Layout */
@@ -41,22 +42,21 @@ html, body {
     padding: 70px 0 40px;
     max-width: 1300px;
     margin: 0 auto;
-    flex-grow: 1; /* FIX: Allows this main content area to take up available vertical space */
+    flex-grow: 1;
 }
 
 /* Sidebar */
 .filter-sidebar {
-    /* ... existing styles ... */
     width: 260px;
     padding: 22px;
     border-radius: 18px;
-    background: rgba(255,255,255,0.9);
+    background: linear-gradient(135deg, #FFFFFF, #D10000); /* White to red gradient */
     box-shadow: 0 6px 18px rgba(0,0,0,0.15);
     backdrop-filter: blur(4px);
     animation: slideInLeft .4s ease-out;
-    height: fit-content; /* IMPROVEMENT: Stops sidebar from being full height and potentially causing issues */
-    position: sticky; /* IMPROVEMENT: Keeps filter visible when scrolling */
-    top: 20px; /* Space from the top */
+    height: calc(100vh - 40px);
+    position: sticky;
+    top: 20px;
 }
 
 @keyframes slideInLeft {
@@ -64,15 +64,18 @@ html, body {
     to {opacity: 1; transform: translateX(0);}
 }
 
+/* Specialty Title */
 .filter-sidebar h3 {
-    font-size: 1.4rem;
+    font-size: 1.6rem; /* Larger title */
     margin-bottom: 15px;
     color: #b30000;
     font-weight: 700;
-    border-bottom: 2px solid #ffd6c8;
     padding-bottom: 6px;
+    font-family: 'Poppins', sans-serif; /* Match home.html */
+    text-align: center;
 }
 
+/* Specialty Buttons */
 .filter-sidebar ul {
     list-style: none;
     padding: 0;
@@ -87,14 +90,20 @@ html, body {
     text-decoration: none;
     color: #b30000;
     font-weight: 500;
-    padding: 5px 4px;
+    padding: 8px 4px;
     display: block;
     transition: 0.2s;
+    background: rgba(255, 255, 255, 0.42);
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif; /* Match home.html */
+    text-align: center;
 }
 
 .filter-sidebar a:hover {
-    color: #ff5500;
+    color: #FF5500;
+    background: rgba(255,255,255,0.5);
     padding-left: 8px;
+    transform: translateX(4px);
 }
 
 /* Page Title */
@@ -103,6 +112,7 @@ html, body {
     font-weight: 800;
     color: #d10000;
     margin-bottom: 25px;
+    font-family: 'Poppins', sans-serif; /* Match home.html */
 }
 
 /* Doctor Cards Grid */
@@ -123,7 +133,8 @@ html, body {
     display: flex;
     flex-direction: column;
     transition: .25s;
-    height: 380px; /* FIXED HEIGHT */
+    height: 380px;
+    font-family: 'Poppins', sans-serif; /* Match home.html */
 }
 
 .doctor-card:hover {
@@ -134,7 +145,7 @@ html, body {
 /* Avatar Fix */
 .doc-avatar {
     width: 100%;
-    height: 220px; /* CONSISTENT SIZE */
+    height: 220px;
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 12px;
@@ -144,7 +155,7 @@ html, body {
 .doc-avatar img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* PREVENTS DISTORTION */
+    object-fit: cover;
 }
 
 /* Text */
@@ -153,11 +164,13 @@ html, body {
     color: #900000;
     margin: 5px 0;
     font-weight: 700;
+    font-family: 'Poppins', sans-serif; /* Match home.html */
 }
 
 .doctor-card p {
     font-size: 0.95rem;
     color: #555;
+    font-family: 'Poppins', sans-serif; /* Match home.html */
 }
 
 /* Status Tags */
@@ -167,6 +180,7 @@ html, body {
     border-radius: 6px;
     font-size: 0.9rem;
     font-weight: 600;
+    font-family: 'Poppins', sans-serif; /* Match home.html */
 }
 
 .status-available {
@@ -188,6 +202,7 @@ html, body {
     font-size: 1rem;
     text-align: center;
     color: #444;
+    font-family: 'Poppins', sans-serif; /* Match home.html */
 }
 
 /* Responsive */
@@ -199,7 +214,6 @@ html, body {
 </style>
 
 <div class="doctor-page">
-
     <aside class="filter-sidebar">
         <h3>Specialties</h3>
         <ul>
@@ -220,7 +234,6 @@ html, body {
 
     <div style="flex: 1;">
         <h1 class="page-title">All Doctors</h1>
-
         <div class="doctor-list">
             {% if doctors %}
                 {% for doc in doctors %}
@@ -232,7 +245,6 @@ html, body {
                             <img src="{% static 'main/img/doctor.png' %}" alt="Default Doctor">
                         {% endif %}
                     </div>
-
                     <h2>{{ doc.first_name }} {{ doc.last_name }}</h2>
                     <p><strong>Specialty:</strong> {{ doc.specialization }}</p>
                     <p>
@@ -250,7 +262,6 @@ html, body {
             {% endif %}
         </div>
     </div>
-
 </div>
 
 {% endblock %}

@@ -4,6 +4,14 @@
 
 {% block content %}
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Set global font style */
+body, html {
+    font-family: 'Poppins', sans-serif;
+}
+
 .wrapper, body, html {
     background-image: url('{% static "main/img/wavybg2.png" %}') !important;
     background-size: cover !important;
@@ -13,7 +21,7 @@
 }
 
 .about-container {
-    padding: 100px 20px 40px; /* Push content down */
+    padding: 100px 20px 40px;
     max-width: 800px;
     margin: 0 auto;
     text-align: center;
@@ -39,6 +47,62 @@
     color: #131313ff;
     margin-bottom: 15px;
 }
+
+/* Values Section */
+.values-section {
+    margin-top: 60px;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.value-card {
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+}
+
+.value-card:hover {
+    transform: translateY(-6px);
+}
+
+.value-icon {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 15px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: white;
+}
+
+.value-card-1 .value-icon { background: #D10000; }
+.value-card-2 .value-icon { background: #FF5500; }
+.value-card-3 .value-icon { background: #6b0303ff; }
+.value-card-4 .value-icon { background: #333; }
+
+.value-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    color: #d10000;
+}
+
+.value-card p {
+    font-size: 1rem;
+    color: #555;
+}
 </style>
 
 <div class="about-container">
@@ -48,9 +112,34 @@
         MedLink is dedicated to making healthcare accessible, convenient, and personalized through innovative digital solutions. Our mission is to connect patients with trusted medical professionals, streamline appointments, and provide resources that support your overall wellness. We combine technology with compassionate care to ensure every individual receives timely and effective healthcare, right at their fingertips.
     </p>
     <p>
-        Our mission is to connect patients with qualified healthcare professionals,
-        ensuring accessibility, convenience, and trust.
+        Our mission is to connect patients with qualified healthcare professionals, ensuring accessibility, convenience, and trust.
     </p>
+</div>
+
+<!-- Values Section -->
+<div class="values-section">
+    <div class="values-grid">
+        <div class="value-card value-card-1">
+            <div class="value-icon">1</div>
+            <h3>Accessibility</h3>
+            <p>We ensure that quality healthcare is within reach for everyone, regardless of location or background, making it easier to connect with medical professionals and receive care.</p>
+        </div>
+        <div class="value-card value-card-2">
+            <div class="value-icon">2</div>
+            <h3>Convenience</h3>
+            <p>Our platform simplifies the process of scheduling appointments and managing health records, providing a seamless experience that fits into your busy life.</p>
+        </div>
+        <div class="value-card value-card-3">
+            <div class="value-icon">3</div>
+            <h3>Trust</h3>
+            <p>We partner with certified healthcare providers and prioritize patient privacy, ensuring you can rely on MedLink for safe and professional care.</p>
+        </div>
+        <div class="value-card value-card-4">
+            <div class="value-icon">4</div>
+            <h3>Wellness</h3>
+            <p>We empower individuals with tools and resources to manage their health proactively, supporting a holistic approach to wellness and prevention.</p>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

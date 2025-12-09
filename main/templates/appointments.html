@@ -5,210 +5,202 @@
 
 {% block style %}
 <style>
-    /* ... (Your existing CSS remains exactly the same) ... */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    /* Sidebar (cleaned & robust) */
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 220px;
-        background: #ffffff;
-        padding: 30px 20px;
-        display: flex;
-        flex-direction: column;
-        gap: 25px;
-        box-sizing: border-box;
-        border-right: 1px solid rgba(0,0,0,0.08);
-        z-index: 2;
-        overflow: hidden;
-    }
+/* Sidebar (cleaned & robust) */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 220px;
+    background: #ffffff;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    box-sizing: border-box;
+    border-right: 1px solid rgba(0,0,0,0.08);
+    z-index: 2;
+    overflow: hidden;
+    font-family: 'Poppins', sans-serif;
+}
+.sidebar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
+    background-size: cover;
+    opacity: 0.28;
+    pointer-events: none;
+    z-index: 0;
+}
+.sidebar .logo img {
+    width: 150px;
+    display: block;
+    margin: 0 auto 30px auto;
+    position: relative;
+    z-index: 1;
+}
+.sidebar nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    position: relative;
+    z-index: 1;
+}
+.sidebar nav ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    display: block;
+    font-weight: 600;
+    transition: background 0.25s ease, transform 0.22s ease, box-shadow 0.25s ease;
+    background: #ad0505;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    position: relative;
+    z-index: 1;
+    font-family: 'Poppins', sans-serif;
+}
+.sidebar nav ul li a:hover,
+.sidebar nav ul li a:focus {
+    background: linear-gradient(to right, #ff7b00, #d10000);
+    color: #fff;
+    transform: translateX(6px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    outline: none;
+}
+.sidebar nav ul li a.active {
+    background: linear-gradient(to right, #d10000, #a30000);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.20);
+    transform: translateX(3px);
+}
 
-    .sidebar::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
-        background-size: cover;
-        opacity: 0.28;
-        pointer-events: none;
-        z-index: 0;
-    }
+.appointment-table-container { 
+    background-color: white; 
+    padding: 20px; 
+    border-radius: 8px; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+    margin-bottom: 30px;
+    color: #222; 
+    font-family: 'Poppins', sans-serif;
+}
+h1.page-title {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #ffffffff;
+    font-family: 'Poppins', sans-serif;
+}
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 20px; 
+    color: #222; 
+    font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
+}
+th, td { 
+    padding: 12px 15px; 
+    text-align: left; 
+    border-bottom: 1px solid #ddd; 
+    font-family: 'Poppins', sans-serif;
+}
+th { 
+    background-color: #fff; 
+    color: #222; 
+    font-weight: bold; 
+    font-family: 'Poppins', sans-serif;
+}
+th:first-child, td:first-child { 
+    color: #d10000; 
+    font-weight: 600; 
+    font-family: 'Poppins', sans-serif;
+}
+tbody tr:nth-child(odd) { background: rgba(245,245,245,0.92); }
+tbody tr:nth-child(even) { background: rgba(255,250,250,0.96); }
+tbody tr:hover { background: rgba(255,238,238,0.96); }
 
-    .sidebar .logo img {
-        width: 150px;
-        display: block;
-        margin: 0 auto 30px auto;
-        position: relative;
-        z-index: 1;
-    }
+.action-buttons a, .action-buttons button { 
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none !important;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    vertical-align: middle;
+    cursor: pointer;
+    margin-right: 5px;
+    color: #fff !important;
+    border: none;
+    font-family: 'Poppins', sans-serif;
+}
+.action-buttons a:hover, .action-buttons button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.14);
+}
 
-    /* Nav list */
-    .sidebar nav ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        position: relative;
-        z-index: 1;
-    }
+.edit-btn { background: linear-gradient(90deg,#3498db,#2980b9); }
+.delete-btn { background: linear-gradient(90deg,#e74c3c,#c0392b); }
+.delete-btn.disabled {
+    background: #7f8c8d;
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.5;
+}
+.complete-btn { background: linear-gradient(90deg,#2ecc71,#27ae60); }
+.approve-btn { background: linear-gradient(90deg,#ff9a3d,#ff7b00); }
+.reinstate-btn { background: linear-gradient(90deg, #5437d6d8, #2f04a7c9);}
+.view-btn { background: linear-gradient(90deg, #1abc9c, #16a085); }
 
-    /* Links */
-    .sidebar nav ul li a {
-        color: #fff; /* reliable white */
-        text-decoration: none;
-        padding: 10px 14px;
-        border-radius: 10px;
-        display: block;
-        font-weight: 600;
-        transition: background 0.25s ease, transform 0.22s ease, box-shadow 0.25s ease;
-        background: #ad0505; /* base red */
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-        position: relative;
-        z-index: 1;
-    }
-
-    .sidebar nav ul li a:hover,
-    .sidebar nav ul li a:focus {
-        background: linear-gradient(to right, #ff7b00, #d10000);
-        color: #fff;
-        transform: translateX(6px);
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
-        outline: none;
-    }
-
-    .sidebar nav ul li a.active {
-        background: linear-gradient(to right, #d10000, #a30000);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.20);
-        transform: translateX(3px);
-    }
-
-    .appointment-table-container { 
-        background-color: white; 
-        padding: 20px; 
-        border-radius: 8px; 
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
-        margin-bottom: 30px;
-        color: #222; 
-    }
-
-    h1.page-title {
-        font-size: 2.5rem;
-        margin-bottom: 20px;
-        color: #ffffffff;
-    }
-
-    table { 
-        width: 100%; 
-        border-collapse: collapse; 
-        margin-top: 20px; 
-        color: #222; 
-        font-size: 0.95rem;
-    }
-
-    th, td { 
-        padding: 12px 15px; 
-        text-align: left; 
-        border-bottom: 1px solid #ddd; 
-    }
-
-    th { 
-        background-color: #fff; 
-        color: #222; 
-        font-weight: bold; 
-    }
-
-    th:first-child, td:first-child { 
-        color: #d10000; 
-        font-weight: 600; 
-    }
-
-    tbody tr:nth-child(odd) { background: rgba(245,245,245,0.92); }
-    tbody tr:nth-child(even) { background: rgba(255,250,250,0.96); }
-    tbody tr:hover { background: rgba(255,238,238,0.96); }
-
-    .action-buttons a, .action-buttons button { 
-        display: inline-block;
-        padding: 6px 12px;
-        border-radius: 10px;
-        font-size: 0.9rem;
-        font-weight: 700;
-        text-decoration: none !important;
-        box-shadow: 0 6px 14px rgba(0,0,0,0.12);
-        transition: transform 0.18s ease, box-shadow 0.18s ease;
-        vertical-align: middle;
-        cursor: pointer;
-        margin-right: 5px;
-        color: #fff !important;
-        border: none;
-    }
-    .action-buttons a:hover, .action-buttons button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 22px rgba(0,0,0,0.14);
-    }
-
-    .edit-btn { background: linear-gradient(90deg,#3498db,#2980b9); }
-    .delete-btn { background: linear-gradient(90deg,#e74c3c,#c0392b); }
-    /* [NEW] Style for disabled delete button */
-    .delete-btn.disabled {
-        background: #7f8c8d;
-        cursor: not-allowed;
-        pointer-events: none;
-        opacity: 0.5;
-    }
-
-    .complete-btn { background: linear-gradient(90deg,#2ecc71,#27ae60); }
-    .approve-btn { background: linear-gradient(90deg,#ff9a3d,#ff7b00); }
-    .reinstate-btn { background: linear-gradient(90deg, #5437d6d8, #2f04a7c9);}
-    
-    /* [NEW] Style for the Doctor View Button */
-    .view-btn { background: linear-gradient(90deg, #1abc9c, #16a085); }
-
-    .status-completed {
-        color: #155724;
-        background-color: #d4edda;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-weight: 600;
-        font-size: 0.85em;
-        display: inline-block;
-    }
-
-    .status-pending {
-        color: #856404;
-        background-color: #fff3cd;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-weight: 600;
-        font-size: 0.85em;
-        display: inline-block;
-    }
-
-    .book-appointment-btn {
-        display: inline-block;
-        background: linear-gradient(90deg,#ff7b00,#d10000);
-        color: white;
-        padding: 10px 18px;
-        border-radius: 6px;
-        font-weight: bold;
-        text-decoration: none;
-        margin-top: 15px;
-        transition: transform 0.2s ease, background-color 0.2s ease;
-    }
-    .book-appointment-btn:hover {
-        transform: scale(1.05);
-    }
+.status-completed {
+    color: #155724;
+    background-color: #d4edda;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85em;
+    display: inline-block;
+    font-family: 'Poppins', sans-serif;
+}
+.status-pending {
+    color: #856404;
+    background-color: #fff3cd;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85em;
+    display: inline-block;
+    font-family: 'Poppins', sans-serif;
+}
+.book-appointment-btn {
+    display: inline-block;
+    background: linear-gradient(90deg,#ff7b00,#d10000);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    margin-top: 15px;
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    font-family: 'Poppins', sans-serif;
+}
+.book-appointment-btn:hover {
+    transform: scale(1.05);
+}
 </style>
 {% endblock %}
 
 {% block content %}
-
 <h1 class="page-title">Manage Appointments</h1>
 
 <div class="appointment-table-container">
@@ -242,18 +234,14 @@
                         {% if request.session.is_doctor %}
                             <a href="{% url 'view_patient_health' appointment.patient_id %}?appt_id={{ appointment.id }}" class="view-btn">View Profile</a>
                         {% endif %}
-
                         <form action="{% url 'approve_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to APPROVE this appointment?');">
                             {% csrf_token %}
                             <button type="submit" class="approve-btn">Approve</button>
                         </form>
-
                         <a href="{% url 'edit_appointment' appointment.id %}" class="edit-btn">Edit</a>
-
                         <form action="{% url 'decline_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to DECLINE this appointment?');">
-    {% csrf_token %}
-    <button type="submit" class="delete-btn">Decline</button>
-</form>
+                            {% csrf_token %}
+                            <button type="submit" class="delete-btn">Decline</button>
                         </form>
                     </td>
                 </tr>
@@ -261,11 +249,9 @@
             {% endfor %}
         </tbody>
     </table>
-
     {% if not request.session.is_doctor %}
         <a href="{% url 'register_appointment' %}" class="book-appointment-btn">+ Book Appointment</a>
     {% endif %}
-
     {% else %}
     <p>No pending appointments.</p>
     {% endif %}
@@ -308,7 +294,6 @@
                         {% if request.session.is_doctor %}
                             <a href="{% url 'view_patient_health' appointment.patient_id %}?appt_id={{ appointment.id }}" class="view-btn">View Profile</a>
                         {% endif %}
-
                         {% if appointment.status == "Cancelled" %}
                             <form action="{% url 'reinstate_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Reinstate this appointment?');">
                                 {% csrf_token %}
@@ -320,15 +305,12 @@
                                onclick="return confirm('Mark this appointment as COMPLETED? This will move it to patient history.')">
                                ✓ Complete
                             </a>
-
                             <form action="{% url 'cancel_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to CANCEL this appointment?');">
                                 {% csrf_token %}
                                 <button type="submit" class="delete-btn">Cancel</button>
                             </form>
                         {% endif %}
-
                         <a href="{% url 'edit_appointment' appointment.id %}" class="edit-btn">Edit</a>
-
                         <form action="{% url 'delete_appointment' appointment.id %}" method="post" style="display:inline;" onsubmit="return confirm('Permanently DELETE this appointment record?');">
                             {% csrf_token %}
                             {% if appointment.status == "Cancelled" %}
@@ -347,5 +329,4 @@
     <p>No approved or cancelled appointments.</p>
     {% endif %}
 </div>
-
 {% endblock %}

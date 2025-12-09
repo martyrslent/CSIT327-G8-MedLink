@@ -3,23 +3,26 @@
 {% block title %}Privacy Policy{% endblock %}
 
 {% block content %}
-
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 body, html {
     background-image: url('{% static "main/img/wavybg2.png" %}');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
+    font-family: 'Poppins', sans-serif;
 }
 
 .page-content {
-    padding: 100px 40px 40px;
+    padding: 70px 40px 40px; /* Reduced top padding to move content up */
     max-width: 100%;
     margin: 0 auto;
 }
 
-.page-content h1{
+.page-content h1 {
     font-size: 2.5rem;
     color: #d10000;
 }
@@ -35,6 +38,10 @@ body, html {
     border-radius: 12px;
     box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     padding: 20px;
+    height: 200px; /* Uniform height for all cards */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     position: relative;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -69,6 +76,19 @@ body, html {
     font-size: 1rem;
     color: #555;
     line-height: 1.5;
+    flex-grow: 1;
+}
+
+.status-tag {
+    display: inline-block;
+    background: #a70000b2;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-left: 10px;
+    vertical-align: middle;
 }
 
 @media (max-width: 900px) {
@@ -76,13 +96,16 @@ body, html {
         grid-template-columns: 1fr;
         padding: 0 20px;
     }
+    .policy-card {
+        height: auto; /* Adjust height for mobile */
+    }
 }
 </style>
 
 <div class="page-content">
     <h1>Privacy Policy</h1>
-    <p>Welcome to MedLink. This Privacy Policy explains how we collect, use, and protect your information when using our platform.</p>
-<br>
+    <p>Welcome to MedLink. This Privacy Policy explains how we collect, use, and protect your information when using our platform. <span class="status-tag">Effective Dec 10, 2025</span></p>
+    <br>
     <div class="policy-grid">
         <div class="policy-card">
             <div class="icon"><img src="{% static "main/img/appointment.png" %}" alt="Icon"></div>
