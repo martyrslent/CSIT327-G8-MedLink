@@ -246,7 +246,13 @@ table tbody tr:hover { background: rgba(255,238,238,0.96); }
             <li><a href="{% url 'user_management' %}">Users</a></li>
             <li><a href="{% url 'patient_records_list' %}">Record Logs</a></li>
             <li><a href="{% url 'appointment_list' %}">Appointments</a></li>
-            <li><a href="{% url 'logout' %}">Logout</a></li>
+            <li><a 
+    href="{% url 'logout' %}" 
+    onclick="return confirm('Are you sure you want to log out of the system?');"
+    class="logout-link"
+>
+    <i class="fas fa-sign-out-alt"></i> Logout
+</a></li>
         </ul>
     </nav>
 </aside>
