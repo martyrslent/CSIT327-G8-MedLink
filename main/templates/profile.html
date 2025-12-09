@@ -25,7 +25,6 @@
         .welcome-section h2 { margin: 0; font-size: 1.6rem; color: #2c3e50; }
         .welcome-section p { margin: 5px 0 0; color: #7f8c8d; font-size: 0.95rem; }
 
-        /* MODIFIED: Added display: flex and gap to align actions horizontally */
         .header-actions {
             display: flex; 
             align-items: center;
@@ -41,7 +40,7 @@
             width: 300px; background: white; border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #eee;
             overflow: hidden;
-            z-index: 100; /* Added z-index to prevent being obscured */
+            z-index: 100;
         }
 
         .profile-card {
@@ -82,7 +81,6 @@
 
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
 
-        /* UPDATED: modal scrollable */
         .modal-content {
             background-color: #fff;
             margin: 5% auto;
@@ -90,8 +88,8 @@
             border-radius: 15px;
             width: 90%;
             max-width: 500px;
-            max-height: 80vh;   /* limit height */
-            overflow-y: auto;   /* vertical scroll */
+            max-height: 80vh;
+            overflow-y: auto;
             box-sizing: border-box;
         }
 
@@ -278,14 +276,42 @@
             <label class="form-label">Allergies</label>
             <textarea name="allergies" class="form-input" rows="3">{{ allergies }}</textarea>
 
-           <label class="form-label">Medical Information</label>
-<textarea name="medical_conditions" class="form-input" rows="3">{{ medical_conditions }}</textarea>
+            <label class="form-label">Medical Information</label>
+            <textarea name="medical_conditions" class="form-input" rows="3">{{ medical_conditions }}</textarea>
 
             <button type="submit">
                 Save Changes
             </button>
         </form>
 
+    </div>
+</div>
+
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <h2 style="color: #dc3545;">Delete Account</h2>
+        <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+        
+        <form action="{% url 'delete_account' %}" method="POST" style="margin-top: 20px;">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 20px; text-align: left;">
+                <label for="delete-password" class="form-label" style="color: #333;">Confirm Password:</label>
+                <input type="password" name="password_confirmation" id="delete-password" required 
+                       placeholder="Enter your password"
+                       class="form-input" style="border-color: #dc3545;">
+            </div>
+
+            <div style="display: flex; gap: 15px;">
+                <button type="button" onclick="closeDeleteModal()" style="background: #6c757d; flex: 1; border: none; padding: 10px; border-radius: 8px; color: white; cursor: pointer;">
+                    Cancel
+                </button>
+                
+                <button type="submit" style="background: #dc3545; flex: 1; border: none; padding: 10px; border-radius: 8px; color: white; font-weight: bold; cursor: pointer;">
+                    Yes, Delete
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
