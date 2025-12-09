@@ -18,263 +18,290 @@
 
     /* Sidebar adjustments */
     .sidebar { 
-      background: #ffffff; 
-      padding: 30px 20px; 
-      display: flex; 
-      flex-direction: column; 
-      gap: 23px; 
-      box-sizing: border-box; 
-      border-right: 1px solid rgba(0,0,0,0.08); 
-      z-index: 2; 
-      overflow: hidden; 
-      font-family: 'Poppins', sans-serif;
-      position: relative;
+        background: #ffffff; 
+        padding: 30px 20px; 
+        display: flex; 
+        flex-direction: column; 
+        gap: 23px; 
+        box-sizing: border-box; 
+        border-right: 1px solid rgba(0,0,0,0.08); 
+        z-index: 2; 
+        overflow: hidden; 
+        font-family: 'Poppins', sans-serif;
+        position: relative;
     }
     .sidebar::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
-      background-size: cover;
-      opacity: 0.28;
-      pointer-events: none;
-      z-index: 0;
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url("{% static 'main/img/womandoctor.png' %}") no-repeat center center;
+        background-size: cover;
+        opacity: 0.28;
+        pointer-events: none;
+        z-index: 0;
     }
     .sidebar .logo { 
-      width: 180px; 
-      display: block; 
-      margin: 0 auto 30px auto; 
-      position: relative; 
-      z-index: 1; 
+        width: 180px; 
+        display: block; 
+        margin: 0 auto 30px auto; 
+        position: relative; 
+        z-index: 1; 
     }
     .sidebar .logo img {
-      width: 100%;
-      height: auto;
+        width: 100%;
+        height: auto;
     }
     .sidebar nav ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      position: relative;
-      z-index: 1;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        position: relative;
+        z-index: 1;
     }
     .sidebar nav ul li a {
-      color: #fff;
-      text-decoration: none;
-      padding: 14px 16px;
-      border-radius: 12px;
-      display: block;
-      font-weight: 600;
-      transition: background 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
-      background: linear-gradient(to right, #8d0000, #ad0505);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      position: relative;
-      z-index: 1;
-      font-family: 'Poppins', sans-serif;
+        color: #fff;
+        text-decoration: none;
+        padding: 14px 16px;
+        border-radius: 12px;
+        display: block;
+        font-weight: 600;
+        transition: background 0.3s ease, transform 0.25s ease, box-shadow 0.3s ease;
+        background: linear-gradient(to right, #8d0000, #ad0505);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        position: relative;
+        z-index: 1;
+        font-family: 'Poppins', sans-serif;
     }
     .sidebar nav ul li a:hover,
     .sidebar nav ul li a:focus {
-      background: linear-gradient(to right, #ad0505, #d10000);
-      color: #fff;
-      transform: translateX(8px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-      outline: none;
+        background: linear-gradient(to right, #ad0505, #d10000);
+        color: #fff;
+        transform: translateX(8px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        outline: none;
     }
     .sidebar nav ul li a.active {
-      background: linear-gradient(to right, #d10000, #a30000);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-      transform: translateX(4px);
+        background: linear-gradient(to right, #d10000, #a30000);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+        transform: translateX(4px);
     }
 
     /* 1. TOP NAV BAR */
     .top-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: white;
-      padding: 15px 30px;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-      margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 15px 30px;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        margin-bottom: 30px;
     }
     .welcome-section h2 { margin: 0; font-size: 1.6rem; color: #2c3e50; }
     .welcome-section p { margin: 5px 0 0; color: #7f8c8d; font-size: 0.95rem; }
     .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
     }
     .notif-wrapper { position: relative; }
     .notif-btn {
-      background: none;
-      border: none;
-      font-size: 1.8rem;
-      cursor: pointer;
-      color: #8d0000;
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        color: #8d0000;
     }
     .notif-btn:hover { color: #ad0505; }
     .notif-dropdown {
-      display: none;
-      position: absolute;
-      right: 0;
-      top: 45px;
-      width: 300px;
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-      border: 1px solid #eee;
-      overflow: hidden;
-      z-index: 100;
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 45px;
+        width: 300px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        border: 1px solid #eee;
+        overflow: hidden;
+        z-index: 100;
     }
 
     /* Profile Card */
     .profile-card {
-      background: linear-gradient(135deg, rgba(141, 0, 0, 0.23), rgba(255, 123, 0, 0.26)), white;
-      padding: 40px;
-      border-radius: 15px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-      max-width: 700px;
-      margin: 0 auto;
+        /* UPDATED: Opaque gradient for vibrant color and contrast */
+        background: linear-gradient(135deg, #8d0000, #ff7b00); 
+        
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        max-width: 700px;
+        margin: 0 auto;
+        /* UPDATED: Set default text color to white for contrast */
+        color: white; 
     }
     .profile-header {
-      text-align: center;
-      margin-bottom: 30px;
-      border-bottom: 2px solid #f0f0f0;
-      padding-bottom: 20px;
+        text-align: center;
+        margin-bottom: 30px;
+        /* UPDATED: Changed border color to be visible on dark background */
+        border-bottom: 2px solid rgba(255, 255, 255, 0.5); 
+        padding-bottom: 20px;
     }
     .profile-img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 4px solid #ad0505;
-      margin-bottom: 15px;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid #ad0505;
+        margin-bottom: 15px;
+    }
+    /* UPDATED: Ensure Change Photo text is white */
+    .profile-header label { 
+        color: white !important; 
     }
     .info-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 15px 0;
-      border-bottom: 1px dashed #eee;
-      border-top: 1px solid #f0f0f0;
+        display: flex;
+        justify-content: space-between;
+        padding: 15px 0;
+        /* UPDATED: Changed border colors for contrast */
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.5);
+        border-top: 1px solid rgba(255, 255, 255, 0.5);
     }
     .info-label {
-      font-weight: 600;
-      color: #666;
+        font-weight: 600;
+        /* UPDATED: Set label color to white */
+        color: white; 
     }
     .info-value {
-      color: #333;
-      font-weight: 500;
-      font-size: 1.05rem;
+        /* UPDATED: Set value color to white */
+        color: white; 
+        font-weight: 500;
+        font-size: 1.05rem;
     }
     .bio-box {
-      background: #f8f9fa;
-      padding: 15px;
-      border-radius: 10px;
-      border-left: 4px solid #ad0505;
-      margin-top: 10px;
-      color: #555;
+        /* UPDATED: Change background to a dark, transparent color */
+        background: rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+        /* UPDATED: Change accent bar to white */
+        border-left: 4px solid #ffffff; 
+        margin-top: 10px;
+        /* UPDATED: Ensure bio text is white */
+        color: white; 
     }
     .section-label {
-      margin-top: 25px;
-      margin-bottom: 8px;
-      font-weight: bold;
-      color: #444;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+        margin-top: 25px;
+        margin-bottom: 8px;
+        font-weight: bold;
+        /* UPDATED: Set section header color to white */
+        color: white; 
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
     .action-grid {
-      margin-top: 30px;
-      padding-top: 20px;
-      border-top: 2px solid #f0f0f0;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
+        margin-top: 30px;
+        padding-top: 20px;
+        /* UPDATED: Changed border color for contrast */
+        border-top: 2px solid rgba(255, 255, 255, 0.5); 
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
     }
     .modal {
-      display: none;
-      position: fixed;
-      z-index: 1000;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
     }
     .modal-content {
-      background-color: #fff;
-      margin: 5% auto;
-      padding: 20px;
-      border-radius: 15px;
-      width: 90%;
-      max-width: 500px;
-      max-height: 80vh;
-      overflow-y: auto;
-      box-sizing: border-box;
+        background-color: #fff;
+        margin: 5% auto;
+        padding: 20px;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-sizing: border-box;
+        /* UPDATED: Ensure text inside modal is dark/black */
+        color: #333; 
+    }
+    /* UPDATED: Ensure modal header is dark */
+    .modal-content h2 {
+        color: #333;
     }
     .form-label {
-      font-weight: 600;
-      margin-bottom: 5px;
-      display: block;
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: block;
+        /* UPDATED: Ensure form labels are dark */
+        color: #444; 
     }
     .form-input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      margin-bottom: 15px;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        /* UPDATED: Ensure text input is dark/black */
+        color: #222; 
     }
     .btn-book-new {
-      background: linear-gradient(to right, #8d0000, #ff7b00);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 12px;
-      text-decoration: none;
-      font-weight: 600;
-      box-shadow: 0 4px 10px rgba(173, 5, 5, 0.2);
-      transition: transform 0.2s;
+        background: linear-gradient(to right, #8d0000, #ff7b00);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        box-shadow: 0 4px 10px rgba(173, 5, 5, 0.2);
+        transition: transform 0.2s;
     }
     .btn-book-new:hover {
-      transform: translateY(-2px);
-      background: linear-gradient(to right, #ad0505, #ff9a3d);
+        transform: translateY(-2px);
+        background: linear-gradient(to right, #ad0505, #ff9a3d);
     }
     .modal-content form button[type="submit"] {
-      background: linear-gradient(to right, #8d0000, #ff7b00);
-      color: white;
-      padding: 10px;
-      border-radius: 12px;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-      transition: transform 0.2s;
+        background: linear-gradient(to right, #8d0000, #ff7b00);
+        color: white;
+        padding: 10px;
+        border-radius: 12px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        transition: transform 0.2s;
     }
     .modal-content form button[type="submit"]:hover {
-      transform: translateY(-2px);
-      background: linear-gradient(to right, #ad0505, #ff9a3d);
+        transform: translateY(-2px);
+        background: linear-gradient(to right, #ad0505, #ff9a3d);
     }
     .modal-content form button[type="button"] {
-      background: linear-gradient(to right, #6c757d, #888);
-      color: white;
-      padding: 10px;
-      border-radius: 12px;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-      width: 100%;
-      transition: transform 0.2s;
+        background: linear-gradient(to right, #6c757d, #888);
+        color: white;
+        padding: 10px;
+        border-radius: 12px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        transition: transform 0.2s;
     }
     .modal-content form button[type="button"]:hover {
-      transform: translateY(-2px);
-      background: linear-gradient(to right, #7c878d, #999);
+        transform: translateY(-2px);
+        background: linear-gradient(to right, #7c878d, #999);
     }
-  </style>
+</style>
 
   <script>
     function toggleNotifications() {

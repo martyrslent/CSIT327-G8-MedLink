@@ -281,9 +281,9 @@ table tbody tr:hover { background: rgba(255,238,238,0.96); }
 <main class="content">
     <h1 class="page-title">
         Dashboard Overview
-        <span class="status-tag">Superadmin</span>
+        <span class="status-tag">{{ request.session.role|default:"Admin"|title }}</span>
     </h1>
-
+    
     <section class="top-row">
         <div class="stat-card">
             <img class="icon" src="{% static 'main/img/stet.png' %}" alt="Doctors">
