@@ -585,7 +585,7 @@ def book_appointment(request):
 
         user_id = request.session.get("user_id")
 
-        # Fetch user data INCLUDING stored medical info
+        # Fetch user data
         user_response = supabase.table("users").select(
             "first_name, last_name, email, allergies, medical_conditions"
         ).eq("id", user_id).single().execute()
@@ -617,18 +617,11 @@ def book_appointment(request):
             return render(request, "book_appointment.html", context)
 
         # ======================================================
-        # 100% AUTOMATIC HEALTH INFO FROM PROFILE
+        # STORE ONLY THE USER'S RAW REASON
         # ======================================================
-        allergies = user.get("allergies") or "None"
-        conditions = user.get("medical_conditions") or "None"
+        full_reason = f"{reason_for_visit}"
 
-        full_reason = (
-            f"{reason_for_visit}\n\n"
-            f"[HEALTH INFO]\n"
-            f"Allergies: {allergies}\n"
-            f"Conditions: {conditions}"
-        )
-
+        # Insert into appointment table
         appointment_data = {
             "patient_id": user_id,
             "first_name": user["first_name"],
@@ -644,8 +637,19 @@ def book_appointment(request):
         inserted = supabase.table("appointment").insert(appointment_data).execute()
         new_appointment_id = inserted.data[0]["id"]
 
+        # ======================================================
+        # ADD MATCHING PATIENT RECORD (same as register_appointment)
+        # ======================================================
+        supabase.table("patient_records").insert({
+            "user_id": user_id,
+            "appointment_id": new_appointment_id,
+            "record_date": appointment_date,
+            "successful_appointment_visit": False,
+            "doctor_notes": "Appointment scheduled."
+        }).execute()
+
         messages.success(request, "Appointment booked successfully!")
-        return redirect("appointment_history")
+        return redirect("user_dashboard")
 
     return render(request, "book_appointment.html", context)
 
@@ -1299,10 +1303,10 @@ def patient_records_list_page(request):
     try:
         search_query = request.GET.get("search", "").strip()
 
-        # Fetch all patient records with joined user name
+        # Fetch all patient records with joined user name and appointment info (including status)
         response = (
             supabase.table("patient_records")
-            .select("*, user_id(first_name, last_name), appointment_id(doctor_name, appointment_date)")
+            .select("*, user_id(first_name, last_name), appointment_id(doctor_name, appointment_date, status)")
             .order("record_date", desc=True)
             .execute()
         )
@@ -1329,6 +1333,7 @@ def patient_records_list_page(request):
         print(f"DEBUG: Error fetching patient records: {str(e)}")
         messages.error(request, f"Could not load patient records: {str(e)}")
         return render(request, "patient_records_list.html", {"records": [], "search": ""})
+
 
 
 # ============================================================
